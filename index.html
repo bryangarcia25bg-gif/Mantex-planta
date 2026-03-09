@@ -10,197 +10,194 @@
 :root{--bg:#0a0c0f;--surface:#111418;--surface2:#181c22;--border:#1e2530;--accent:#f0a500;--accent2:#00d4aa;--danger:#ff4757;--warn:#ffa502;--info:#1e90ff;--text:#e8edf5;--muted:#5a6480;--mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;--display:'Bebas Neue',cursive}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
+/* LOGIN */
 #login-screen{position:fixed;inset:0;background:var(--bg);z-index:1000;display:flex;align-items:center;justify-content:center}
-.login-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:48px 40px;width:100%;max-width:420px;text-align:center}
-.login-logo{font-family:var(--display);font-size:52px;color:var(--accent);letter-spacing:4px;line-height:1}
-.login-sub{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:4px;margin-top:6px;margin-bottom:32px}
-.login-role-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
-.role-card{border:1px solid var(--border);border-radius:10px;padding:14px 10px;cursor:pointer;transition:all .2s;background:transparent}
-.role-card:hover{border-color:var(--accent);background:rgba(240,165,0,.06)}
-.role-card.selected{border-color:var(--accent);background:rgba(240,165,0,.12)}
-.role-icon{font-size:26px;margin-bottom:6px}
-.role-name{font-size:13px;font-weight:600}
-.role-desc{font-size:11px;color:var(--muted);margin-top:2px}
-.login-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:11px 14px;font-size:14px;font-family:var(--sans);outline:none;margin-bottom:12px;transition:border-color .15s}
+.login-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:44px 38px;width:100%;max-width:400px;text-align:center}
+.login-logo{font-family:var(--display);font-size:50px;color:var(--accent);letter-spacing:4px;line-height:1}
+.login-sub{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:4px;margin-top:6px;margin-bottom:28px}
+.login-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:11px 14px;font-size:14px;font-family:var(--sans);outline:none;margin-bottom:10px;transition:border-color .15s}
 .login-input:focus{border-color:var(--accent)}
 .login-btn{width:100%;background:var(--accent);color:var(--bg);border:none;border-radius:8px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--sans);transition:background .15s;letter-spacing:1px}
 .login-btn:hover{background:#ffc125}
-.login-note{font-size:11px;color:var(--muted);margin-top:14px}
-.sidebar{position:fixed;left:0;top:0;bottom:0;width:230px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100}
-.logo{padding:22px 20px 18px;border-bottom:1px solid var(--border)}
-.logo h1{font-family:var(--display);font-size:30px;color:var(--accent);letter-spacing:2px;line-height:1}
+.login-note{font-size:11px;color:var(--muted);margin-top:12px}
+/* SIDEBAR */
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:232px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100}
+.logo{padding:20px 18px 16px;border-bottom:1px solid var(--border)}
+.logo h1{font-family:var(--display);font-size:29px;color:var(--accent);letter-spacing:2px;line-height:1}
 .logo p{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:3px;margin-top:4px}
-.nav{padding:12px;flex:1;overflow-y:auto}
+.nav{padding:10px;flex:1;overflow-y:auto}
 .nav-section{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:3px;padding:10px 8px 5px;text-transform:uppercase}
-.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:6px;cursor:pointer;transition:all .15s;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:2px;border-left:2px solid transparent}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:6px;cursor:pointer;transition:all .15s;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:2px;border-left:2px solid transparent}
 .nav-item:hover{background:var(--surface2);color:var(--text)}
 .nav-item.active{background:rgba(240,165,0,.12);color:var(--accent);border-left-color:var(--accent)}
-.nav-item .icon{font-size:15px;width:20px;text-align:center}
+.nav-item .icon{font-size:14px;width:18px;text-align:center}
 .nav-badge{margin-left:auto;background:var(--danger);color:#fff;font-family:var(--mono);font-size:10px;padding:1px 6px;border-radius:10px}
-.sidebar-footer{padding:14px;border-top:1px solid var(--border)}
-.user-pill{display:flex;align-items:center;gap:10px}
-.user-avatar{width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:16px;color:var(--bg);flex-shrink:0}
+.sidebar-footer{padding:12px;border-top:1px solid var(--border)}
+.user-pill{display:flex;align-items:center;gap:9px}
+.user-avatar{width:31px;height:31px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:15px;color:var(--bg);flex-shrink:0}
 .user-info{font-size:11px;overflow:hidden;flex:1}
 .user-info strong{display:block;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .user-info span{color:var(--muted)}
-.logout-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:17px;padding:4px;border-radius:4px}
+.logout-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:4px;border-radius:4px}
 .logout-btn:hover{color:var(--danger)}
-.main{margin-left:230px;min-height:100vh}
-.topbar{height:54px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:50}
-.topbar-left{display:flex;align-items:center;gap:14px}
-.topbar-title{font-family:var(--display);font-size:20px;letter-spacing:2px}
+/* MAIN */
+.main{margin-left:232px;min-height:100vh}
+.topbar{height:52px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 22px;position:sticky;top:0;z-index:50}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.topbar-title{font-family:var(--display);font-size:19px;letter-spacing:2px}
 .online-dot{width:7px;height:7px;border-radius:50%;background:var(--accent2);animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 .online-label{font-family:var(--mono);font-size:10px;color:var(--accent2)}
-.topbar-date{font-family:var(--mono);font-size:11px;color:var(--muted)}
-.btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .15s;font-family:var(--sans)}
+.topbar-date{font-family:var(--mono);font-size:10px;color:var(--muted)}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .15s;font-family:var(--sans)}
 .btn-primary{background:var(--accent);color:var(--bg)}.btn-primary:hover{background:#ffc125}
 .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}.btn-ghost:hover{color:var(--text);border-color:var(--muted)}
-.btn-danger{background:var(--danger);color:#fff}
-.btn-success{background:var(--accent2);color:var(--bg)}
-.btn-info{background:var(--info);color:#fff}
-.btn-sm{padding:5px 11px;font-size:12px}
-.content{padding:24px}
+.btn-danger{background:var(--danger);color:#fff}.btn-success{background:var(--accent2);color:var(--bg)}
+.btn-info{background:var(--info);color:#fff}.btn-sm{padding:4px 10px;font-size:12px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+/* CONTENT */
+.content{padding:22px}
 .page{display:none}
 .page.active{display:block;animation:fadeIn .2s ease}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
-.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px;position:relative;overflow:hidden;transition:transform .2s}
-.kpi-card:hover{transform:translateY(-2px)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:22px}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:17px;position:relative;overflow:hidden}
 .kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
 .kpi-card.yellow::before{background:var(--accent)}.kpi-card.green::before{background:var(--accent2)}.kpi-card.red::before{background:var(--danger)}.kpi-card.blue::before{background:var(--info)}
 .kpi-label{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
-.kpi-value{font-family:var(--display);font-size:38px;line-height:1}
-.kpi-sub{font-size:12px;color:var(--muted);margin-top:5px}
-.kpi-trend{position:absolute;top:18px;right:18px;font-size:20px}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:18px}
-.card-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
-.card-title{font-family:var(--display);font-size:17px;letter-spacing:1px}
+.kpi-value{font-family:var(--display);font-size:36px;line-height:1}
+.kpi-sub{font-size:11px;color:var(--muted);margin-top:5px}
+.kpi-trend{position:absolute;top:17px;right:17px;font-size:19px}
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px}
+.card-header{padding:13px 17px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.card-title{font-family:var(--display);font-size:16px;letter-spacing:1px}
 .table-wrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse;min-width:600px}
-th{padding:10px 14px;text-align:left;font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;background:var(--surface2);border-bottom:1px solid var(--border);white-space:nowrap}
-td{padding:11px 14px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle}
+table{width:100%;border-collapse:collapse;min-width:500px}
+th{padding:9px 12px;text-align:left;font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;background:var(--surface2);border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none}
+th:hover{color:var(--text)}
+td{padding:10px 12px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:rgba(255,255,255,.02)}
-.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:1px}
+/* BADGES */
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:1px}
 .badge-yellow{background:rgba(240,165,0,.15);color:var(--accent);border:1px solid rgba(240,165,0,.3)}
 .badge-green{background:rgba(0,212,170,.15);color:var(--accent2);border:1px solid rgba(0,212,170,.3)}
 .badge-red{background:rgba(255,71,87,.15);color:var(--danger);border:1px solid rgba(255,71,87,.3)}
 .badge-blue{background:rgba(30,144,255,.15);color:var(--info);border:1px solid rgba(30,144,255,.3)}
 .badge-gray{background:rgba(90,100,128,.15);color:var(--muted);border:1px solid rgba(90,100,128,.3)}
 .badge-orange{background:rgba(255,165,0,.15);color:#ffa500;border:1px solid rgba(255,165,0,.3)}
-.priority-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+.priority-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px}
 .p-alta{background:var(--danger)}.p-media{background:var(--warn)}.p-baja{background:var(--accent2)}
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:200;align-items:center;justify-content:center;padding:16px}
+/* MODALS */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:200;align-items:center;justify-content:center;padding:14px}
 .modal-overlay.open{display:flex}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;width:100%;max-width:700px;max-height:92vh;overflow-y:auto;animation:slideUp .2s ease}
-.modal-lg{max-width:900px}
-@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:none;opacity:1}}
-.modal-header{padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.modal-header h2{font-family:var(--display);font-size:20px;letter-spacing:1px}
-.modal-close{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:4px 8px;border-radius:4px}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;width:100%;max-width:680px;max-height:93vh;overflow-y:auto;animation:slideUp .2s ease}
+.modal-xl{max-width:960px}
+@keyframes slideUp{from{transform:translateY(18px);opacity:0}to{transform:none;opacity:1}}
+.modal-header{padding:16px 20px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.modal-header h2{font-family:var(--display);font-size:19px;letter-spacing:1px}
+.modal-close{background:none;border:none;color:var(--muted);font-size:19px;cursor:pointer;padding:3px 7px;border-radius:4px}
 .modal-close:hover{color:var(--text);background:var(--surface2)}
-.modal-body{padding:20px}
-.modal-footer{padding:14px 22px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.form-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.modal-body{padding:18px}
+.modal-footer{padding:12px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+/* FORMS */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.form-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:13px}
 .form-full{grid-column:1/-1}
 .form-group{display:flex;flex-direction:column;gap:5px}
 .form-group label{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase}
-.form-control{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:8px 11px;font-size:13px;font-family:var(--sans);transition:border-color .15s;outline:none}
+.form-control{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:8px 10px;font-size:13px;font-family:var(--sans);transition:border-color .15s;outline:none;width:100%}
 .form-control:focus{border-color:var(--accent)}
 .form-control option{background:var(--surface2)}
-textarea.form-control{resize:vertical;min-height:70px}
-.form-control[type=file]{padding:6px;cursor:pointer}
-.search-bar{display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
-.search-input{flex:1;min-width:180px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:8px 12px;font-size:13px;font-family:var(--sans);outline:none;transition:border-color .15s}
+textarea.form-control{resize:vertical;min-height:65px}
+/* Combobox con lápiz */
+.combo-wrap{position:relative;display:flex;gap:6px}
+.combo-wrap select{flex:1}
+.combo-add-btn{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;padding:0 10px;font-size:16px;transition:all .15s;flex-shrink:0}
+.combo-add-btn:hover{color:var(--accent);border-color:var(--accent)}
+/* Search */
+.search-bar{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.search-input{flex:1;min-width:160px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 11px;font-size:13px;font-family:var(--sans);outline:none;transition:border-color .15s}
 .search-input:focus{border-color:var(--accent)}
-.section-title{font-family:var(--display);font-size:24px;letter-spacing:2px;margin-bottom:5px}
-.section-sub{font-size:13px;color:var(--muted);margin-bottom:20px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-.stat-row{display:flex;gap:12px;margin-bottom:18px;flex-wrap:wrap}
-.stat-box{background:var(--surface2);border-radius:8px;padding:12px 18px;min-width:100px}
-.stat-box .val{font-family:var(--display);font-size:26px;line-height:1}
+.section-title{font-family:var(--display);font-size:23px;letter-spacing:2px;margin-bottom:4px}
+.section-sub{font-size:13px;color:var(--muted);margin-bottom:18px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.stat-row{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.stat-box{background:var(--surface2);border-radius:8px;padding:11px 16px;min-width:95px}
+.stat-box .val{font-family:var(--display);font-size:24px;line-height:1}
 .stat-box .lbl{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px;margin-top:3px}
-.filter-chip{padding:5px 12px;border-radius:20px;border:1px solid var(--border);font-size:12px;cursor:pointer;transition:all .15s;background:transparent;color:var(--muted);font-family:var(--sans)}
+.filter-chip{padding:4px 11px;border-radius:20px;border:1px solid var(--border);font-size:12px;cursor:pointer;transition:all .15s;background:transparent;color:var(--muted);font-family:var(--sans)}
 .filter-chip.active{background:var(--accent);color:var(--bg);border-color:var(--accent);font-weight:600}
-.prog-bar{background:var(--surface2);border-radius:4px;height:6px;overflow:hidden;margin-top:5px}
+.prog-bar{background:var(--surface2);border-radius:4px;height:5px;overflow:hidden;margin-top:4px}
 .prog-fill{height:100%;border-radius:4px;background:var(--accent2);transition:width .3s}
-.pill-num{display:inline-block;background:var(--accent);color:var(--bg);border-radius:4px;font-family:var(--mono);font-size:11px;padding:1px 7px;font-weight:600}
-.loading-overlay{position:fixed;inset:0;background:rgba(10,12,15,.9);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
-.spinner{width:38px;height:38px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+.pill-num{display:inline-block;background:var(--accent);color:var(--bg);border-radius:4px;font-family:var(--mono);font-size:11px;padding:1px 6px;font-weight:600}
+/* Loading */
+.loading-overlay{position:fixed;inset:0;background:rgba(10,12,15,.92);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.loading-text{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:3px}
-#toast{position:fixed;bottom:22px;right:22px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 18px;font-size:13px;z-index:9999;display:none;box-shadow:0 8px 32px rgba(0,0,0,.5);min-width:240px}
-#toast.show{display:flex;align-items:center;gap:10px}
+.loading-text{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:3px}
+/* Toast */
+#toast{position:fixed;bottom:20px;right:20px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:11px 16px;font-size:13px;z-index:9999;display:none;box-shadow:0 8px 32px rgba(0,0,0,.5);min-width:230px}
+#toast.show{display:flex;align-items:center;gap:9px}
 #toast.success{border-left:3px solid var(--accent2)}
 #toast.error{border-left:3px solid var(--danger)}
 #toast.info{border-left:3px solid var(--info)}
-.upload-zone{border:2px dashed var(--border);border-radius:10px;padding:30px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:14px}
-.upload-zone:hover,.upload-zone.drag{border-color:var(--accent);background:rgba(240,165,0,.05)}
-.upload-zone-icon{font-size:36px;margin-bottom:10px}
+/* Upload */
+.upload-zone{border:2px dashed var(--border);border-radius:10px;padding:26px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:12px}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--accent);background:rgba(240,165,0,.04)}
+.upload-zone-icon{font-size:32px;margin-bottom:8px}
 .upload-zone-text{font-size:14px;color:var(--muted)}
-.upload-zone-sub{font-size:12px;color:var(--muted);margin-top:4px}
-.tab-bar{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:18px}
-.tab{padding:10px 18px;cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;transition:all .15s}
-.tab:hover{color:var(--text)}
-.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
-.photo-preview{width:100%;max-height:200px;object-fit:cover;border-radius:8px;margin-top:8px;border:1px solid var(--border)}
-.duration-display{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px 11px;font-family:var(--mono);font-size:13px;color:var(--accent2)}
-.material-tag{display:inline-flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;margin:3px}
-.material-tag button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;line-height:1}
+.upload-zone-sub{font-size:12px;color:var(--muted);margin-top:3px}
+/* Duration */
+.duration-display{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-family:var(--mono);font-size:13px;color:var(--accent2)}
+/* Material tag */
+.material-tag{display:inline-flex;align-items:center;gap:5px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:3px 9px;font-size:12px;margin:2px}
+.material-tag button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;line-height:1}
 .material-tag button:hover{color:var(--danger)}
-.eqp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.eqp-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;transition:all .15s}
+/* Section divider */
+.section-divider{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:3px;text-transform:uppercase;padding:12px 0 7px;border-bottom:1px solid var(--border);margin-bottom:13px}
+/* Column toggle */
+.col-toggle-bar{display:flex;gap:6px;flex-wrap:wrap;padding:10px 16px;background:var(--surface2);border-bottom:1px solid var(--border)}
+.col-toggle{display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;color:var(--muted)}
+.col-toggle input{accent-color:var(--accent);cursor:pointer}
+.col-toggle:hover{color:var(--text)}
+/* Eqp grid */
+.eqp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
+.eqp-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:15px;transition:all .15s}
 .eqp-card:hover{border-color:var(--accent)}
-.section-divider{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:3px;text-transform:uppercase;padding:12px 0 8px;border-bottom:1px solid var(--border);margin-bottom:14px}
+/* Photo */
+.photo-preview{width:100%;max-height:180px;object-fit:cover;border-radius:8px;margin-top:7px;border:1px solid var(--border)}
+/* Users table */
+.role-badge-planner{background:rgba(240,165,0,.15);color:var(--accent);border:1px solid rgba(240,165,0,.3)}
+.role-badge-supervisor{background:rgba(30,144,255,.15);color:var(--info);border:1px solid rgba(30,144,255,.3)}
+.role-badge-tecnico{background:rgba(0,212,170,.15);color:var(--accent2);border:1px solid rgba(0,212,170,.3)}
+.role-badge-jefatura{background:rgba(90,100,128,.15);color:var(--muted);border:1px solid rgba(90,100,128,.3)}
 </style>
 </head>
 <body>
 
-<div class="loading-overlay" id="loading">
-  <div class="spinner"></div>
-  <div class="loading-text">CONECTANDO...</div>
-</div>
+<div class="loading-overlay" id="loading"><div class="spinner"></div><div class="loading-text">CONECTANDO...</div></div>
 
+<!-- LOGIN -->
 <div id="login-screen" style="display:none">
   <div class="login-box">
     <div class="login-logo">MANTEX</div>
     <div class="login-sub">Gestión de Mantenimiento Industrial</div>
-    <div style="margin-bottom:14px;text-align:left">
-      <div style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:10px">SELECCIONA TU ROL</div>
-      <div class="login-role-grid">
-        <div class="role-card selected" onclick="selectRole('planner',this)"><div class="role-icon">📋</div><div class="role-name">Planner</div><div class="role-desc">Acceso total</div></div>
-        <div class="role-card" onclick="selectRole('supervisor',this)"><div class="role-icon">👔</div><div class="role-name">Supervisor</div><div class="role-desc">Lectura + estados</div></div>
-        <div class="role-card" onclick="selectRole('tecnico',this)"><div class="role-icon">🔧</div><div class="role-name">Técnico</div><div class="role-desc">Mis OT + EPPs</div></div>
-        <div class="role-card" onclick="selectRole('jefatura',this)"><div class="role-icon">📊</div><div class="role-name">Jefatura</div><div class="role-desc">Solo lectura</div></div>
-      </div>
-    </div>
-    <input class="login-input" id="login-name" placeholder="Tu nombre completo">
+    <input class="login-input" id="login-user" placeholder="Usuario" autocomplete="off">
     <input class="login-input" id="login-pass" type="password" placeholder="Contraseña">
-    <button class="login-btn" onclick="doLogin()">INGRESAR AL SISTEMA</button>
-    <div class="login-note">🔒 Datos sincronizados en tiempo real · Firebase</div>
+    <button class="login-btn" onclick="doLogin()">INGRESAR</button>
+    <div class="login-note">🔒 Sistema seguro · Firebase Firestore</div>
   </div>
 </div>
 
+<!-- APP -->
 <div id="app" style="display:none">
 <nav class="sidebar">
   <div class="logo"><h1>MANTEX</h1><p>Gestión · Mantenimiento</p></div>
-  <div class="nav">
-    <div class="nav-section">Principal</div>
-    <div class="nav-item active" onclick="navigate('dashboard',this)"><span class="icon">📊</span>Dashboard</div>
-    <div class="nav-section">Operaciones</div>
-    <div class="nav-item" onclick="navigate('ot',this)"><span class="icon">🔧</span>Órdenes de Trabajo<span class="nav-badge" id="badge-ot">0</span></div>
-    <div class="nav-item" onclick="navigate('servicios',this)"><span class="icon">📋</span>Servicios / Logística<span class="nav-badge" id="badge-svc">0</span></div>
-    <div class="nav-item" onclick="navigate('equipos',this)"><span class="icon">⚙️</span>Equipos</div>
-    <div class="nav-section">Recursos</div>
-    <div class="nav-item" onclick="navigate('materiales',this)"><span class="icon">📦</span>Materiales</div>
-    <div class="nav-item" onclick="navigate('herramientas',this)"><span class="icon">🪛</span>Herramientas</div>
-    <div class="nav-item" onclick="navigate('epp',this)"><span class="icon">🦺</span>Entrega EPPs</div>
-    <div class="nav-item" onclick="navigate('tecnicos',this)"><span class="icon">👷</span>Técnicos</div>
-    <div class="nav-section">Análisis</div>
-    <div class="nav-item" onclick="navigate('reportes',this)"><span class="icon">📈</span>Indicadores</div>
-  </div>
+  <div class="nav" id="sidebar-nav"></div>
   <div class="sidebar-footer">
     <div class="user-pill">
       <div class="user-avatar" id="user-avatar">?</div>
@@ -214,11 +211,10 @@ textarea.form-control{resize:vertical;min-height:70px}
   <div class="topbar">
     <div class="topbar-left">
       <span class="topbar-title" id="page-title">DASHBOARD</span>
-      <div style="display:flex;align-items:center;gap:6px"><div class="online-dot"></div><span class="online-label">EN VIVO</span></div>
+      <div style="display:flex;align-items:center;gap:5px"><div class="online-dot"></div><span class="online-label">EN VIVO</span></div>
     </div>
     <span class="topbar-date" id="topbar-date"></span>
   </div>
-
   <div class="content">
 
     <!-- DASHBOARD -->
@@ -226,59 +222,74 @@ textarea.form-control{resize:vertical;min-height:70px}
       <div class="kpi-grid" id="kpi-grid"></div>
       <div class="grid2">
         <div class="card"><div class="card-header"><span class="card-title">ÓRDENES RECIENTES</span><button class="btn btn-ghost btn-sm" onclick="navigate('ot',null)">Ver todas →</button></div><div id="dash-ot-recent"></div></div>
-        <div class="card"><div class="card-header"><span class="card-title">SERVICIOS PENDIENTES</span><button class="btn btn-ghost btn-sm" onclick="navigate('servicios',null)">Ver todas →</button></div><div id="dash-svc-pending"></div></div>
+        <div class="card"><div class="card-header"><span class="card-title">SERVICIOS PENDIENTES</span><button class="btn btn-ghost btn-sm" onclick="navigate('logistica',null)">Ver todas →</button></div><div id="dash-svc-pending"></div></div>
       </div>
       <div class="card"><div class="card-header"><span class="card-title">ACTIVIDAD EN TIEMPO REAL</span></div><div id="dash-activity"></div></div>
     </div>
 
-    <!-- ÓRDENES DE TRABAJO -->
+    <!-- OT -->
     <div class="page" id="page-ot">
       <div class="section-title">ÓRDENES DE TRABAJO</div>
       <div class="section-sub">Gestión y seguimiento de OT de mantenimiento</div>
       <div class="search-bar">
         <input class="search-input" id="ot-search" placeholder="🔍 Buscar OT, equipo, técnico..." oninput="renderOT()">
-        <select class="form-control" style="width:150px" id="ot-f-estado" onchange="renderOT()">
+        <select class="form-control" style="width:145px" id="ot-f-estado" onchange="renderOT()">
           <option value="">Todos estados</option><option>Abierta</option><option>En proceso</option><option>Pausada</option><option>Cerrada</option>
         </select>
-        <select class="form-control" style="width:150px" id="ot-f-tipo" onchange="renderOT()">
-          <option value="">Todos tipos</option><option>Correctivo</option><option>Preventivo</option><option>Predictivo</option>
+        <select class="form-control" style="width:145px" id="ot-f-tipo" onchange="renderOT()">
+          <option value="">Todos tipos</option><option>Correctivo</option><option>Preventivo</option><option>Predictivo</option><option>Mejora</option>
         </select>
+        <button class="btn btn-ghost" onclick="openModal('modal-import-ot')">⬆️ Importar Excel</button>
         <button class="btn btn-primary" id="btn-nueva-ot" onclick="openModal('modal-ot')">+ Nueva OT</button>
       </div>
       <div class="stat-row" id="ot-stats"></div>
       <div class="card"><div class="table-wrap"><table><thead><tr>
-        <th>N° OT</th><th>N° OM</th><th>Sistema</th><th>Equipo</th><th>Descripción</th>
+        <th>N° OT</th><th>Sistema</th><th>Subsistema</th><th>Equipo</th><th>Descripción</th>
         <th>Tipo</th><th>Técnico</th><th>% Avance</th><th>Estado</th><th>Fecha</th><th>Acciones</th>
       </tr></thead><tbody id="ot-tbody"></tbody></table></div></div>
     </div>
 
-    <!-- SERVICIOS / LOGÍSTICA (reemplaza SAP) -->
-    <div class="page" id="page-servicios">
-      <div class="section-title">SERVICIOS / LOGÍSTICA</div>
+    <!-- SAP LOGÍSTICA -->
+    <div class="page" id="page-logistica">
+      <div class="section-title">SAP — LOGÍSTICA</div>
       <div class="section-sub">Seguimiento de solicitudes, pedidos y servicios de proveedores</div>
       <div class="search-bar">
-        <input class="search-input" id="svc-search" placeholder="🔍 Buscar solicitud, pedido, proveedor..." oninput="renderServicios()">
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <button class="filter-chip active" onclick="setSvcFilter('Todos',this)">Todos</button>
-          <button class="filter-chip" onclick="setSvcFilter('Pendiente',this)">Pendiente</button>
-          <button class="filter-chip" onclick="setSvcFilter('En proceso',this)">En proceso</button>
-          <button class="filter-chip" onclick="setSvcFilter('Facturado',this)">Facturado</button>
-          <button class="filter-chip" onclick="setSvcFilter('Cerrado',this)">Cerrado</button>
+        <input class="search-input" id="log-search" placeholder="🔍 Buscar sol. pedido, texto, proveedor..." oninput="renderLogistica()">
+        <div style="display:flex;gap:5px;flex-wrap:wrap">
+          <button class="filter-chip active" onclick="setLogFilter('Todos',this)">Todos</button>
+          <button class="filter-chip" onclick="setLogFilter('Pendiente',this)">Pendiente</button>
+          <button class="filter-chip" onclick="setLogFilter('En proceso',this)">En proceso</button>
+          <button class="filter-chip" onclick="setLogFilter('Facturado',this)">Facturado</button>
+          <button class="filter-chip" onclick="setLogFilter('Cerrado',this)">Cerrado</button>
         </div>
-        <button class="btn btn-primary" id="btn-nueva-svc" onclick="openModal('modal-svc')">+ Nuevo Servicio</button>
+        <button class="btn btn-ghost" onclick="openModal('modal-import-log')">⬆️ Importar Excel</button>
+        <button class="btn btn-primary" id="btn-nueva-log" onclick="openModal('modal-log')">+ Nuevo</button>
       </div>
       <div class="card"><div class="table-wrap"><table><thead><tr>
-        <th>Fe. Sol.</th><th>Sol. Pedido</th><th>Pedido</th><th>Texto Breve</th><th>Proveedor</th>
+        <th>Fe. Sol.</th><th>Sol.Pedido</th><th>Pedido</th><th>Texto Breve</th><th>Proveedor</th>
         <th>Valor Total</th><th>Moneda</th><th>N° Factura</th><th>Ingreso MP</th><th>Estado</th><th>Comentario</th><th>Acciones</th>
-      </tr></thead><tbody id="svc-tbody"></tbody></table></div></div>
+      </tr></thead><tbody id="log-tbody"></tbody></table></div></div>
+    </div>
+
+    <!-- SAP SUMINISTROS -->
+    <div class="page" id="page-suministros">
+      <div class="section-title">SAP — SUMINISTROS</div>
+      <div class="section-sub">Solicitudes de pedido de materiales y suministros</div>
+      <div class="search-bar">
+        <input class="search-input" id="sum-search" placeholder="🔍 Buscar material, pedido, solicitante..." oninput="renderSuministros()">
+        <button class="btn btn-ghost btn-sm" onclick="openModal('modal-sum-cols')" style="white-space:nowrap">⚙️ Columnas</button>
+        <button class="btn btn-ghost" onclick="openModal('modal-import-sum')">⬆️ Importar Excel</button>
+        <button class="btn btn-primary" id="btn-nueva-sum" onclick="openModal('modal-sum')">+ Nuevo</button>
+      </div>
+      <div class="card" id="sum-table-card"></div>
     </div>
 
     <!-- EQUIPOS -->
     <div class="page" id="page-equipos">
       <div class="section-title">EQUIPOS</div>
-      <div class="section-sub">Registro de activos y equipos de la planta</div>
+      <div class="section-sub">Registro de activos de la planta</div>
       <div class="search-bar">
-        <input class="search-input" id="eq-search" placeholder="🔍 Buscar equipo, TAG, área..." oninput="renderEquipos()">
+        <input class="search-input" id="eq-search" placeholder="🔍 Buscar equipo, TAG..." oninput="renderEquipos()">
         <button class="btn btn-primary" id="btn-nuevo-eq" onclick="openModal('modal-eq')">+ Nuevo Equipo</button>
       </div>
       <div class="eqp-grid" id="eqp-grid"></div>
@@ -286,66 +297,74 @@ textarea.form-control{resize:vertical;min-height:70px}
 
     <!-- MATERIALES -->
     <div class="page" id="page-materiales">
-      <div class="section-title">LISTA DE MATERIALES</div>
-      <div class="section-sub">Registro de materiales disponibles para actividades de mantenimiento</div>
+      <div class="section-title">MATERIALES</div>
+      <div class="section-sub">Lista de materiales disponibles</div>
       <div class="search-bar">
-        <input class="search-input" id="mat-search" placeholder="🔍 Buscar material, código..." oninput="renderMateriales()">
-        <button class="btn btn-ghost" id="btn-import-mat" onclick="openModal('modal-import-mat')">⬆️ Importar Excel</button>
-        <button class="btn btn-primary" id="btn-nuevo-mat" onclick="openModal('modal-mat')">+ Nuevo Material</button>
+        <input class="search-input" id="mat-search" placeholder="🔍 Buscar material..." oninput="renderMateriales()">
+        <button class="btn btn-ghost" onclick="openModal('modal-import-mat')">⬆️ Importar Excel</button>
+        <button class="btn btn-primary" id="btn-nuevo-mat" onclick="openModal('modal-mat')">+ Nuevo</button>
       </div>
       <div class="card"><div class="table-wrap"><table><thead><tr>
-        <th>Material</th><th>Texto Breve</th><th>Unidad Medida</th><th>Precio</th><th>Moneda</th><th>Centro</th><th>Acciones</th>
+        <th>Material</th><th>Texto Breve</th><th>UM</th><th>Precio</th><th>Moneda</th><th>Centro</th><th>Acc.</th>
       </tr></thead><tbody id="mat-tbody"></tbody></table></div></div>
     </div>
 
     <!-- HERRAMIENTAS -->
     <div class="page" id="page-herramientas">
-      <div class="section-title">ENTREGA DE HERRAMIENTAS</div>
-      <div class="section-sub">Control de préstamo y devolución de herramientas</div>
+      <div class="section-title">HERRAMIENTAS</div>
+      <div class="section-sub">Control de entrega y devolución</div>
       <div class="search-bar">
         <input class="search-input" id="her-search" placeholder="🔍 Buscar herramienta, técnico..." oninput="renderHerramientas()">
-        <button class="btn btn-primary" id="btn-nueva-her" onclick="openModal('modal-her')">+ Registrar Entrega</button>
+        <button class="btn btn-primary" id="btn-nueva-her" onclick="openModal('modal-her')">+ Registrar</button>
       </div>
       <div class="grid2">
-        <div class="card">
-          <div class="card-header"><span class="card-title">HISTORIAL DE ENTREGAS</span></div>
-          <div class="table-wrap"><table><thead><tr><th>Técnico</th><th>Herramienta</th><th>Cant.</th><th>OT Relacionada</th><th>Fecha Entrega</th><th>Devolución</th><th>Estado</th></tr></thead>
+        <div class="card"><div class="card-header"><span class="card-title">HISTORIAL</span></div>
+          <div class="table-wrap"><table><thead><tr><th>Técnico</th><th>Herramienta</th><th>Cant.</th><th>OT</th><th>Entrega</th><th>Devol.</th><th>Estado</th></tr></thead>
           <tbody id="her-tbody"></tbody></table></div>
         </div>
-        <div class="card">
-          <div class="card-header"><span class="card-title">HERRAMIENTAS PENDIENTES DEVOLUCIÓN</span></div>
-          <div style="padding:16px" id="her-pendientes"></div>
-        </div>
+        <div class="card"><div class="card-header"><span class="card-title">PENDIENTES DEVOLUCIÓN</span></div><div style="padding:14px" id="her-pendientes"></div></div>
       </div>
     </div>
 
     <!-- EPP -->
     <div class="page" id="page-epp">
       <div class="section-title">ENTREGA DE EPPs</div>
-      <div class="section-sub">Control de entrega de equipos de protección personal</div>
+      <div class="section-sub">Control de equipos de protección personal</div>
       <div class="search-bar">
         <input class="search-input" id="epp-search" placeholder="🔍 Buscar técnico o EPP..." oninput="renderEPP()">
-        <button class="btn btn-primary" id="btn-nuevo-epp" onclick="openModal('modal-epp')">+ Registrar Entrega</button>
+        <button class="btn btn-primary" id="btn-nuevo-epp" onclick="openModal('modal-epp')">+ Registrar</button>
       </div>
       <div class="grid2">
         <div class="card"><div class="card-header"><span class="card-title">HISTORIAL</span></div>
           <div class="table-wrap"><table><thead><tr><th>Técnico</th><th>EPP</th><th>Cant.</th><th>Fecha</th><th>Entregado por</th></tr></thead>
           <tbody id="epp-tbody"></tbody></table></div>
         </div>
-        <div class="card"><div class="card-header"><span class="card-title">STOCK EPPs</span></div><div style="padding:18px" id="epp-stock"></div></div>
+        <div class="card"><div class="card-header"><span class="card-title">STOCK EPPs</span></div><div style="padding:16px" id="epp-stock"></div></div>
       </div>
     </div>
 
     <!-- TÉCNICOS -->
     <div class="page" id="page-tecnicos">
       <div class="section-title">TÉCNICOS</div>
-      <div class="section-sub">Gestión del personal de mantenimiento</div>
+      <div class="section-sub">Personal de mantenimiento</div>
       <div class="search-bar">
         <input class="search-input" id="tec-search" placeholder="🔍 Buscar técnico..." oninput="renderTecnicos()">
         <button class="btn btn-primary" id="btn-nuevo-tec" onclick="openModal('modal-tec')">+ Nuevo Técnico</button>
       </div>
-      <div class="card"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Nombre</th><th>Especialidad</th><th>Turno</th><th>OT Activas</th><th>Estado</th><th>Acciones</th></tr></thead>
+      <div class="card"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Nombre</th><th>Especialidad</th><th>Turno</th><th>OT Activas</th><th>Estado</th><th>Acc.</th></tr></thead>
       <tbody id="tec-tbody"></tbody></table></div></div>
+    </div>
+
+    <!-- USUARIOS (solo planner) -->
+    <div class="page" id="page-usuarios">
+      <div class="section-title">GESTIÓN DE USUARIOS</div>
+      <div class="section-sub">Crear y administrar accesos al sistema</div>
+      <div class="search-bar">
+        <input class="search-input" id="usr-search" placeholder="🔍 Buscar usuario..." oninput="renderUsuarios()">
+        <button class="btn btn-primary" onclick="openModal('modal-usr')">+ Nuevo Usuario</button>
+      </div>
+      <div class="card"><div class="table-wrap"><table><thead><tr><th>Usuario</th><th>Nombre</th><th>Rol</th><th>Técnico asoc.</th><th>Creado</th><th>Acciones</th></tr></thead>
+      <tbody id="usr-tbody"></tbody></table></div></div>
     </div>
 
     <!-- REPORTES -->
@@ -354,15 +373,16 @@ textarea.form-control{resize:vertical;min-height:70px}
       <div class="section-sub">Métricas del área de mantenimiento</div>
       <div class="kpi-grid" id="kpi-reportes"></div>
       <div class="grid2">
-        <div class="card"><div class="card-header"><span class="card-title">OT POR TIPO</span></div><div style="padding:18px" id="rep-tipos"></div></div>
-        <div class="card"><div class="card-header"><span class="card-title">OT POR ESTADO</span></div><div style="padding:18px" id="rep-estados"></div></div>
+        <div class="card"><div class="card-header"><span class="card-title">OT POR TIPO</span></div><div style="padding:16px" id="rep-tipos"></div></div>
+        <div class="card"><div class="card-header"><span class="card-title">OT POR ESTADO</span></div><div style="padding:16px" id="rep-estados"></div></div>
       </div>
       <div class="card"><div class="card-header"><span class="card-title">EXPORTAR DATOS</span></div>
-        <div style="padding:18px;display:flex;gap:10px;flex-wrap:wrap">
-          <button class="btn btn-ghost" onclick="exportCSV('ot')">⬇️ OT en CSV</button>
-          <button class="btn btn-ghost" onclick="exportCSV('servicios')">⬇️ Servicios en CSV</button>
-          <button class="btn btn-ghost" onclick="exportCSV('materiales')">⬇️ Materiales en CSV</button>
-          <button class="btn btn-ghost" onclick="exportCSV('epp')">⬇️ EPP en CSV</button>
+        <div style="padding:16px;display:flex;gap:9px;flex-wrap:wrap">
+          <button class="btn btn-ghost" onclick="exportCSV('ot')">⬇️ OT CSV</button>
+          <button class="btn btn-ghost" onclick="exportCSV('logistica')">⬇️ Logística CSV</button>
+          <button class="btn btn-ghost" onclick="exportCSV('suministros')">⬇️ Suministros CSV</button>
+          <button class="btn btn-ghost" onclick="exportCSV('materiales')">⬇️ Materiales CSV</button>
+          <button class="btn btn-ghost" onclick="exportCSV('epp')">⬇️ EPP CSV</button>
         </div>
       </div>
     </div>
@@ -371,131 +391,237 @@ textarea.form-control{resize:vertical;min-height:70px}
 </main>
 </div>
 
-<!-- ========== MODALS ========== -->
+<!-- ===== MODALS ===== -->
 
-<!-- MODAL OT (completo) -->
+<!-- MODAL OT -->
 <div class="modal-overlay" id="modal-ot">
-  <div class="modal modal-lg">
+  <div class="modal modal-xl">
     <div class="modal-header"><h2>NUEVA ORDEN DE TRABAJO</h2><button class="modal-close" onclick="closeModal('modal-ot')">✕</button></div>
     <div class="modal-body">
       <div class="section-divider">IDENTIFICACIÓN</div>
       <div class="form-grid3">
-        <div class="form-group"><label>Temporada</label><input type="text" class="form-control" id="ot-temporada" placeholder="ej. 2025-I"></div>
-        <div class="form-group"><label>N° OM</label><input type="text" class="form-control" id="ot-nom" placeholder="ej. OM-0042"></div>
-        <div class="form-group"><label>Área Solicitante</label><input type="text" class="form-control" id="ot-area-sol" placeholder="ej. Producción"></div>
-      </div>
-      <div class="section-divider" style="margin-top:16px">UBICACIÓN Y EQUIPO</div>
-      <div class="form-grid">
-        <div class="form-group"><label>Sistema</label><input type="text" class="form-control" id="ot-sistema" placeholder="ej. Sistema Hidráulico"></div>
-        <div class="form-group"><label>Subsistema</label><input type="text" class="form-control" id="ot-subsistema" placeholder="ej. Circuito retorno"></div>
-        <div class="form-group"><label>Ubicación</label><input type="text" class="form-control" id="ot-ubicacion" placeholder="ej. Planta A - Nivel 2"></div>
-        <div class="form-group"><label>Equipo / TAG *</label><select class="form-control" id="ot-equipo"></select></div>
-      </div>
-      <div class="section-divider" style="margin-top:16px">ACTIVIDAD</div>
-      <div class="form-grid">
-        <div class="form-group form-full"><label>Descripción *</label><textarea class="form-control" id="ot-desc" placeholder="Descripción general de la OT..."></textarea></div>
-        <div class="form-group form-full"><label>Actividad Detallada</label><textarea class="form-control" id="ot-actividad" placeholder="Detalle de las actividades a realizar..."></textarea></div>
+        <div class="form-group"><label>Temporada</label><div class="combo-wrap"><select class="form-control" id="ot-temporada"></select><button class="combo-add-btn" title="Agregar opción" onclick="addComboOption('ot-temporada','temporadas','Temporada')">✏️</button></div></div>
+        <div class="form-group"><label>Área Solicitante</label><div class="combo-wrap"><select class="form-control" id="ot-area-sol"></select><button class="combo-add-btn" onclick="addComboOption('ot-area-sol','areas','Área')">✏️</button></div></div>
         <div class="form-group"><label>Tipo de Mantenimiento</label><select class="form-control" id="ot-tipo"><option>Correctivo</option><option>Preventivo</option><option>Predictivo</option><option>Mejora</option></select></div>
-        <div class="form-group"><label>Técnico Responsable *</label><select class="form-control" id="ot-tecnico"></select></div>
       </div>
-      <div class="section-divider" style="margin-top:16px">TIEMPO</div>
+      <div class="section-divider" style="margin-top:14px">UBICACIÓN Y EQUIPO</div>
+      <div class="form-grid">
+        <div class="form-group"><label>Sistema</label><div class="combo-wrap"><select class="form-control" id="ot-sistema"></select><button class="combo-add-btn" onclick="addComboOption('ot-sistema','sistemas','Sistema')">✏️</button></div></div>
+        <div class="form-group"><label>Subsistema</label><div class="combo-wrap"><select class="form-control" id="ot-subsistema"></select><button class="combo-add-btn" onclick="addComboOption('ot-subsistema','subsistemas','Subsistema')">✏️</button></div></div>
+        <div class="form-group"><label>Ubicación</label><div class="combo-wrap"><select class="form-control" id="ot-ubicacion"></select><button class="combo-add-btn" onclick="addComboOption('ot-ubicacion','ubicaciones','Ubicación')">✏️</button></div></div>
+        <div class="form-group"><label>Equipo / TAG *</label><div class="combo-wrap"><select class="form-control" id="ot-equipo"></select><button class="combo-add-btn" onclick="openModal('modal-eq')">✏️</button></div></div>
+      </div>
+      <div class="section-divider" style="margin-top:14px">ACTIVIDAD</div>
+      <div class="form-grid">
+        <div class="form-group form-full"><label>Descripción *</label><textarea class="form-control" id="ot-desc" placeholder="Descripción de la OT..."></textarea></div>
+        <div class="form-group"><label>Técnico Responsable *</label><select class="form-control" id="ot-tecnico"></select></div>
+        <div class="form-group"><label>Estado</label><select class="form-control" id="ot-estado"><option>Abierta</option><option>En proceso</option><option>Pausada</option><option>Cerrada</option></select></div>
+      </div>
+      <div class="section-divider" style="margin-top:14px">TIEMPO</div>
       <div class="form-grid3">
         <div class="form-group"><label>Fecha</label><input type="date" class="form-control" id="ot-fecha"></div>
         <div class="form-group"><label>Hora Inicio</label><input type="time" class="form-control" id="ot-hora-ini" oninput="calcDuracion()"></div>
         <div class="form-group"><label>Hora Fin</label><input type="time" class="form-control" id="ot-hora-fin" oninput="calcDuracion()"></div>
       </div>
-      <div class="form-group" style="margin-top:10px"><label>Duración (calculada automáticamente)</label><div class="duration-display" id="ot-duracion">—</div></div>
-      <div class="section-divider" style="margin-top:16px">AVANCE Y MATERIALES</div>
+      <div class="form-group" style="margin-top:10px"><label>Duración (automática)</label><div class="duration-display" id="ot-duracion">—</div></div>
+      <div class="section-divider" style="margin-top:14px">AVANCE Y MATERIALES</div>
       <div class="form-grid">
-        <div class="form-group"><label>% Avance</label>
+        <div class="form-group">
+          <label>% Avance</label>
           <input type="range" class="form-control" id="ot-avance" min="0" max="100" value="0" oninput="document.getElementById('ot-avance-val').textContent=this.value+'%'">
-          <div style="font-family:var(--mono);font-size:12px;color:var(--accent);margin-top:4px" id="ot-avance-val">0%</div>
+          <div style="font-family:var(--mono);font-size:12px;color:var(--accent);margin-top:3px" id="ot-avance-val">0%</div>
         </div>
-        <div class="form-group"><label>Estado</label><select class="form-control" id="ot-estado"><option>Abierta</option><option>En proceso</option><option>Pausada</option><option>Cerrada</option></select></div>
-      </div>
-      <div class="form-group" style="margin-top:12px">
-        <label>Suministros / Materiales Utilizados</label>
-        <div style="display:flex;gap:8px;margin-top:6px">
-          <select class="form-control" id="ot-mat-sel" style="flex:1"></select>
-          <button class="btn btn-ghost btn-sm" onclick="addMatToOT()">+ Agregar</button>
-        </div>
-        <div id="ot-mats-selected" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px"></div>
-        <div style="margin-top:8px">
-          <label style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px">COSTO MATERIALES (S/)</label>
-          <div class="duration-display" id="ot-costo-mat" style="margin-top:6px">S/ 0.00</div>
+        <div class="form-group">
+          <label>Materiales Utilizados</label>
+          <div style="display:flex;gap:7px"><select class="form-control" id="ot-mat-sel" style="flex:1"></select><button class="btn btn-ghost btn-sm" onclick="addMatToOT()">+ Agregar</button></div>
+          <div id="ot-mats-selected" style="margin-top:7px;display:flex;flex-wrap:wrap;gap:3px"></div>
+          <div style="margin-top:6px;font-family:var(--mono);font-size:12px;color:var(--accent2)" id="ot-costo-mat">Costo: S/ 0.00</div>
         </div>
       </div>
-      <div class="form-group" style="margin-top:12px"><label>Observaciones</label><textarea class="form-control" id="ot-obs" placeholder="Notas, dificultades, recomendaciones..."></textarea></div>
-      <div class="form-group" style="margin-top:12px">
-        <label>Foto de Evidencia</label>
-        <input type="file" class="form-control" id="ot-foto" accept="image/*" onchange="previewFoto(this)">
-        <img id="ot-foto-preview" class="photo-preview" style="display:none">
+      <div class="form-grid" style="margin-top:12px">
+        <div class="form-group form-full"><label>Observaciones</label><textarea class="form-control" id="ot-obs" placeholder="Notas, dificultades, recomendaciones..."></textarea></div>
+        <div class="form-group form-full">
+          <label>Foto de Evidencia</label>
+          <input type="file" class="form-control" id="ot-foto" accept="image/*" onchange="previewFoto(this)">
+          <img id="ot-foto-preview" class="photo-preview" style="display:none">
+        </div>
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-ot')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveOT()">Crear OT</button>
-    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-ot')">Cancelar</button><button class="btn btn-primary" onclick="saveOT()">Crear OT</button></div>
   </div>
 </div>
 
 <!-- MODAL VER OT -->
 <div class="modal-overlay" id="modal-ver-ot">
-  <div class="modal modal-lg">
+  <div class="modal modal-xl">
     <div class="modal-header"><h2 id="ver-ot-titulo">DETALLE OT</h2><button class="modal-close" onclick="closeModal('modal-ver-ot')">✕</button></div>
     <div class="modal-body" id="ver-ot-body"></div>
   </div>
 </div>
 
-<!-- MODAL SERVICIOS -->
-<div class="modal-overlay" id="modal-svc">
-  <div class="modal">
-    <div class="modal-header"><h2>NUEVO SERVICIO / SOLICITUD</h2><button class="modal-close" onclick="closeModal('modal-svc')">✕</button></div>
+<!-- MODAL ESTADO OT -->
+<div class="modal-overlay" id="modal-estado-ot">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header"><h2>ACTUALIZAR OT</h2><button class="modal-close" onclick="closeModal('modal-estado-ot')">✕</button></div>
     <div class="modal-body">
+      <div style="font-family:var(--mono);color:var(--accent);font-size:13px;margin-bottom:13px" id="est-ot-num"></div>
       <div class="form-grid">
-        <div class="form-group"><label>Fe. Solicitud</label><input type="date" class="form-control" id="svc-fesol"></div>
-        <div class="form-group"><label>Sol. Pedido</label><input type="text" class="form-control" id="svc-solped" placeholder="N° Sol. Pedido"></div>
-        <div class="form-group"><label>Pedido</label><input type="text" class="form-control" id="svc-pedido" placeholder="N° Pedido"></div>
-        <div class="form-group"><label>Texto Breve *</label><input type="text" class="form-control" id="svc-texto" placeholder="Descripción del servicio"></div>
-        <div class="form-group"><label>Proveedor</label><input type="text" class="form-control" id="svc-proveedor" placeholder="Nombre del proveedor"></div>
-        <div class="form-group"><label>Valor Total</label><input type="number" class="form-control" id="svc-valor" placeholder="0.00" step="0.01"></div>
-        <div class="form-group"><label>Moneda</label><select class="form-control" id="svc-moneda"><option>PEN</option><option>USD</option><option>EUR</option></select></div>
-        <div class="form-group"><label>N° Factura</label><input type="text" class="form-control" id="svc-factura" placeholder="ej. F001-00123"></div>
-        <div class="form-group"><label>Ingreso a MP</label><input type="date" class="form-control" id="svc-ingreso"></div>
-        <div class="form-group"><label>Estado</label><select class="form-control" id="svc-estado"><option>Pendiente</option><option>En proceso</option><option>Facturado</option><option>Cerrado</option></select></div>
-        <div class="form-group form-full"><label>Comentario</label><textarea class="form-control" id="svc-comentario" placeholder="Observaciones del servicio..."></textarea></div>
+        <div class="form-group"><label>Estado</label><select class="form-control" id="est-ot-val"><option>Abierta</option><option>En proceso</option><option>Pausada</option><option>Cerrada</option></select></div>
+        <div class="form-group"><label>% Avance</label><input type="number" class="form-control" id="est-ot-avance" min="0" max="100"></div>
       </div>
+      <div class="form-group" style="margin-top:11px"><label>Comentario</label><textarea class="form-control" id="est-ot-comment" style="min-height:55px"></textarea></div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-svc')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveServicio()">Registrar</button>
-    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-estado-ot')">Cancelar</button><button class="btn btn-primary" onclick="confirmEstadoOT()">Confirmar</button></div>
   </div>
 </div>
 
-<!-- MODAL EDITAR SERVICIO -->
-<div class="modal-overlay" id="modal-edit-svc">
+<!-- MODAL IMPORT OT -->
+<div class="modal-overlay" id="modal-import-ot">
   <div class="modal">
-    <div class="modal-header"><h2>EDITAR SERVICIO</h2><button class="modal-close" onclick="closeModal('modal-edit-svc')">✕</button></div>
+    <div class="modal-header"><h2>IMPORTAR OT DESDE EXCEL</h2><button class="modal-close" onclick="closeModal('modal-import-ot')">✕</button></div>
+    <div class="modal-body">
+      <div class="upload-zone" onclick="document.getElementById('excel-ot').click()" ondragover="dragOver(event,'upload-zone-ot')" ondrop="dropFile(event,'ot')">
+        <div class="upload-zone-icon">📊</div><div class="upload-zone-text">Arrastra tu Excel aquí o haz clic</div><div class="upload-zone-sub">.xlsx, .xls</div>
+      </div>
+      <input type="file" id="excel-ot" accept=".xlsx,.xls" style="display:none" onchange="loadExcelImport(this,'ot')">
+      <div style="background:var(--surface2);border-radius:8px;padding:12px;font-size:12px;color:var(--muted);margin-bottom:12px">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--accent);margin-bottom:6px">COLUMNAS RECONOCIDAS:</div>
+        Sistema · Subsistema · Ubicación · Equipo · Descripción · Tipo · Técnico · Fecha · Estado · Avance · Observaciones
+      </div>
+      <div id="preview-ot" style="display:none"><div style="font-family:var(--mono);font-size:11px;color:var(--accent2);margin-bottom:7px" id="count-ot"></div></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-import-ot')">Cancelar</button><button class="btn btn-primary" id="btn-imp-ot" onclick="confirmImport('ot')" disabled>Importar</button></div>
+  </div>
+</div>
+
+<!-- MODAL LOGÍSTICA -->
+<div class="modal-overlay" id="modal-log">
+  <div class="modal">
+    <div class="modal-header"><h2>NUEVO REGISTRO LOGÍSTICA</h2><button class="modal-close" onclick="closeModal('modal-log')">✕</button></div>
     <div class="modal-body">
       <div class="form-grid">
-        <div class="form-group"><label>Fe. Solicitud</label><input type="date" class="form-control" id="esvc-fesol"></div>
-        <div class="form-group"><label>Sol. Pedido</label><input type="text" class="form-control" id="esvc-solped"></div>
-        <div class="form-group"><label>Pedido</label><input type="text" class="form-control" id="esvc-pedido"></div>
-        <div class="form-group"><label>Texto Breve</label><input type="text" class="form-control" id="esvc-texto"></div>
-        <div class="form-group"><label>Proveedor</label><input type="text" class="form-control" id="esvc-proveedor"></div>
-        <div class="form-group"><label>Valor Total</label><input type="number" class="form-control" id="esvc-valor" step="0.01"></div>
-        <div class="form-group"><label>Moneda</label><select class="form-control" id="esvc-moneda"><option>PEN</option><option>USD</option><option>EUR</option></select></div>
-        <div class="form-group"><label>N° Factura</label><input type="text" class="form-control" id="esvc-factura"></div>
-        <div class="form-group"><label>Ingreso a MP</label><input type="date" class="form-control" id="esvc-ingreso"></div>
-        <div class="form-group"><label>Estado</label><select class="form-control" id="esvc-estado"><option>Pendiente</option><option>En proceso</option><option>Facturado</option><option>Cerrado</option></select></div>
-        <div class="form-group form-full"><label>Comentario</label><textarea class="form-control" id="esvc-comentario"></textarea></div>
+        <div class="form-group"><label>Fe. Solicitud</label><input type="date" class="form-control" id="log-fesol"></div>
+        <div class="form-group"><label>Sol. Pedido</label><input type="text" class="form-control" id="log-solped"></div>
+        <div class="form-group"><label>Pedido</label><input type="text" class="form-control" id="log-pedido"></div>
+        <div class="form-group"><label>Texto Breve *</label><input type="text" class="form-control" id="log-texto"></div>
+        <div class="form-group"><label>Proveedor</label><input type="text" class="form-control" id="log-proveedor"></div>
+        <div class="form-group"><label>Valor Total</label><input type="number" class="form-control" id="log-valor" step="0.01"></div>
+        <div class="form-group"><label>Moneda</label><select class="form-control" id="log-moneda"><option>PEN</option><option>USD</option><option>EUR</option></select></div>
+        <div class="form-group"><label>N° Factura</label><input type="text" class="form-control" id="log-factura"></div>
+        <div class="form-group"><label>Ingreso MP</label><input type="date" class="form-control" id="log-ingreso"></div>
+        <div class="form-group"><label>Estado</label><select class="form-control" id="log-estado"><option>Pendiente</option><option>En proceso</option><option>Facturado</option><option>Cerrado</option></select></div>
+        <div class="form-group form-full"><label>Comentario</label><textarea class="form-control" id="log-comentario"></textarea></div>
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-edit-svc')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveEditServicio()">Guardar Cambios</button>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-log')">Cancelar</button><button class="btn btn-primary" onclick="saveLogistica()">Registrar</button></div>
+  </div>
+</div>
+
+<!-- MODAL EDIT LOGÍSTICA -->
+<div class="modal-overlay" id="modal-edit-log">
+  <div class="modal">
+    <div class="modal-header"><h2>EDITAR REGISTRO</h2><button class="modal-close" onclick="closeModal('modal-edit-log')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label>Fe. Solicitud</label><input type="date" class="form-control" id="elog-fesol"></div>
+        <div class="form-group"><label>Sol. Pedido</label><input type="text" class="form-control" id="elog-solped"></div>
+        <div class="form-group"><label>Pedido</label><input type="text" class="form-control" id="elog-pedido"></div>
+        <div class="form-group"><label>Texto Breve</label><input type="text" class="form-control" id="elog-texto"></div>
+        <div class="form-group"><label>Proveedor</label><input type="text" class="form-control" id="elog-proveedor"></div>
+        <div class="form-group"><label>Valor Total</label><input type="number" class="form-control" id="elog-valor" step="0.01"></div>
+        <div class="form-group"><label>Moneda</label><select class="form-control" id="elog-moneda"><option>PEN</option><option>USD</option><option>EUR</option></select></div>
+        <div class="form-group"><label>N° Factura</label><input type="text" class="form-control" id="elog-factura"></div>
+        <div class="form-group"><label>Ingreso MP</label><input type="date" class="form-control" id="elog-ingreso"></div>
+        <div class="form-group"><label>Estado</label><select class="form-control" id="elog-estado"><option>Pendiente</option><option>En proceso</option><option>Facturado</option><option>Cerrado</option></select></div>
+        <div class="form-group form-full"><label>Comentario</label><textarea class="form-control" id="elog-comentario"></textarea></div>
+      </div>
     </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-edit-log')">Cancelar</button><button class="btn btn-primary" onclick="saveEditLog()">Guardar</button></div>
+  </div>
+</div>
+
+<!-- MODAL IMPORT LOGÍSTICA -->
+<div class="modal-overlay" id="modal-import-log">
+  <div class="modal">
+    <div class="modal-header"><h2>IMPORTAR LOGÍSTICA DESDE EXCEL</h2><button class="modal-close" onclick="closeModal('modal-import-log')">✕</button></div>
+    <div class="modal-body">
+      <div class="upload-zone" onclick="document.getElementById('excel-log').click()">
+        <div class="upload-zone-icon">📊</div><div class="upload-zone-text">Arrastra tu Excel aquí o haz clic</div><div class="upload-zone-sub">.xlsx, .xls</div>
+      </div>
+      <input type="file" id="excel-log" accept=".xlsx,.xls" style="display:none" onchange="loadExcelImport(this,'log')">
+      <div style="background:var(--surface2);border-radius:8px;padding:12px;font-size:12px;color:var(--muted);margin-bottom:12px">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--accent);margin-bottom:6px">COLUMNAS RECONOCIDAS:</div>
+        FE. SOL · SOL.PEDIDO · PEDIDO · TEXTO BREVE · PROVEEDOR · VALOR TOTAL · MONEDA · N° FACTURA · INGRESO A MP · ESTADO · COMENTARIO
+      </div>
+      <div id="preview-log" style="display:none"><div style="font-family:var(--mono);font-size:11px;color:var(--accent2);margin-bottom:7px" id="count-log"></div></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-import-log')">Cancelar</button><button class="btn btn-primary" id="btn-imp-log" onclick="confirmImport('log')" disabled>Importar</button></div>
+  </div>
+</div>
+
+<!-- MODAL SUMINISTROS -->
+<div class="modal-overlay" id="modal-sum">
+  <div class="modal modal-xl">
+    <div class="modal-header"><h2>NUEVO SUMINISTRO</h2><button class="modal-close" onclick="closeModal('modal-sum')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid3">
+        <div class="form-group"><label>Status</label><select class="form-control" id="sum-status"><option>Abierto</option><option>Cerrado</option><option>Pendiente</option></select></div>
+        <div class="form-group"><label>Pos. Sol. Pedido</label><input type="text" class="form-control" id="sum-pos-sol"></div>
+        <div class="form-group"><label>Tipo Imputación</label><input type="text" class="form-control" id="sum-tipo-imp"></div>
+        <div class="form-group"><label>Tipo Posición</label><input type="text" class="form-control" id="sum-tipo-pos"></div>
+        <div class="form-group"><label>Material</label><input type="text" class="form-control" id="sum-material"></div>
+        <div class="form-group"><label>Texto Breve</label><input type="text" class="form-control" id="sum-texto"></div>
+        <div class="form-group"><label>Cantidad Solicitada</label><input type="number" class="form-control" id="sum-cant" step="0.01"></div>
+        <div class="form-group"><label>Unidad de Medida</label><input type="text" class="form-control" id="sum-um"></div>
+        <div class="form-group"><label>Precio Valoración</label><input type="number" class="form-control" id="sum-precio" step="0.01"></div>
+        <div class="form-group"><label>Moneda</label><select class="form-control" id="sum-moneda"><option>PEN</option><option>USD</option><option>EUR</option></select></div>
+        <div class="form-group"><label>Centro</label><input type="text" class="form-control" id="sum-centro"></div>
+        <div class="form-group"><label>Pedido</label><input type="text" class="form-control" id="sum-pedido"></div>
+        <div class="form-group"><label>Grupo Artículos</label><input type="text" class="form-control" id="sum-grupo-art"></div>
+        <div class="form-group"><label>Valor Total</label><input type="number" class="form-control" id="sum-valor-total" step="0.01"></div>
+        <div class="form-group"><label>Posición Pedido</label><input type="text" class="form-control" id="sum-pos-ped"></div>
+        <div class="form-group"><label>Fecha Orden Compra</label><input type="date" class="form-control" id="sum-fecha-oc"></div>
+        <div class="form-group"><label>Grupo de Compras</label><input type="text" class="form-control" id="sum-grupo-comp"></div>
+        <div class="form-group"><label>Solicitante</label><input type="text" class="form-control" id="sum-solicitante"></div>
+        <div class="form-group"><label>Creado Por</label><input type="text" class="form-control" id="sum-creado-por"></div>
+        <div class="form-group"><label>Tipo Fe. Entrega</label><input type="text" class="form-control" id="sum-tipo-fe"></div>
+        <div class="form-group"><label>Fecha de Entrega</label><input type="date" class="form-control" id="sum-fecha-ent"></div>
+        <div class="form-group"><label>Almacén</label><input type="text" class="form-control" id="sum-almacen"></div>
+        <div class="form-group"><label>Urgencia Necesidad</label><input type="text" class="form-control" id="sum-urgencia"></div>
+        <div class="form-group"><label>N° Necesidad</label><input type="text" class="form-control" id="sum-num-nec"></div>
+        <div class="form-group"><label>Status Tratamiento</label><input type="text" class="form-control" id="sum-status-trat"></div>
+        <div class="form-group"><label>Status Trat. Sol. Pedido</label><input type="text" class="form-control" id="sum-status-trat-sol"></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-sum')">Cancelar</button><button class="btn btn-primary" onclick="saveSum()">Registrar</button></div>
+  </div>
+</div>
+
+<!-- MODAL IMPORT SUMINISTROS -->
+<div class="modal-overlay" id="modal-import-sum">
+  <div class="modal">
+    <div class="modal-header"><h2>IMPORTAR SUMINISTROS DESDE EXCEL</h2><button class="modal-close" onclick="closeModal('modal-import-sum')">✕</button></div>
+    <div class="modal-body">
+      <div class="upload-zone" onclick="document.getElementById('excel-sum').click()">
+        <div class="upload-zone-icon">📊</div><div class="upload-zone-text">Arrastra tu Excel aquí o haz clic</div><div class="upload-zone-sub">.xlsx, .xls</div>
+      </div>
+      <input type="file" id="excel-sum" accept=".xlsx,.xls" style="display:none" onchange="loadExcelImport(this,'sum')">
+      <div style="background:var(--surface2);border-radius:8px;padding:12px;font-size:12px;color:var(--muted);margin-bottom:12px">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--accent);margin-bottom:6px">SE DETECTAN AUTOMÁTICAMENTE LAS COLUMNAS DEL EXCEL SAP</div>
+        Status · Pos.solicitud pedido · Material · Texto breve · Cantidad solicitada · Precio de valoración · Moneda · Centro · Pedido · Valor total · Solicitante · Fecha de entrega · Almacén...
+      </div>
+      <div id="preview-sum" style="display:none"><div style="font-family:var(--mono);font-size:11px;color:var(--accent2);margin-bottom:7px" id="count-sum"></div></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-import-sum')">Cancelar</button><button class="btn btn-primary" id="btn-imp-sum" onclick="confirmImport('sum')" disabled>Importar</button></div>
+  </div>
+</div>
+
+<!-- MODAL COLUMNAS SUMINISTROS -->
+<div class="modal-overlay" id="modal-sum-cols">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-header"><h2>CONFIGURAR COLUMNAS VISIBLES</h2><button class="modal-close" onclick="closeModal('modal-sum-cols')">✕</button></div>
+    <div class="modal-body" id="sum-cols-body"></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-sum-cols')">Cerrar</button><button class="btn btn-primary" onclick="saveColsConfig();closeModal('modal-sum-cols')">Aplicar</button></div>
   </div>
 </div>
 
@@ -505,72 +631,55 @@ textarea.form-control{resize:vertical;min-height:70px}
     <div class="modal-header"><h2>NUEVO MATERIAL</h2><button class="modal-close" onclick="closeModal('modal-mat')">✕</button></div>
     <div class="modal-body">
       <div class="form-grid">
-        <div class="form-group"><label>Código Material *</label><input type="text" class="form-control" id="mat-cod" placeholder="ej. 10000123"></div>
-        <div class="form-group"><label>Texto Breve *</label><input type="text" class="form-control" id="mat-texto" placeholder="Descripción del material"></div>
-        <div class="form-group"><label>Unidad de Medida Base</label><select class="form-control" id="mat-um"><option>UN</option><option>KG</option><option>LT</option><option>MT</option><option>GL</option><option>PAR</option><option>JGO</option><option>BLS</option><option>RLL</option><option>CJA</option></select></div>
-        <div class="form-group"><label>Precio</label><input type="number" class="form-control" id="mat-precio" placeholder="0.00" step="0.01"></div>
-        <div class="form-group"><label>Moneda</label><select class="form-control" id="mat-moneda"><option>PEN</option><option>USD</option><option>EUR</option></select></div>
-        <div class="form-group"><label>Centro</label><input type="text" class="form-control" id="mat-centro" placeholder="ej. PE01"></div>
+        <div class="form-group"><label>Código Material *</label><input type="text" class="form-control" id="mat-cod"></div>
+        <div class="form-group"><label>Texto Breve *</label><input type="text" class="form-control" id="mat-texto"></div>
+        <div class="form-group"><label>Unidad Medida</label><select class="form-control" id="mat-um"><option>UN</option><option>KG</option><option>LT</option><option>MT</option><option>GL</option><option>PAR</option><option>JGO</option><option>BLS</option></select></div>
+        <div class="form-group"><label>Precio</label><input type="number" class="form-control" id="mat-precio" step="0.01"></div>
+        <div class="form-group"><label>Moneda</label><select class="form-control" id="mat-moneda"><option>PEN</option><option>USD</option></select></div>
+        <div class="form-group"><label>Centro</label><input type="text" class="form-control" id="mat-centro"></div>
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-mat')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveMaterial()">Guardar</button>
-    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-mat')">Cancelar</button><button class="btn btn-primary" onclick="saveMaterial()">Guardar</button></div>
   </div>
 </div>
 
-<!-- MODAL IMPORTAR EXCEL MATERIALES -->
+<!-- MODAL IMPORT MATERIALES -->
 <div class="modal-overlay" id="modal-import-mat">
   <div class="modal">
     <div class="modal-header"><h2>IMPORTAR MATERIALES DESDE EXCEL</h2><button class="modal-close" onclick="closeModal('modal-import-mat')">✕</button></div>
     <div class="modal-body">
-      <div class="upload-zone" id="upload-zone" onclick="document.getElementById('excel-file').click()" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)">
-        <div class="upload-zone-icon">📊</div>
-        <div class="upload-zone-text">Arrastra tu archivo Excel aquí</div>
-        <div class="upload-zone-sub">o haz clic para seleccionar · .xlsx, .xls</div>
+      <div class="upload-zone" onclick="document.getElementById('excel-mat').click()">
+        <div class="upload-zone-icon">📊</div><div class="upload-zone-text">Arrastra tu Excel aquí o haz clic</div><div class="upload-zone-sub">.xlsx, .xls</div>
       </div>
-      <input type="file" id="excel-file" accept=".xlsx,.xls" style="display:none" onchange="loadExcel(this)">
-      <div style="background:var(--surface2);border-radius:8px;padding:14px;font-size:12px;color:var(--muted);margin-bottom:14px">
-        <div style="font-family:var(--mono);font-size:10px;color:var(--accent);margin-bottom:8px;letter-spacing:1px">COLUMNAS REQUERIDAS EN EL EXCEL:</div>
-        <div>El Excel debe tener estas columnas (en cualquier orden):</div>
-        <div style="margin-top:6px;font-family:var(--mono);color:var(--text)">Material · Texto breve de material · Unidad medida base · Precio · Moneda · Centro</div>
+      <input type="file" id="excel-mat" accept=".xlsx,.xls" style="display:none" onchange="loadExcelImport(this,'mat')">
+      <div style="background:var(--surface2);border-radius:8px;padding:12px;font-size:12px;color:var(--muted)">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--accent);margin-bottom:6px">COLUMNAS REQUERIDAS:</div>
+        Material · Texto breve de material · Unidad medida base · Precio · Moneda · Centro
       </div>
-      <div id="excel-preview" style="display:none">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--accent2);margin-bottom:8px" id="excel-count"></div>
-        <div class="table-wrap" style="max-height:200px;overflow-y:auto">
-          <table id="excel-preview-table"><thead></thead><tbody></tbody></table>
-        </div>
-      </div>
+      <div id="preview-mat" style="display:none"><div style="font-family:var(--mono);font-size:11px;color:var(--accent2);margin-top:10px" id="count-mat"></div></div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-import-mat')">Cancelar</button>
-      <button class="btn btn-primary" id="btn-confirm-import" onclick="confirmImportMat()" disabled>Importar Materiales</button>
-    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-import-mat')">Cancelar</button><button class="btn btn-primary" id="btn-imp-mat" onclick="confirmImport('mat')" disabled>Importar</button></div>
   </div>
 </div>
 
 <!-- MODAL HERRAMIENTAS -->
 <div class="modal-overlay" id="modal-her">
   <div class="modal">
-    <div class="modal-header"><h2>REGISTRAR ENTREGA DE HERRAMIENTA</h2><button class="modal-close" onclick="closeModal('modal-her')">✕</button></div>
+    <div class="modal-header"><h2>ENTREGA DE HERRAMIENTA</h2><button class="modal-close" onclick="closeModal('modal-her')">✕</button></div>
     <div class="modal-body">
       <div class="form-grid">
         <div class="form-group"><label>Técnico *</label><select class="form-control" id="her-tec"></select></div>
-        <div class="form-group"><label>Herramienta *</label><input type="text" class="form-control" id="her-nombre" placeholder="ej. Llave torquímetro 3/4"></div>
-        <div class="form-group"><label>Código / Serie</label><input type="text" class="form-control" id="her-codigo" placeholder="ej. HER-042"></div>
+        <div class="form-group"><label>Herramienta *</label><input type="text" class="form-control" id="her-nombre"></div>
+        <div class="form-group"><label>Código / Serie</label><input type="text" class="form-control" id="her-codigo"></div>
         <div class="form-group"><label>Cantidad</label><input type="number" class="form-control" id="her-cant" value="1" min="1"></div>
         <div class="form-group"><label>OT Relacionada</label><select class="form-control" id="her-ot"></select></div>
         <div class="form-group"><label>Fecha Entrega</label><input type="date" class="form-control" id="her-fecha"></div>
-        <div class="form-group"><label>Fecha Devolución Estimada</label><input type="date" class="form-control" id="her-fecha-dev"></div>
+        <div class="form-group"><label>Fecha Devolución Est.</label><input type="date" class="form-control" id="her-fecha-dev"></div>
         <div class="form-group"><label>Condición</label><select class="form-control" id="her-condicion"><option>Bueno</option><option>Regular</option><option>Requiere mantenimiento</option></select></div>
-        <div class="form-group form-full"><label>Observaciones</label><textarea class="form-control" id="her-obs" placeholder="Notas adicionales..."></textarea></div>
+        <div class="form-group form-full"><label>Observaciones</label><textarea class="form-control" id="her-obs"></textarea></div>
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-her')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveHerramienta()">Registrar</button>
-    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-her')">Cancelar</button><button class="btn btn-primary" onclick="saveHerramienta()">Registrar</button></div>
   </div>
 </div>
 
@@ -584,13 +693,10 @@ textarea.form-control{resize:vertical;min-height:70px}
         <div class="form-group"><label>EPP</label><select class="form-control" id="epp-tipo"><option>Casco de Seguridad</option><option>Lentes de Seguridad</option><option>Guantes de Cuero</option><option>Guantes de Nitrilo</option><option>Botas de Seguridad</option><option>Chaleco Reflectivo</option><option>Arnés de Seguridad</option><option>Respirador N95</option><option>Tapones Auditivos</option><option>Careta Facial</option><option>Traje Tyvek</option></select></div>
         <div class="form-group"><label>Cantidad</label><input type="number" class="form-control" id="epp-cant" value="1" min="1"></div>
         <div class="form-group"><label>Fecha</label><input type="date" class="form-control" id="epp-fecha"></div>
-        <div class="form-group form-full"><label>Motivo / OT</label><input type="text" class="form-control" id="epp-motivo" placeholder="ej. OT-0012 Trabajo en altura"></div>
+        <div class="form-group form-full"><label>Motivo / OT</label><input type="text" class="form-control" id="epp-motivo"></div>
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-epp')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveEPP()">Registrar</button>
-    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-epp')">Cancelar</button><button class="btn btn-primary" onclick="saveEPP()">Registrar</button></div>
   </div>
 </div>
 
@@ -601,17 +707,14 @@ textarea.form-control{resize:vertical;min-height:70px}
     <div class="modal-body">
       <div class="form-grid">
         <div class="form-group"><label>Nombre *</label><input type="text" class="form-control" id="eq-nombre"></div>
-        <div class="form-group"><label>TAG *</label><input type="text" class="form-control" id="eq-tag" placeholder="ej. BC-101"></div>
-        <div class="form-group"><label>Área / Línea</label><input type="text" class="form-control" id="eq-area"></div>
+        <div class="form-group"><label>TAG *</label><input type="text" class="form-control" id="eq-tag"></div>
+        <div class="form-group"><label>Área</label><input type="text" class="form-control" id="eq-area"></div>
         <div class="form-group"><label>Tipo</label><select class="form-control" id="eq-tipo"><option>Bomba</option><option>Motor</option><option>Compresor</option><option>Transportador</option><option>Caldera</option><option>Reductor</option><option>Ventilador</option><option>Otro</option></select></div>
         <div class="form-group"><label>Marca / Modelo</label><input type="text" class="form-control" id="eq-marca"></div>
         <div class="form-group"><label>Criticidad</label><select class="form-control" id="eq-crit"><option>Alta</option><option>Media</option><option>Baja</option></select></div>
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-eq')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveEquipo()">Guardar</button>
-    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-eq')">Cancelar</button><button class="btn btn-primary" onclick="saveEquipo()">Guardar</button></div>
   </div>
 </div>
 
@@ -621,44 +724,60 @@ textarea.form-control{resize:vertical;min-height:70px}
     <div class="modal-header"><h2>NUEVO TÉCNICO</h2><button class="modal-close" onclick="closeModal('modal-tec')">✕</button></div>
     <div class="modal-body">
       <div class="form-grid">
-        <div class="form-group"><label>Nombre Completo *</label><input type="text" class="form-control" id="tec-nombre"></div>
-        <div class="form-group"><label>ID / Ficha</label><input type="text" class="form-control" id="tec-id" placeholder="ej. T-041"></div>
+        <div class="form-group"><label>Nombre *</label><input type="text" class="form-control" id="tec-nombre"></div>
+        <div class="form-group"><label>ID / Ficha</label><input type="text" class="form-control" id="tec-id"></div>
         <div class="form-group"><label>Especialidad</label><select class="form-control" id="tec-esp"><option>Mecánico</option><option>Eléctrico</option><option>Instrumentista</option><option>Soldador</option><option>Lubricador</option><option>General</option></select></div>
         <div class="form-group"><label>Turno</label><select class="form-control" id="tec-turno"><option>Día</option><option>Tarde</option><option>Noche</option><option>Rotativo</option></select></div>
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-tec')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveTecnico()">Guardar</button>
-    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-tec')">Cancelar</button><button class="btn btn-primary" onclick="saveTecnico()">Guardar</button></div>
   </div>
 </div>
 
-<!-- MODAL CAMBIO ESTADO OT -->
-<div class="modal-overlay" id="modal-estado-ot">
-  <div class="modal" style="max-width:420px">
-    <div class="modal-header"><h2>ACTUALIZAR OT</h2><button class="modal-close" onclick="closeModal('modal-estado-ot')">✕</button></div>
+<!-- MODAL USUARIO -->
+<div class="modal-overlay" id="modal-usr">
+  <div class="modal">
+    <div class="modal-header"><h2 id="usr-modal-title">NUEVO USUARIO</h2><button class="modal-close" onclick="closeModal('modal-usr')">✕</button></div>
     <div class="modal-body">
-      <div style="font-family:var(--mono);color:var(--accent);font-size:13px;margin-bottom:14px" id="est-ot-num"></div>
       <div class="form-grid">
-        <div class="form-group"><label>Estado</label><select class="form-control" id="est-ot-val"><option>Abierta</option><option>En proceso</option><option>Pausada</option><option>Cerrada</option></select></div>
-        <div class="form-group"><label>% Avance</label><input type="number" class="form-control" id="est-ot-avance" min="0" max="100"></div>
+        <div class="form-group"><label>Usuario (login) *</label><input type="text" class="form-control" id="usr-username" placeholder="ej. jperez" autocomplete="off"></div>
+        <div class="form-group"><label>Contraseña *</label><input type="text" class="form-control" id="usr-password" placeholder="Contraseña de acceso"></div>
+        <div class="form-group"><label>Nombre Completo *</label><input type="text" class="form-control" id="usr-nombre"></div>
+        <div class="form-group"><label>Rol</label>
+          <select class="form-control" id="usr-rol" onchange="toggleTecnicoSelect()">
+            <option value="planner">Planner (Acceso Total)</option>
+            <option value="supervisor">Supervisor (Acceso Total)</option>
+            <option value="tecnico">Técnico (Solo sus OT)</option>
+            <option value="jefatura">Jefatura (Solo Lectura)</option>
+          </select>
+        </div>
+        <div class="form-group form-full" id="usr-tec-group" style="display:none">
+          <label>Técnico Asociado (para filtrar sus OT)</label>
+          <select class="form-control" id="usr-tec-asoc"></select>
+        </div>
       </div>
-      <div class="form-group" style="margin-top:12px"><label>Comentario</label><textarea class="form-control" id="est-ot-comment" placeholder="Nota de actualización..." style="min-height:60px"></textarea></div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-estado-ot')">Cancelar</button>
-      <button class="btn btn-primary" onclick="confirmEstadoOT()">Confirmar</button>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-usr')">Cancelar</button><button class="btn btn-primary" onclick="saveUsuario()">Guardar</button></div>
+  </div>
+</div>
+
+<!-- MODAL COMBO ADD -->
+<div class="modal-overlay" id="modal-combo-add">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-header"><h2 id="combo-modal-title">AGREGAR OPCIÓN</h2><button class="modal-close" onclick="closeModal('modal-combo-add')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label id="combo-modal-label">Nueva opción</label><input type="text" class="form-control" id="combo-new-val" placeholder="Escribe el nuevo valor..."></div>
     </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-combo-add')">Cancelar</button><button class="btn btn-primary" onclick="saveComboOption()">Agregar</button></div>
   </div>
 </div>
 
 <div id="toast"></div>
 
+<!-- ===== FIREBASE + LOGIC ===== -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { getStorage, ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+import { getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDVFdyZLIj0Z5_kWMEazrbZD8kd4j__Jtk",
@@ -669,70 +788,145 @@ const firebaseConfig = {
   appId: "1:841811638010:web:fe72e74bc0302905b43b43"
 };
 
-const PASSWORDS = {planner:"planner2024",supervisor:"super2024",tecnico:"tec2024",jefatura:"jefe2024"};
-const ROLE_LABELS = {planner:"Planner Mtto",supervisor:"Supervisor",tecnico:"Técnico",jefatura:"Jefatura"};
-const ROLE_WRITE = {planner:true,supervisor:false,tecnico:false,jefatura:false};
-const ROLE_EPP = {planner:true,supervisor:false,tecnico:true,jefatura:false};
+// ROLES
+const ROLE_LABELS = {planner:"Planner",supervisor:"Supervisor",tecnico:"Técnico",jefatura:"Jefatura"};
+const ROLE_WRITE = {planner:true,supervisor:true,tecnico:false,jefatura:false};
+const NAV_CONFIG = {
+  planner:  ['dashboard','ot','logistica','suministros','equipos','materiales','herramientas','epp','tecnicos','usuarios','reportes'],
+  supervisor:['dashboard','ot','logistica','suministros','equipos','materiales','herramientas','epp','tecnicos','reportes'],
+  tecnico:  ['ot'],
+  jefatura: ['dashboard','ot','logistica','suministros','reportes']
+};
+const NAV_LABELS = {
+  dashboard:'Dashboard',ot:'Órdenes de Trabajo',logistica:'SAP — Logística',
+  suministros:'SAP — Suministros',equipos:'Equipos',materiales:'Materiales',
+  herramientas:'Herramientas',epp:'Entrega EPPs',tecnicos:'Técnicos',
+  usuarios:'Gestión de Usuarios',reportes:'Indicadores'
+};
+const NAV_ICONS = {
+  dashboard:'📊',ot:'🔧',logistica:'📋',suministros:'🛒',equipos:'⚙️',
+  materiales:'📦',herramientas:'🪛',epp:'🦺',tecnicos:'👷',usuarios:'👥',reportes:'📈'
+};
+const NAV_SECTIONS = {
+  dashboard:'Principal',ot:'Operaciones',logistica:'Operaciones',suministros:'Operaciones',
+  equipos:'Recursos',materiales:'Recursos',herramientas:'Recursos',epp:'Recursos',tecnicos:'Recursos',
+  usuarios:'Administración',reportes:'Análisis'
+};
 
-let app, db, storage;
+// STATE
+let app, db;
 let currentUser = null;
-let otData=[], svcData=[], eqData=[], tecData=[], eppData=[], herData=[], matData=[], actData=[];
-let svcFilterVal='Todos';
-let editingOTId=null, editingSvcId=null;
+let otData=[],logData=[],sumData=[],eqData=[],tecData=[],eppData=[],herData=[],matData=[],actData=[],usrData=[],listasData={};
+let logFilterVal='Todos';
+let editingLogId=null, editingUsrId=null;
 let otCounter=1;
 let unsubscribers=[];
-let excelImportData=[];
+let importBuffers={ot:[],log:[],sum:[],mat:[]};
 let otMatsSelected=[];
+let comboTarget={selectId:'',collection:''};
 
+// SUM COLUMNS
+const SUM_COLS = [
+  {key:'status',label:'Status'},
+  {key:'posSol',label:'Pos.Sol.Pedido'},
+  {key:'tipoImp',label:'Tipo Imputación'},
+  {key:'tipoPos',label:'Tipo Posición'},
+  {key:'material',label:'Material'},
+  {key:'texto',label:'Texto Breve'},
+  {key:'cant',label:'Cantidad'},
+  {key:'um',label:'UM'},
+  {key:'precio',label:'Precio Valor.'},
+  {key:'moneda',label:'Moneda'},
+  {key:'centro',label:'Centro'},
+  {key:'pedido',label:'Pedido'},
+  {key:'grupoArt',label:'Grupo Art.'},
+  {key:'valorTotal',label:'Valor Total'},
+  {key:'posEd',label:'Pos.Pedido'},
+  {key:'fechaOC',label:'Fe.Orden Compra'},
+  {key:'grupoComp',label:'Grupo Compras'},
+  {key:'solicitante',label:'Solicitante'},
+  {key:'creadoPorSAP',label:'Creado Por'},
+  {key:'tipoFe',label:'Tipo Fe.Entrega'},
+  {key:'fechaEnt',label:'Fe.Entrega'},
+  {key:'almacen',label:'Almacén'},
+  {key:'urgencia',label:'Urgencia'},
+  {key:'numNec',label:'N° Necesidad'},
+  {key:'statusTrat',label:'Status Trat.'},
+  {key:'statusTratSol',label:'Status Trat.Sol.'}
+];
+let visibleSumCols = SUM_COLS.map(c=>c.key); // all visible by default
+
+// INIT
 try {
   app = initializeApp(firebaseConfig);
   db = getFirestore(app);
-  try { storage = getStorage(app); } catch(e){}
   document.getElementById('loading').style.display='none';
   const saved = sessionStorage.getItem('mantex_user');
   if(saved){ currentUser=JSON.parse(saved); bootApp(); }
   else { document.getElementById('login-screen').style.display='flex'; }
 } catch(e) {
-  document.getElementById('loading').innerHTML=`<div style="text-align:center;padding:40px"><div style="font-size:40px;margin-bottom:20px">⚠️</div><div style="font-family:var(--display);font-size:28px;color:var(--accent)">ERROR DE CONEXIÓN</div><div style="color:var(--muted);margin-top:12px">${e.message}</div></div>`;
+  document.getElementById('loading').innerHTML=`<div style="text-align:center;padding:40px;max-width:400px"><div style="font-size:38px;margin-bottom:16px">⚠️</div><div style="font-family:var(--display);font-size:26px;color:var(--accent)">ERROR CONEXIÓN</div><div style="color:var(--muted);margin-top:10px;font-size:13px">${e.message}</div></div>`;
 }
 
-window.selectRole = function(role,el){ document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('selected')); el.classList.add('selected'); window._selectedRole=role; };
-window._selectedRole='planner';
+// LOGIN
+window.doLogin = async function(){
+  const username = document.getElementById('login-user').value.trim().toLowerCase();
+  const pass = document.getElementById('login-pass').value;
+  if(!username||!pass){toast('Completa usuario y contraseña','error');return;}
+  
+  // Check Firestore users collection
+  try {
+    const snap = await getDoc(doc(db,'usuarios',username));
+    if(snap.exists()){
+      const usr = snap.data();
+      if(usr.password === pass){
+        currentUser = {name:usr.nombre, role:usr.rol, username, avatar:usr.nombre.charAt(0).toUpperCase(), tecnicoAsoc:usr.tecnicoAsoc||''};
+        sessionStorage.setItem('mantex_user',JSON.stringify(currentUser));
+        document.getElementById('login-screen').style.display='none';
+        bootApp();
+        return;
+      } else { toast('Contraseña incorrecta','error'); return; }
+    }
+  } catch(e) {}
 
-window.doLogin = function(){
-  const name=document.getElementById('login-name').value.trim();
-  const pass=document.getElementById('login-pass').value;
-  const role=window._selectedRole;
-  if(!name){ toast('Ingresa tu nombre','error'); return; }
-  if(pass!==PASSWORDS[role]){ toast('Contraseña incorrecta','error'); return; }
-  currentUser={name,role,avatar:name.charAt(0).toUpperCase()};
-  sessionStorage.setItem('mantex_user',JSON.stringify(currentUser));
-  document.getElementById('login-screen').style.display='none';
-  bootApp();
+  // Fallback default planner
+  if(username==='planner'&&pass==='planner2024'){
+    currentUser={name:'Planner',role:'planner',username:'planner',avatar:'P',tecnicoAsoc:''};
+    sessionStorage.setItem('mantex_user',JSON.stringify(currentUser));
+    document.getElementById('login-screen').style.display='none';
+    bootApp();
+    return;
+  }
+  toast('Usuario no encontrado','error');
 };
 
 window.doLogout = function(){ unsubscribers.forEach(u=>u()); sessionStorage.removeItem('mantex_user'); location.reload(); };
 
+// BOOT
 function bootApp(){
   document.getElementById('app').style.display='block';
   document.getElementById('user-display-name').textContent=currentUser.name;
-  document.getElementById('user-role-label').textContent=ROLE_LABELS[currentUser.role];
+  document.getElementById('user-role-label').textContent=ROLE_LABELS[currentUser.role]||currentUser.role;
   document.getElementById('user-avatar').textContent=currentUser.avatar;
   document.getElementById('topbar-date').textContent=new Date().toLocaleDateString('es-PE',{weekday:'short',year:'numeric',month:'short',day:'numeric'}).toUpperCase();
-  applyRoleRestrictions();
+  buildNav();
   subscribeAll();
   setDefaultDates();
-  navigate('dashboard',document.querySelector('.nav-item'));
+  const firstPage = NAV_CONFIG[currentUser.role][0];
+  navigate(firstPage, null);
 }
 
-function applyRoleRestrictions(){
-  if(!ROLE_WRITE[currentUser.role]){
-    ['btn-nueva-ot','btn-nueva-svc','btn-nuevo-eq','btn-nuevo-tec','btn-nuevo-mat','btn-import-mat'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
-  }
-  if(!ROLE_EPP[currentUser.role]){
-    const el=document.getElementById('btn-nuevo-epp');if(el)el.style.display='none';
-    const el2=document.getElementById('btn-nueva-her');if(el2)el2.style.display='none';
-  }
+function buildNav(){
+  const pages = NAV_CONFIG[currentUser.role]||['dashboard'];
+  let html='';
+  let lastSection='';
+  pages.forEach(p=>{
+    const sec = NAV_SECTIONS[p]||'';
+    if(sec!==lastSection){html+=`<div class="nav-section">${sec}</div>`;lastSection=sec;}
+    const badge = p==='ot'?` <span class="nav-badge" id="badge-ot">0</span>`:p==='logistica'?` <span class="nav-badge" id="badge-log">0</span>`:'';
+    html+=`<div class="nav-item" id="nav-${p}" onclick="navigate('${p}',this)"><span class="icon">${NAV_ICONS[p]}</span>${NAV_LABELS[p]}${badge}</div>`;
+  });
+  document.getElementById('sidebar-nav').innerHTML=html;
 }
 
 function subscribeAll(){
@@ -744,11 +938,15 @@ function subscribeAll(){
     if(document.getElementById('page-dashboard').classList.contains('active')) renderDashboard();
     if(document.getElementById('page-reportes').classList.contains('active')) renderReportes();
   }));
-  unsubscribers.push(onSnapshot(collection(db,'servicios'),snap=>{
-    svcData=snap.docs.map(d=>({id:d.id,...d.data()}));
+  unsubscribers.push(onSnapshot(collection(db,'logistica'),snap=>{
+    logData=snap.docs.map(d=>({id:d.id,...d.data()}));
     updateBadges();
-    if(document.getElementById('page-servicios').classList.contains('active')) renderServicios();
+    if(document.getElementById('page-logistica').classList.contains('active')) renderLogistica();
     if(document.getElementById('page-dashboard').classList.contains('active')) renderDashboard();
+  }));
+  unsubscribers.push(onSnapshot(collection(db,'suministros'),snap=>{
+    sumData=snap.docs.map(d=>({id:d.id,...d.data()}));
+    if(document.getElementById('page-suministros').classList.contains('active')) renderSuministros();
   }));
   unsubscribers.push(onSnapshot(collection(db,'equipos'),snap=>{
     eqData=snap.docs.map(d=>({id:d.id,...d.data()}));
@@ -777,50 +975,70 @@ function subscribeAll(){
     actData=snap.docs.map(d=>({id:d.id,...d.data()}));
     if(document.getElementById('page-dashboard').classList.contains('active')) renderActivity();
   }));
+  unsubscribers.push(onSnapshot(collection(db,'usuarios'),snap=>{
+    usrData=snap.docs.map(d=>({id:d.id,...d.data()}));
+    if(document.getElementById('page-usuarios')?.classList.contains('active')) renderUsuarios();
+  }));
+  // Listas para combos
+  ['temporadas','areas','sistemas','subsistemas','ubicaciones'].forEach(col=>{
+    unsubscribers.push(onSnapshot(collection(db,col),snap=>{
+      listasData[col]=snap.docs.map(d=>d.data().valor).filter(Boolean).sort();
+      populateCombos();
+    }));
+  });
 }
 
-const titles={dashboard:'DASHBOARD',ot:'ÓRDENES DE TRABAJO',servicios:'SERVICIOS / LOGÍSTICA',equipos:'EQUIPOS',materiales:'MATERIALES',herramientas:'HERRAMIENTAS',epp:'ENTREGA DE EPPs',tecnicos:'TÉCNICOS',reportes:'INDICADORES'};
+// NAV
+const PAGE_TITLES={dashboard:'DASHBOARD',ot:'ÓRDENES DE TRABAJO',logistica:'SAP — LOGÍSTICA',suministros:'SAP — SUMINISTROS',equipos:'EQUIPOS',materiales:'MATERIALES',herramientas:'HERRAMIENTAS',epp:'ENTREGA DE EPPs',tecnicos:'TÉCNICOS',usuarios:'GESTIÓN DE USUARIOS',reportes:'INDICADORES'};
 window.navigate=function(page,el){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById('page-'+page).classList.add('active');
-  document.getElementById('page-title').textContent=titles[page];
-  if(el)el.classList.add('active');
-  else document.querySelectorAll('.nav-item').forEach(n=>{if(n.getAttribute('onclick')?.includes("'"+page+"'"))n.classList.add('active');});
-  const renders={dashboard:renderDashboard,ot:renderOT,servicios:renderServicios,equipos:renderEquipos,materiales:renderMateriales,herramientas:renderHerramientas,epp:renderEPP,tecnicos:renderTecnicos,reportes:renderReportes};
-  if(renders[page])renders[page]();
+  const pg=document.getElementById('page-'+page);
+  if(!pg) return;
+  pg.classList.add('active');
+  document.getElementById('page-title').textContent=PAGE_TITLES[page]||page.toUpperCase();
+  if(el) el.classList.add('active');
+  else { const n=document.getElementById('nav-'+page); if(n) n.classList.add('active'); }
+  const r={dashboard:renderDashboard,ot:renderOT,logistica:renderLogistica,suministros:renderSuministros,equipos:renderEquipos,materiales:renderMateriales,herramientas:renderHerramientas,epp:renderEPP,tecnicos:renderTecnicos,usuarios:renderUsuarios,reportes:renderReportes};
+  if(r[page]) r[page]();
 };
 
 // ── DASHBOARD ──
 function renderDashboard(){
   const otAct=otData.filter(o=>o.estado!=='Cerrada').length;
   const otCerr=otData.filter(o=>o.estado==='Cerrada').length;
-  const svcPend=svcData.filter(s=>s.estado==='Pendiente'||s.estado==='En proceso').length;
+  const logPend=logData.filter(s=>s.estado==='Pendiente'||s.estado==='En proceso').length;
   const otAlta=otData.filter(o=>o.prior==='Alta'&&o.estado!=='Cerrada').length;
   document.getElementById('kpi-grid').innerHTML=`
     <div class="kpi-card yellow"><div class="kpi-label">OT Activas</div><div class="kpi-value">${otAct}</div><div class="kpi-sub">En proceso y abiertas</div><div class="kpi-trend">🔧</div></div>
     <div class="kpi-card red"><div class="kpi-label">Alta Prioridad</div><div class="kpi-value">${otAlta}</div><div class="kpi-sub">Requieren atención</div><div class="kpi-trend">🚨</div></div>
-    <div class="kpi-card blue"><div class="kpi-label">Servicios Activos</div><div class="kpi-value">${svcPend}</div><div class="kpi-sub">Pendiente / En proceso</div><div class="kpi-trend">📋</div></div>
+    <div class="kpi-card blue"><div class="kpi-label">Logística Activa</div><div class="kpi-value">${logPend}</div><div class="kpi-sub">Pendiente / En proceso</div><div class="kpi-trend">📋</div></div>
     <div class="kpi-card green"><div class="kpi-label">OT Cerradas</div><div class="kpi-value">${otCerr}</div><div class="kpi-sub">Completadas</div><div class="kpi-trend">✅</div></div>`;
-  const recOT=[...otData].slice(0,6);
+  const recOT=[...filterOTByUser()].slice(0,6);
   document.getElementById('dash-ot-recent').innerHTML=recOT.length
     ?`<table><thead><tr><th>OT</th><th>Equipo</th><th>Avance</th><th>Estado</th></tr></thead><tbody>${recOT.map(o=>`<tr><td><span class="pill-num">${o.num}</span></td><td>${o.equipo||''}</td><td style="font-family:var(--mono)">${o.avance||0}%</td><td>${estadoBadge(o.estado)}</td></tr>`).join('')}</tbody></table>`
     :emptyMsg('Sin OT registradas');
-  const pendSvc=svcData.filter(s=>s.estado==='Pendiente'||s.estado==='En proceso').slice(0,6);
-  document.getElementById('dash-svc-pending').innerHTML=pendSvc.length
-    ?`<table><thead><tr><th>Sol. Pedido</th><th>Texto Breve</th><th>Estado</th></tr></thead><tbody>${pendSvc.map(s=>`<tr><td style="font-family:var(--mono);font-size:12px">${s.solped||'—'}</td><td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.texto||''}</td><td>${svcEstadoBadge(s.estado)}</td></tr>`).join('')}</tbody></table>`
+  const pendLog=logData.filter(s=>s.estado==='Pendiente'||s.estado==='En proceso').slice(0,6);
+  document.getElementById('dash-svc-pending').innerHTML=pendLog.length
+    ?`<table><thead><tr><th>Sol.Pedido</th><th>Texto Breve</th><th>Estado</th></tr></thead><tbody>${pendLog.map(s=>`<tr><td style="font-family:var(--mono);font-size:11px">${s.solped||'—'}</td><td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.texto||''}</td><td>${logEstadoBadge(s.estado)}</td></tr>`).join('')}</tbody></table>`
     :emptyMsg('Sin servicios pendientes ✅');
   renderActivity();
 }
 function renderActivity(){
   const acts=actData.slice(0,10);
   document.getElementById('dash-activity').innerHTML=acts.length
-    ?acts.map(a=>`<div style="display:flex;gap:12px;align-items:flex-start;padding:10px 18px;border-bottom:1px solid var(--border)"><div style="font-size:17px;flex-shrink:0">${a.type==='ot'?'🔧':a.type==='svc'?'📋':a.type==='mat'?'📦':'🦺'}</div><div><div style="font-family:var(--mono);font-size:10px;color:var(--accent)">${a.user||'Sistema'}</div><div style="font-size:13px;margin-top:2px">${a.text}</div><div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:3px">${fmtTs(a.ts)}</div></div></div>`).join('')
+    ?acts.map(a=>`<div style="display:flex;gap:11px;align-items:flex-start;padding:9px 16px;border-bottom:1px solid var(--border)"><div style="font-size:16px;flex-shrink:0">${a.type==='ot'?'🔧':a.type==='log'?'📋':a.type==='mat'?'📦':'🦺'}</div><div><div style="font-family:var(--mono);font-size:10px;color:var(--accent)">${a.user||'Sistema'}</div><div style="font-size:13px;margin-top:2px">${a.text}</div><div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px">${fmtTs(a.ts)}</div></div></div>`).join('')
     :emptyMsg('Sin actividad');
 }
 function updateBadges(){
-  document.getElementById('badge-ot').textContent=otData.filter(o=>o.estado!=='Cerrada').length;
-  document.getElementById('badge-svc').textContent=svcData.filter(s=>s.estado==='Pendiente'||s.estado==='En proceso').length;
+  const bOT=document.getElementById('badge-ot'); if(bOT) bOT.textContent=filterOTByUser().filter(o=>o.estado!=='Cerrada').length;
+  const bLog=document.getElementById('badge-log'); if(bLog) bLog.textContent=logData.filter(s=>s.estado==='Pendiente'||s.estado==='En proceso').length;
+}
+function filterOTByUser(){
+  if(currentUser.role==='tecnico' && currentUser.tecnicoAsoc){
+    return otData.filter(o=>o.tecnico===currentUser.tecnicoAsoc);
+  }
+  return otData;
 }
 
 // ── OT ──
@@ -828,31 +1046,32 @@ function renderOT(){
   const search=document.getElementById('ot-search')?.value?.toLowerCase()||'';
   const fE=document.getElementById('ot-f-estado')?.value||'';
   const fT=document.getElementById('ot-f-tipo')?.value||'';
-  let list=otData.filter(o=>{
-    const m=!search||(o.num||'').toLowerCase().includes(search)||(o.desc||'').toLowerCase().includes(search)||(o.equipo||'').toLowerCase().includes(search)||(o.tecnico||'').toLowerCase().includes(search)||(o.nom||'').toLowerCase().includes(search);
+  let list=filterOTByUser().filter(o=>{
+    const m=!search||(o.num||'').toLowerCase().includes(search)||(o.desc||'').toLowerCase().includes(search)||(o.equipo||'').toLowerCase().includes(search)||(o.tecnico||'').toLowerCase().includes(search);
     return m&&(!fE||o.estado===fE)&&(!fT||o.tipo===fT);
   });
   const stats={Abierta:0,'En proceso':0,Pausada:0,Cerrada:0};
-  otData.forEach(o=>stats[o.estado]=(stats[o.estado]||0)+1);
+  filterOTByUser().forEach(o=>stats[o.estado]=(stats[o.estado]||0)+1);
   document.getElementById('ot-stats').innerHTML=Object.entries(stats).map(([k,v])=>`<div class="stat-box"><div class="val">${v}</div><div class="lbl">${k}</div></div>`).join('');
   const canWrite=ROLE_WRITE[currentUser.role];
+  const showBtn=document.getElementById('btn-nueva-ot');
+  if(showBtn) showBtn.style.display=canWrite?'':'none';
   document.getElementById('ot-tbody').innerHTML=list.length?list.map(o=>`<tr>
     <td><span class="pill-num">${o.num}</span></td>
-    <td style="font-family:var(--mono);font-size:11px">${o.nom||'—'}</td>
     <td style="font-size:12px">${o.sistema||'—'}</td>
+    <td style="font-size:12px">${o.subsistema||'—'}</td>
     <td style="font-family:var(--mono);font-size:12px">${o.equipo||''}</td>
-    <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${o.desc||''}">${o.desc||''}</td>
+    <td style="max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${o.desc||''}">${o.desc||''}</td>
     <td>${tipoBadge(o.tipo)}</td>
     <td>${o.tecnico||''}</td>
-    <td><div style="display:flex;align-items:center;gap:6px"><div style="flex:1;background:var(--surface2);border-radius:3px;height:5px;overflow:hidden"><div style="width:${o.avance||0}%;height:100%;background:var(--accent2);border-radius:3px"></div></div><span style="font-family:var(--mono);font-size:11px">${o.avance||0}%</span></div></td>
+    <td><div style="display:flex;align-items:center;gap:5px"><div style="flex:1;background:var(--surface2);border-radius:3px;height:5px;overflow:hidden"><div style="width:${o.avance||0}%;height:100%;background:var(--accent2);border-radius:3px"></div></div><span style="font-family:var(--mono);font-size:10px">${o.avance||0}%</span></div></td>
     <td>${estadoBadge(o.estado)}</td>
     <td style="font-family:var(--mono);font-size:11px">${o.fecha||''}</td>
-    <td style="display:flex;gap:4px;flex-wrap:wrap">
+    <td style="display:flex;gap:3px;flex-wrap:nowrap">
       <button class="btn btn-ghost btn-sm" onclick="verOT('${o.id}')">👁</button>
       ${canWrite?`<button class="btn btn-ghost btn-sm" onclick="openCambioEstadoOT('${o.id}','${o.num}','${o.estado}','${o.avance||0}')">Estado</button>
       <button class="btn btn-danger btn-sm" onclick="deleteOT('${o.id}')">✕</button>`:''}
-    </td></tr>`).join('')
-    :`<tr><td colspan="11">${emptyMsg('Sin órdenes')}</td></tr>`;
+    </td></tr>`).join(''):`<tr><td colspan="11">${emptyMsg('Sin órdenes de trabajo')}</td></tr>`;
 }
 
 window.verOT=function(id){
@@ -860,221 +1079,236 @@ window.verOT=function(id){
   document.getElementById('ver-ot-titulo').textContent=`${o.num} — ${o.equipo||''}`;
   const mats=o.materiales?o.materiales.map(m=>`<span class="material-tag">${m.texto} (${m.um}) — ${m.moneda} ${m.precio}</span>`).join(''):'—';
   document.getElementById('ver-ot-body').innerHTML=`
-    <div class="form-grid3" style="margin-bottom:16px">
-      ${field('Temporada',o.temporada)}${field('N° OM',o.nom)}${field('Área Solicitante',o.areaSol)}
-      ${field('Sistema',o.sistema)}${field('Subsistema',o.subsistema)}${field('Ubicación',o.ubicacion)}
-      ${field('Equipo',o.equipo)}${field('Tipo',o.tipo)}${field('Técnico',o.tecnico)}
-      ${field('Fecha',o.fecha)}${field('Hora Inicio',o.horaIni)}${field('Hora Fin',o.horaFin)}
-      ${field('Duración',o.duracion)}${field('% Avance',`${o.avance||0}%`)}${field('Estado',o.estado)}
+    <div class="form-grid3" style="gap:16px;margin-bottom:16px">
+      ${fd('Temporada',o.temporada)}${fd('Área Solicitante',o.areaSol)}${fd('Tipo',o.tipo)}
+      ${fd('Sistema',o.sistema)}${fd('Subsistema',o.subsistema)}${fd('Ubicación',o.ubicacion)}
+      ${fd('Equipo',o.equipo)}${fd('Técnico',o.tecnico)}${fd('Estado',o.estado)}
+      ${fd('Fecha',o.fecha)}${fd('Hora Inicio',o.horaIni)}${fd('Hora Fin',o.horaFin)}
+      ${fd('Duración',o.duracion)}${fd('% Avance',`${o.avance||0}%`)}${fd('Costo Mat.',o.costoMat)}
     </div>
-    <div class="form-group form-full" style="margin-bottom:12px"><label style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px">DESCRIPCIÓN</label><div style="margin-top:6px;font-size:13px">${o.desc||'—'}</div></div>
-    <div class="form-group form-full" style="margin-bottom:12px"><label style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px">ACTIVIDAD</label><div style="margin-top:6px;font-size:13px">${o.actividad||'—'}</div></div>
-    <div class="form-group form-full" style="margin-bottom:12px"><label style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px">MATERIALES UTILIZADOS</label><div style="margin-top:8px">${mats}</div><div style="margin-top:6px;font-family:var(--mono);font-size:12px;color:var(--accent2)">Costo total: ${o.costoMat||'S/ 0.00'}</div></div>
-    <div class="form-group form-full" style="margin-bottom:12px"><label style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px">OBSERVACIONES</label><div style="margin-top:6px;font-size:13px">${o.obs||'—'}</div></div>
-    ${o.fotoUrl?`<div><label style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px">FOTO EVIDENCIA</label><img src="${o.fotoUrl}" class="photo-preview" style="display:block;margin-top:8px"></div>`:''}
-  `;
+    <div style="margin-bottom:12px"><div style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:5px">DESCRIPCIÓN</div><div style="font-size:13px">${o.desc||'—'}</div></div>
+    <div style="margin-bottom:12px"><div style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:5px">MATERIALES UTILIZADOS</div><div>${mats}</div></div>
+    <div style="margin-bottom:12px"><div style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:5px">OBSERVACIONES</div><div style="font-size:13px">${o.obs||'—'}</div></div>
+    ${o.fotoUrl?`<div><div style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:5px">FOTO EVIDENCIA</div><img src="${o.fotoUrl}" class="photo-preview"></div>`:''}`;
   openModal('modal-ver-ot');
 };
-function field(label,val){ return `<div><div style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px">${label}</div><div style="margin-top:4px;font-size:13px">${val||'—'}</div></div>`; }
+function fd(label,val){ return `<div><div style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px">${label}</div><div style="margin-top:4px;font-size:13px;font-weight:500">${val||'—'}</div></div>`; }
 
 window.calcDuracion=function(){
-  const ini=document.getElementById('ot-hora-ini').value;
-  const fin=document.getElementById('ot-hora-fin').value;
+  const ini=document.getElementById('ot-hora-ini').value, fin=document.getElementById('ot-hora-fin').value;
   if(!ini||!fin){document.getElementById('ot-duracion').textContent='—';return;}
-  const [ih,im]=ini.split(':').map(Number);
-  const [fh,fm]=fin.split(':').map(Number);
-  let mins=(fh*60+fm)-(ih*60+im);
-  if(mins<0)mins+=1440;
-  const h=Math.floor(mins/60),m=mins%60;
-  document.getElementById('ot-duracion').textContent=`${h}h ${m}m`;
+  const [ih,im]=ini.split(':').map(Number), [fh,fm]=fin.split(':').map(Number);
+  let mins=(fh*60+fm)-(ih*60+im); if(mins<0)mins+=1440;
+  document.getElementById('ot-duracion').textContent=`${Math.floor(mins/60)}h ${mins%60}m`;
 };
 
 window.addMatToOT=function(){
-  const sel=document.getElementById('ot-mat-sel');
-  const val=sel.value; if(!val) return;
-  const mat=matData.find(m=>m.id===val); if(!mat) return;
-  if(otMatsSelected.find(m=>m.id===val)){toast('Material ya agregado','info');return;}
-  otMatsSelected.push(mat);
-  renderOTMats();
+  const sel=document.getElementById('ot-mat-sel'); const val=sel.value; if(!val)return;
+  const mat=matData.find(m=>m.id===val); if(!mat)return;
+  if(otMatsSelected.find(m=>m.id===val)){toast('Ya agregado','info');return;}
+  otMatsSelected.push(mat); renderOTMats();
 };
 function renderOTMats(){
-  const cont=document.getElementById('ot-mats-selected');
-  cont.innerHTML=otMatsSelected.map(m=>`<span class="material-tag">${m.texto} (${m.um})<button onclick="removeMatOT('${m.id}')">×</button></span>`).join('');
-  const costo=otMatsSelected.reduce((a,m)=>a+(parseFloat(m.precio)||0),0);
-  document.getElementById('ot-costo-mat').textContent=`S/ ${costo.toFixed(2)}`;
+  document.getElementById('ot-mats-selected').innerHTML=otMatsSelected.map(m=>`<span class="material-tag">${m.texto}<button onclick="removeMatOT('${m.id}')">×</button></span>`).join('');
+  const c=otMatsSelected.reduce((a,m)=>a+(parseFloat(m.precio)||0),0);
+  document.getElementById('ot-costo-mat').textContent=`Costo: S/ ${c.toFixed(2)}`;
 }
-window.removeMatOT=function(id){ otMatsSelected=otMatsSelected.filter(m=>m.id!==id); renderOTMats(); };
-
-window.previewFoto=function(input){
-  const file=input.files[0]; if(!file) return;
-  const reader=new FileReader();
-  reader.onload=e=>{const img=document.getElementById('ot-foto-preview');img.src=e.target.result;img.style.display='block';};
-  reader.readAsDataURL(file);
-};
+window.removeMatOT=function(id){otMatsSelected=otMatsSelected.filter(m=>m.id!==id);renderOTMats();};
+window.previewFoto=function(input){const f=input.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{const img=document.getElementById('ot-foto-preview');img.src=e.target.result;img.style.display='block';};r.readAsDataURL(f);};
 
 window.saveOT=async function(){
   const desc=document.getElementById('ot-desc').value.trim();
   const equipo=document.getElementById('ot-equipo').value;
   const tecnico=document.getElementById('ot-tecnico').value;
   if(!desc||!equipo||!tecnico){toast('Completa los campos requeridos','error');return;}
-  const ini=document.getElementById('ot-hora-ini').value;
-  const fin=document.getElementById('ot-hora-fin').value;
+  const ini=document.getElementById('ot-hora-ini').value, fin=document.getElementById('ot-hora-fin').value;
   let duracion='—';
-  if(ini&&fin){const [ih,im]=ini.split(':').map(Number);const [fh,fm]=fin.split(':').map(Number);let mins=(fh*60+fm)-(ih*60+im);if(mins<0)mins+=1440;duracion=`${Math.floor(mins/60)}h ${mins%60}m`;}
-  const avance=document.getElementById('ot-avance').value;
+  if(ini&&fin){const [ih,im]=ini.split(':').map(Number),[fh,fm]=fin.split(':').map(Number);let m=(fh*60+fm)-(ih*60+im);if(m<0)m+=1440;duracion=`${Math.floor(m/60)}h ${m%60}m`;}
+  const avance=parseInt(document.getElementById('ot-avance').value)||0;
   const costo=otMatsSelected.reduce((a,m)=>a+(parseFloat(m.precio)||0),0);
   const num=`OT-${String(otCounter).padStart(4,'0')}`;
+  // foto en base64 (guardada en el doc si es pequeña)
   let fotoUrl='';
   const fotoInput=document.getElementById('ot-foto');
-  if(fotoInput.files[0]&&storage){
-    try{
-      const reader=new FileReader();
-      await new Promise(res=>{reader.onload=e=>{uploadString(ref(storage,`fotos/${num}`),e.target.result,'data_url').then(snap=>getDownloadURL(snap.ref)).then(url=>{fotoUrl=url;res();}).catch(res);};reader.readAsDataURL(fotoInput.files[0]);});
-    }catch(e){console.warn('Foto no subida:',e);}
+  if(fotoInput.files[0]){
+    await new Promise(res=>{const r=new FileReader();r.onload=e=>{fotoUrl=e.target.result;res();};r.readAsDataURL(fotoInput.files[0]);});
   }
-  const data={
+  await addDoc(collection(db,'ot'),{
     num,desc,equipo,tecnico,
     temporada:document.getElementById('ot-temporada').value,
-    nom:document.getElementById('ot-nom').value,
     areaSol:document.getElementById('ot-area-sol').value,
     sistema:document.getElementById('ot-sistema').value,
     subsistema:document.getElementById('ot-subsistema').value,
     ubicacion:document.getElementById('ot-ubicacion').value,
-    actividad:document.getElementById('ot-actividad').value,
     tipo:document.getElementById('ot-tipo').value,
     estado:document.getElementById('ot-estado').value,
     fecha:document.getElementById('ot-fecha').value||hoy(),
-    horaIni:ini,horaFin:fin,duracion,
-    avance:parseInt(avance),
-    materiales:otMatsSelected.map(m=>({id:m.id,cod:m.cod,texto:m.texto,um:m.um,precio:m.precio,moneda:m.moneda})),
+    horaIni:ini,horaFin:fin,duracion,avance,
+    materiales:otMatsSelected.map(m=>({id:m.id,cod:m.cod||'',texto:m.texto,um:m.um,precio:m.precio,moneda:m.moneda})),
     costoMat:`S/ ${costo.toFixed(2)}`,
     obs:document.getElementById('ot-obs').value,
-    fotoUrl,
-    creadoPor:currentUser.name,
-    createdAt:serverTimestamp()
-  };
-  await addDoc(collection(db,'ot'),data);
+    fotoUrl,creadoPor:currentUser.name,createdAt:serverTimestamp()
+  });
   await addActivity(`${num} creada por ${currentUser.name} — ${equipo}`,'ot');
-  closeModal('modal-ot');
-  toast(`${num} creada exitosamente`,'success');
+  closeModal('modal-ot'); toast(`${num} creada`,'success');
   otMatsSelected=[];
-  ['ot-desc','ot-nom','ot-temporada','ot-area-sol','ot-sistema','ot-subsistema','ot-ubicacion','ot-actividad','ot-obs'].forEach(id=>document.getElementById(id).value='');
+  ['ot-desc','ot-obs'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('ot-hora-ini').value=''; document.getElementById('ot-hora-fin').value='';
   document.getElementById('ot-avance').value=0; document.getElementById('ot-avance-val').textContent='0%';
   document.getElementById('ot-duracion').textContent='—'; document.getElementById('ot-foto-preview').style.display='none';
   renderOTMats();
 };
-
-window.openCambioEstadoOT=function(id,num,estado,avance){
-  editingOTId=id;
-  document.getElementById('est-ot-num').textContent=num;
-  document.getElementById('est-ot-val').value=estado;
-  document.getElementById('est-ot-avance').value=avance||0;
-  document.getElementById('est-ot-comment').value='';
-  openModal('modal-estado-ot');
-};
+window.openCambioEstadoOT=function(id,num,estado,avance){editingOTId=id;document.getElementById('est-ot-num').textContent=num;document.getElementById('est-ot-val').value=estado;document.getElementById('est-ot-avance').value=avance||0;document.getElementById('est-ot-comment').value='';openModal('modal-estado-ot');};
 window.confirmEstadoOT=async function(){
   const nuevoEstado=document.getElementById('est-ot-val').value;
   const avance=document.getElementById('est-ot-avance').value;
   const comment=document.getElementById('est-ot-comment').value.trim();
   await updateDoc(doc(db,'ot',editingOTId),{estado:nuevoEstado,avance:parseInt(avance)});
-  const otItem=otData.find(o=>o.id===editingOTId);
-  await addActivity(`${otItem?.num} → "${nuevoEstado}" ${avance}%${comment?' — '+comment:''}`,'ot');
-  closeModal('modal-estado-ot');
-  toast(`OT actualizada: ${nuevoEstado}`,'success');
+  const ot=otData.find(o=>o.id===editingOTId);
+  await addActivity(`${ot?.num} → "${nuevoEstado}" ${avance}%${comment?' — '+comment:''}`,'ot');
+  closeModal('modal-estado-ot'); toast(`OT: ${nuevoEstado}`,'success');
 };
-window.deleteOT=async function(id){ if(!confirm('¿Eliminar esta OT?'))return; await deleteDoc(doc(db,'ot',id)); toast('OT eliminada','success'); };
+window.deleteOT=async function(id){if(!confirm('¿Eliminar OT?'))return;await deleteDoc(doc(db,'ot',id));toast('OT eliminada','success');};
+let editingOTId=null;
 
-// ── SERVICIOS ──
-window.setSvcFilter=function(val,el){ svcFilterVal=val; document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active')); el.classList.add('active'); renderServicios(); };
-function renderServicios(){
-  const search=document.getElementById('svc-search')?.value?.toLowerCase()||'';
-  let list=svcData.filter(s=>{
-    const m=!search||(s.solped||'').toLowerCase().includes(search)||(s.pedido||'').toLowerCase().includes(search)||(s.texto||'').toLowerCase().includes(search)||(s.proveedor||'').toLowerCase().includes(search);
-    return m&&(svcFilterVal==='Todos'||s.estado===svcFilterVal);
+// ── LOGÍSTICA ──
+window.setLogFilter=function(val,el){logFilterVal=val;document.querySelectorAll('#page-logistica .filter-chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');renderLogistica();};
+function renderLogistica(){
+  const search=document.getElementById('log-search')?.value?.toLowerCase()||'';
+  let list=logData.filter(s=>{
+    const m=!search||(s.solped||'').toLowerCase().includes(search)||(s.texto||'').toLowerCase().includes(search)||(s.proveedor||'').toLowerCase().includes(search)||(s.pedido||'').toLowerCase().includes(search);
+    return m&&(logFilterVal==='Todos'||s.estado===logFilterVal);
   });
   const canWrite=ROLE_WRITE[currentUser.role];
-  document.getElementById('svc-tbody').innerHTML=list.length?list.map(s=>`<tr>
+  document.getElementById('log-tbody').innerHTML=list.length?list.map(s=>`<tr>
     <td style="font-family:var(--mono);font-size:11px">${s.fesol||'—'}</td>
     <td style="font-family:var(--mono);font-size:11px;color:var(--accent)">${s.solped||'—'}</td>
     <td style="font-family:var(--mono);font-size:11px">${s.pedido||'—'}</td>
-    <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${s.texto||''}">${s.texto||'—'}</td>
+    <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${s.texto||''}">${s.texto||'—'}</td>
     <td>${s.proveedor||'—'}</td>
     <td style="font-family:var(--mono);text-align:right">${s.valor?Number(s.valor).toLocaleString('es-PE',{minimumFractionDigits:2}):'—'}</td>
     <td><span class="badge badge-gray">${s.moneda||'PEN'}</span></td>
     <td style="font-family:var(--mono);font-size:11px">${s.factura||'—'}</td>
     <td style="font-family:var(--mono);font-size:11px">${s.ingreso||'—'}</td>
-    <td>${svcEstadoBadge(s.estado)}</td>
-    <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:var(--muted)" title="${s.comentario||''}">${s.comentario||'—'}</td>
-    <td style="display:flex;gap:4px">
-      ${canWrite?`<button class="btn btn-ghost btn-sm" onclick="editServicio('${s.id}')">✏️</button>
-      <button class="btn btn-danger btn-sm" onclick="deleteSvc('${s.id}')">✕</button>`:'—'}
-    </td></tr>`).join('')
-    :`<tr><td colspan="12">${emptyMsg('Sin servicios registrados')}</td></tr>`;
+    <td>${logEstadoBadge(s.estado)}</td>
+    <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:var(--muted)" title="${s.comentario||''}">${s.comentario||'—'}</td>
+    <td style="display:flex;gap:3px">${canWrite?`<button class="btn btn-ghost btn-sm" onclick="editLog('${s.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteLog('${s.id}')">✕</button>`:'—'}</td>
+  </tr>`).join(''):`<tr><td colspan="12">${emptyMsg('Sin registros logística')}</td></tr>`;
 }
-window.saveServicio=async function(){
-  const texto=document.getElementById('svc-texto').value.trim();
+window.saveLogistica=async function(){
+  const texto=document.getElementById('log-texto').value.trim();
   if(!texto){toast('Texto breve requerido','error');return;}
-  await addDoc(collection(db,'servicios'),{
-    fesol:document.getElementById('svc-fesol').value,
-    solped:document.getElementById('svc-solped').value,
-    pedido:document.getElementById('svc-pedido').value,
-    texto,
-    proveedor:document.getElementById('svc-proveedor').value,
-    valor:document.getElementById('svc-valor').value,
-    moneda:document.getElementById('svc-moneda').value,
-    factura:document.getElementById('svc-factura').value,
-    ingreso:document.getElementById('svc-ingreso').value,
-    estado:document.getElementById('svc-estado').value,
-    comentario:document.getElementById('svc-comentario').value,
-    creadoPor:currentUser.name,
-    createdAt:serverTimestamp()
+  await addDoc(collection(db,'logistica'),{fesol:document.getElementById('log-fesol').value,solped:document.getElementById('log-solped').value,pedido:document.getElementById('log-pedido').value,texto,proveedor:document.getElementById('log-proveedor').value,valor:document.getElementById('log-valor').value,moneda:document.getElementById('log-moneda').value,factura:document.getElementById('log-factura').value,ingreso:document.getElementById('log-ingreso').value,estado:document.getElementById('log-estado').value,comentario:document.getElementById('log-comentario').value,creadoPor:currentUser.name,createdAt:serverTimestamp()});
+  await addActivity(`Logística "${texto}" registrada`,'log');
+  closeModal('modal-log'); toast('Registro logística guardado','success');
+  ['log-solped','log-pedido','log-texto','log-proveedor','log-valor','log-factura','log-comentario'].forEach(id=>document.getElementById(id).value='');
+};
+window.editLog=function(id){
+  const s=logData.find(x=>x.id===id); if(!s)return;
+  editingLogId=id;
+  ['fesol','solped','pedido','texto','proveedor','valor','moneda','factura','ingreso','estado','comentario'].forEach(f=>{const el=document.getElementById('elog-'+f);if(el)el.value=s[f]||'';});
+  openModal('modal-edit-log');
+};
+window.saveEditLog=async function(){
+  const data={};
+  ['fesol','solped','pedido','texto','proveedor','valor','moneda','factura','ingreso','estado','comentario'].forEach(f=>{data[f]=document.getElementById('elog-'+f)?.value||'';});
+  await updateDoc(doc(db,'logistica',editingLogId),data);
+  await addActivity(`Logística actualizada por ${currentUser.name}`,'log');
+  closeModal('modal-edit-log'); toast('Actualizado','success');
+};
+window.deleteLog=async function(id){if(!confirm('¿Eliminar?'))return;await deleteDoc(doc(db,'logistica',id));toast('Eliminado','success');};
+
+// ── SUMINISTROS ──
+function renderSuministros(){
+  const search=document.getElementById('sum-search')?.value?.toLowerCase()||'';
+  let list=sumData.filter(s=>!search||Object.values(s).some(v=>String(v).toLowerCase().includes(search)));
+  const cols=SUM_COLS.filter(c=>visibleSumCols.includes(c.key));
+  const canWrite=ROLE_WRITE[currentUser.role];
+  const html=`<div class="table-wrap"><table>
+    <thead><tr>${cols.map(c=>`<th>${c.label}</th>`).join('')}${canWrite?'<th>Acc.</th>':''}</tr></thead>
+    <tbody>${list.length?list.map(s=>`<tr>${cols.map(c=>`<td style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px" title="${s[c.key]||''}">${s[c.key]||'—'}</td>`).join('')}${canWrite?`<td><button class="btn btn-danger btn-sm" onclick="deleteSum('${s.id}')">✕</button></td>`:''}</tr>`).join(''):`<tr><td colspan="${cols.length+(canWrite?1:0)}">${emptyMsg('Sin suministros')}</td></tr>`}</tbody>
+  </table></div>`;
+  document.getElementById('sum-table-card').innerHTML=html;
+}
+window.saveSum=async function(){
+  const fields={status:'sum-status',posSol:'sum-pos-sol',tipoImp:'sum-tipo-imp',tipoPos:'sum-tipo-pos',material:'sum-material',texto:'sum-texto',cant:'sum-cant',um:'sum-um',precio:'sum-precio',moneda:'sum-moneda',centro:'sum-centro',pedido:'sum-pedido',grupoArt:'sum-grupo-art',valorTotal:'sum-valor-total',posEd:'sum-pos-ped',fechaOC:'sum-fecha-oc',grupoComp:'sum-grupo-comp',solicitante:'sum-solicitante',creadoPorSAP:'sum-creado-por',tipoFe:'sum-tipo-fe',fechaEnt:'sum-fecha-ent',almacen:'sum-almacen',urgencia:'sum-urgencia',numNec:'sum-num-nec',statusTrat:'sum-status-trat',statusTratSol:'sum-status-trat-sol'};
+  const data={createdAt:serverTimestamp(),creadoPor:currentUser.name};
+  Object.entries(fields).forEach(([k,id])=>{const el=document.getElementById(id);if(el)data[k]=el.value;});
+  await addDoc(collection(db,'suministros'),data);
+  closeModal('modal-sum'); toast('Suministro registrado','success');
+};
+window.deleteSum=async function(id){if(!confirm('¿Eliminar?'))return;await deleteDoc(doc(db,'suministros',id));toast('Eliminado','success');};
+window.saveColsConfig=function(){
+  visibleSumCols=SUM_COLS.filter(c=>document.getElementById('col-'+c.key)?.checked).map(c=>c.key);
+  renderSuministros();
+};
+// Open cols modal
+const origOpenModal=window.openModal;
+window.openModal=function(id){
+  if(id==='modal-sum-cols'){
+    document.getElementById('sum-cols-body').innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">${SUM_COLS.map(c=>`<label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer"><input type="checkbox" id="col-${c.key}" ${visibleSumCols.includes(c.key)?'checked':''} style="accent-color:var(--accent)">${c.label}</label>`).join('')}</div>`;
+  }
+  document.getElementById(id).classList.add('open');
+};
+
+// ── EQUIPOS ──
+function renderEquipos(){
+  const search=document.getElementById('eq-search')?.value?.toLowerCase()||'';
+  const list=eqData.filter(e=>!search||(e.nombre||'').toLowerCase().includes(search)||(e.tag||'').toLowerCase().includes(search));
+  const iconMap={Bomba:'🔄',Motor:'⚡',Compresor:'💨',Transportador:'🏗️',Caldera:'🔥',Reductor:'⚙️',Ventilador:'🌀',Otro:'🔩'};
+  const canWrite=ROLE_WRITE[currentUser.role];
+  document.getElementById('eqp-grid').innerHTML=list.length?list.map(e=>`<div class="eqp-card">
+    <div style="font-size:24px;margin-bottom:7px">${iconMap[e.tipo]||'🔩'}</div>
+    <div style="font-weight:600;font-size:14px">${e.nombre}</div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px">${e.tag} · ${e.area||''}</div>
+    <div style="font-size:12px;color:var(--muted);margin-top:2px">${e.marca||''}</div>
+    <div style="display:flex;gap:5px;margin-top:9px;flex-wrap:wrap">${criticidadBadge(e.crit)} ${e.estado==='Operativo'?'<span class="badge badge-green">Operativo</span>':'<span class="badge badge-yellow">Mantto</span>'}</div>
+    ${canWrite?`<div style="display:flex;gap:5px;margin-top:9px"><button class="btn btn-ghost btn-sm" style="flex:1" onclick="toggleEquipo('${e.id}','${e.estado}')">${e.estado==='Operativo'?'⏸ Mantto':'▶ Operar'}</button><button class="btn btn-danger btn-sm" onclick="deleteEquipo('${e.id}')">✕</button></div>`:''}
+  </div>`).join(''):`<div style="padding:40px;text-align:center;color:var(--muted)">Sin equipos</div>`;
+}
+window.toggleEquipo=async function(id,e){await updateDoc(doc(db,'equipos',id),{estado:e==='Operativo'?'En mantenimiento':'Operativo'});};
+window.deleteEquipo=async function(id){if(!confirm('¿Eliminar?'))return;await deleteDoc(doc(db,'equipos',id));};
+window.saveEquipo=async function(){
+  const nombre=document.getElementById('eq-nombre').value.trim(), tag=document.getElementById('eq-tag').value.trim();
+  if(!nombre||!tag){toast('Nombre y TAG requeridos','error');return;}
+  await addDoc(collection(db,'equipos'),{nombre,tag,area:document.getElementById('eq-area').value,tipo:document.getElementById('eq-tipo').value,marca:document.getElementById('eq-marca').value,crit:document.getElementById('eq-crit').value,estado:'Operativo',createdAt:serverTimestamp()});
+  closeModal('modal-eq'); toast(`Equipo ${tag} registrado`,'success');
+  ['eq-nombre','eq-tag','eq-area','eq-marca'].forEach(id=>document.getElementById(id).value='');
+};
+
+// ── COMBOS CON LÁPIZ ──
+window.addComboOption=function(selectId, colName, label){
+  comboTarget={selectId, collection:colName};
+  document.getElementById('combo-modal-title').textContent=`AGREGAR ${label.toUpperCase()}`;
+  document.getElementById('combo-modal-label').textContent=`Nueva ${label}`;
+  document.getElementById('combo-new-val').value='';
+  document.getElementById('modal-combo-add').classList.add('open');
+};
+window.saveComboOption=async function(){
+  const val=document.getElementById('combo-new-val').value.trim();
+  if(!val){toast('Escribe un valor','error');return;}
+  await addDoc(collection(db,comboTarget.collection),{valor:val,createdAt:serverTimestamp()});
+  document.getElementById('modal-combo-add').classList.remove('open');
+  toast('Opción agregada','success');
+};
+function populateCombos(){
+  const maps={
+    'ot-temporada':'temporadas','ot-area-sol':'areas',
+    'ot-sistema':'sistemas','ot-subsistema':'subsistemas','ot-ubicacion':'ubicaciones'
+  };
+  Object.entries(maps).forEach(([selId,colName])=>{
+    const sel=document.getElementById(selId); if(!sel) return;
+    const vals=listasData[colName]||[];
+    const cur=sel.value;
+    sel.innerHTML='<option value="">— Seleccionar —</option>'+vals.map(v=>`<option value="${v}">${v}</option>`).join('');
+    if(cur) sel.value=cur;
   });
-  await addActivity(`Servicio "${texto}" registrado por ${currentUser.name}`,'svc');
-  closeModal('modal-svc');
-  toast('Servicio registrado','success');
-  ['svc-solped','svc-pedido','svc-texto','svc-proveedor','svc-valor','svc-factura','svc-comentario'].forEach(id=>document.getElementById(id).value='');
-};
-window.editServicio=function(id){
-  const s=svcData.find(x=>x.id===id); if(!s)return;
-  editingSvcId=id;
-  document.getElementById('esvc-fesol').value=s.fesol||'';
-  document.getElementById('esvc-solped').value=s.solped||'';
-  document.getElementById('esvc-pedido').value=s.pedido||'';
-  document.getElementById('esvc-texto').value=s.texto||'';
-  document.getElementById('esvc-proveedor').value=s.proveedor||'';
-  document.getElementById('esvc-valor').value=s.valor||'';
-  document.getElementById('esvc-moneda').value=s.moneda||'PEN';
-  document.getElementById('esvc-factura').value=s.factura||'';
-  document.getElementById('esvc-ingreso').value=s.ingreso||'';
-  document.getElementById('esvc-estado').value=s.estado||'Pendiente';
-  document.getElementById('esvc-comentario').value=s.comentario||'';
-  openModal('modal-edit-svc');
-};
-window.saveEditServicio=async function(){
-  await updateDoc(doc(db,'servicios',editingSvcId),{
-    fesol:document.getElementById('esvc-fesol').value,
-    solped:document.getElementById('esvc-solped').value,
-    pedido:document.getElementById('esvc-pedido').value,
-    texto:document.getElementById('esvc-texto').value,
-    proveedor:document.getElementById('esvc-proveedor').value,
-    valor:document.getElementById('esvc-valor').value,
-    moneda:document.getElementById('esvc-moneda').value,
-    factura:document.getElementById('esvc-factura').value,
-    ingreso:document.getElementById('esvc-ingreso').value,
-    estado:document.getElementById('esvc-estado').value,
-    comentario:document.getElementById('esvc-comentario').value,
-  });
-  await addActivity(`Servicio actualizado por ${currentUser.name}`,'svc');
-  closeModal('modal-edit-svc');
-  toast('Servicio actualizado','success');
-};
-window.deleteSvc=async function(id){ if(!confirm('¿Eliminar este servicio?'))return; await deleteDoc(doc(db,'servicios',id)); toast('Servicio eliminado','success'); };
+}
 
 // ── MATERIALES ──
 function renderMateriales(){
   const search=document.getElementById('mat-search')?.value?.toLowerCase()||'';
-  const list=matData.filter(m=>!search||(m.cod||'').toLowerCase().includes(search)||(m.texto||'').toLowerCase().includes(search)||(m.centro||'').toLowerCase().includes(search));
+  const list=matData.filter(m=>!search||(m.cod||'').toLowerCase().includes(search)||(m.texto||'').toLowerCase().includes(search));
   const canWrite=ROLE_WRITE[currentUser.role];
   document.getElementById('mat-tbody').innerHTML=list.length?list.map(m=>`<tr>
     <td style="font-family:var(--mono);font-size:12px;color:var(--accent)">${m.cod||'—'}</td>
@@ -1083,176 +1317,51 @@ function renderMateriales(){
     <td style="font-family:var(--mono);text-align:right">${m.precio?Number(m.precio).toFixed(2):'—'}</td>
     <td><span class="badge badge-blue">${m.moneda||'—'}</span></td>
     <td style="font-family:var(--mono);font-size:12px">${m.centro||'—'}</td>
-    <td>${canWrite?`<button class="btn btn-danger btn-sm" onclick="deleteMaterial('${m.id}')">✕</button>`:'—'}</td>
-  </tr>`).join('')
-    :`<tr><td colspan="7">${emptyMsg('Sin materiales. Agrega manualmente o importa desde Excel.')}</td></tr>`;
+    <td>${canWrite?`<button class="btn btn-danger btn-sm" onclick="deleteMat('${m.id}')">✕</button>`:'—'}</td>
+  </tr>`).join(''):`<tr><td colspan="7">${emptyMsg('Sin materiales. Importa desde Excel o agrega uno a uno.')}</td></tr>`;
 }
 window.saveMaterial=async function(){
-  const cod=document.getElementById('mat-cod').value.trim();
-  const texto=document.getElementById('mat-texto').value.trim();
+  const cod=document.getElementById('mat-cod').value.trim(), texto=document.getElementById('mat-texto').value.trim();
   if(!cod||!texto){toast('Código y texto requeridos','error');return;}
-  await addDoc(collection(db,'materiales'),{
-    cod,texto,
-    um:document.getElementById('mat-um').value,
-    precio:document.getElementById('mat-precio').value,
-    moneda:document.getElementById('mat-moneda').value,
-    centro:document.getElementById('mat-centro').value,
-    createdAt:serverTimestamp()
-  });
-  await addActivity(`Material ${cod} registrado`,'mat');
-  closeModal('modal-mat');
-  toast(`Material ${cod} guardado`,'success');
+  await addDoc(collection(db,'materiales'),{cod,texto,um:document.getElementById('mat-um').value,precio:document.getElementById('mat-precio').value,moneda:document.getElementById('mat-moneda').value,centro:document.getElementById('mat-centro').value,createdAt:serverTimestamp()});
+  closeModal('modal-mat'); toast('Material guardado','success');
   ['mat-cod','mat-texto','mat-precio','mat-centro'].forEach(id=>document.getElementById(id).value='');
 };
-window.deleteMaterial=async function(id){ if(!confirm('¿Eliminar material?'))return; await deleteDoc(doc(db,'materiales',id)); toast('Material eliminado','success'); };
-
-// Excel import
-window.dragOver=function(e){e.preventDefault();document.getElementById('upload-zone').classList.add('drag');};
-window.dragLeave=function(){document.getElementById('upload-zone').classList.remove('drag');};
-window.dropFile=function(e){e.preventDefault();document.getElementById('upload-zone').classList.remove('drag');const f=e.dataTransfer.files[0];if(f){document.getElementById('excel-file').files;loadExcelFile(f);}};
-window.loadExcel=function(input){if(input.files[0])loadExcelFile(input.files[0]);};
-function loadExcelFile(file){
-  const reader=new FileReader();
-  reader.onload=e=>{
-    try{
-      const wb=XLSX.read(e.target.result,{type:'array'});
-      const ws=wb.Sheets[wb.SheetNames[0]];
-      const json=XLSX.utils.sheet_to_json(ws,{defval:''});
-      if(!json.length){toast('Excel vacío','error');return;}
-      // Map columns flexibly
-      const COL_MAP={'material':'cod','material ':'cod','texto breve de material':'texto','texto breve':'texto','unidad medida base':'um','unidad de medida base':'um','precio':'precio','moneda':'moneda','centro':'centro'};
-      excelImportData=json.map(row=>{
-        const mapped={};
-        Object.entries(row).forEach(([k,v])=>{const key=COL_MAP[k.toLowerCase().trim()];if(key)mapped[key]=String(v);});
-        return mapped;
-      }).filter(r=>r.cod||r.texto);
-      if(!excelImportData.length){toast('No se encontraron columnas válidas','error');return;}
-      document.getElementById('excel-count').textContent=`✅ ${excelImportData.length} materiales encontrados`;
-      const prev=document.getElementById('excel-preview');
-      prev.style.display='block';
-      const t=document.getElementById('excel-preview-table');
-      t.querySelector('thead').innerHTML='<tr><th>Material</th><th>Texto Breve</th><th>UM</th><th>Precio</th><th>Moneda</th><th>Centro</th></tr>';
-      t.querySelector('tbody').innerHTML=excelImportData.slice(0,8).map(r=>`<tr><td style="font-family:var(--mono);font-size:11px">${r.cod||''}</td><td>${r.texto||''}</td><td>${r.um||''}</td><td>${r.precio||''}</td><td>${r.moneda||''}</td><td>${r.centro||''}</td></tr>`).join('');
-      document.getElementById('btn-confirm-import').disabled=false;
-    }catch(err){toast('Error al leer el Excel: '+err.message,'error');}
-  };
-  reader.readAsArrayBuffer(file);
-}
-window.confirmImportMat=async function(){
-  if(!excelImportData.length)return;
-  document.getElementById('btn-confirm-import').disabled=true;
-  document.getElementById('btn-confirm-import').textContent='Importando...';
-  let count=0;
-  for(const m of excelImportData){
-    await addDoc(collection(db,'materiales'),{cod:m.cod||'',texto:m.texto||'',um:m.um||'UN',precio:m.precio||'0',moneda:m.moneda||'PEN',centro:m.centro||'',createdAt:serverTimestamp()});
-    count++;
-  }
-  await addActivity(`${count} materiales importados desde Excel por ${currentUser.name}`,'mat');
-  closeModal('modal-import-mat');
-  toast(`${count} materiales importados exitosamente`,'success');
-  excelImportData=[];
-  document.getElementById('btn-confirm-import').textContent='Importar Materiales';
-  document.getElementById('excel-preview').style.display='none';
-  document.getElementById('excel-count').textContent='';
-};
+window.deleteMat=async function(id){if(!confirm('¿Eliminar?'))return;await deleteDoc(doc(db,'materiales',id));toast('Eliminado','success');};
 
 // ── HERRAMIENTAS ──
 function renderHerramientas(){
   const search=document.getElementById('her-search')?.value?.toLowerCase()||'';
   const list=herData.filter(h=>!search||(h.tecnico||'').toLowerCase().includes(search)||(h.nombre||'').toLowerCase().includes(search));
-  document.getElementById('her-tbody').innerHTML=list.length?list.map(h=>`<tr>
-    <td>${h.tecnico}</td><td>${h.nombre}</td>
-    <td style="font-family:var(--mono)">${h.cant}</td>
-    <td style="font-family:var(--mono);font-size:11px">${h.otRel||'—'}</td>
-    <td style="font-family:var(--mono);font-size:11px">${h.fecha||''}</td>
-    <td style="font-family:var(--mono);font-size:11px">${h.fechaDev||'—'}</td>
-    <td>${h.devuelto?'<span class="badge badge-green">Devuelta</span>':'<span class="badge badge-yellow">Pendiente</span>'}</td>
-  </tr>`).join(''):`<tr><td colspan="7">${emptyMsg('Sin registros')}</td></tr>`;
+  document.getElementById('her-tbody').innerHTML=list.length?list.map(h=>`<tr><td>${h.tecnico}</td><td>${h.nombre}</td><td style="font-family:var(--mono)">${h.cant}</td><td style="font-family:var(--mono);font-size:11px">${h.otRel||'—'}</td><td style="font-family:var(--mono);font-size:11px">${h.fecha||''}</td><td style="font-family:var(--mono);font-size:11px">${h.fechaDev||'—'}</td><td>${h.devuelto?'<span class="badge badge-green">Devuelta</span>':'<span class="badge badge-yellow">Pendiente</span>'}</td></tr>`).join(''):`<tr><td colspan="7">${emptyMsg('Sin registros')}</td></tr>`;
   const pend=herData.filter(h=>!h.devuelto);
-  document.getElementById('her-pendientes').innerHTML=pend.length
-    ?pend.map(h=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
-        <div><div style="font-size:13px;font-weight:600">${h.nombre}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${h.tecnico} · Entregado: ${h.fecha||'—'}</div></div>
-        <button class="btn btn-success btn-sm" onclick="devolverHer('${h.id}')">✓ Devuelta</button>
-      </div>`).join('')
-    :`<div style="text-align:center;color:var(--muted);padding:24px;font-size:13px">✅ Sin herramientas pendientes</div>`;
+  document.getElementById('her-pendientes').innerHTML=pend.length?pend.map(h=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:13px;font-weight:600">${h.nombre}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${h.tecnico} · ${h.fecha||''}</div></div><button class="btn btn-success btn-sm" onclick="devolverHer('${h.id}')">✓ Devuelta</button></div>`).join(''):`<div style="text-align:center;color:var(--muted);padding:20px;font-size:13px">✅ Sin pendientes</div>`;
 }
-window.devolverHer=async function(id){ await updateDoc(doc(db,'herramientas',id),{devuelto:true,fechaDevReal:hoy()}); toast('Herramienta marcada como devuelta','success'); };
+window.devolverHer=async function(id){await updateDoc(doc(db,'herramientas',id),{devuelto:true});toast('Marcada como devuelta','success');};
 window.saveHerramienta=async function(){
-  const tec=document.getElementById('her-tec').value;
-  const nombre=document.getElementById('her-nombre').value.trim();
+  const tec=document.getElementById('her-tec').value, nombre=document.getElementById('her-nombre').value.trim();
   if(!tec||!nombre){toast('Técnico y herramienta requeridos','error');return;}
-  const otSel=document.getElementById('her-ot');
-  await addDoc(collection(db,'herramientas'),{
-    tecnico:tec,nombre,
-    codigo:document.getElementById('her-codigo').value,
-    cant:document.getElementById('her-cant').value,
-    otRel:otSel.value||'',
-    fecha:document.getElementById('her-fecha').value||hoy(),
-    fechaDev:document.getElementById('her-fecha-dev').value,
-    condicion:document.getElementById('her-condicion').value,
-    obs:document.getElementById('her-obs').value,
-    devuelto:false,
-    entregadoPor:currentUser.name,
-    createdAt:serverTimestamp()
-  });
-  await addActivity(`Herramienta "${nombre}" entregada a ${tec}`,'her');
-  closeModal('modal-her');
-  toast(`Herramienta registrada para ${tec}`,'success');
+  await addDoc(collection(db,'herramientas'),{tecnico:tec,nombre,codigo:document.getElementById('her-codigo').value,cant:document.getElementById('her-cant').value,otRel:document.getElementById('her-ot').value,fecha:document.getElementById('her-fecha').value||hoy(),fechaDev:document.getElementById('her-fecha-dev').value,condicion:document.getElementById('her-condicion').value,obs:document.getElementById('her-obs').value,devuelto:false,entregadoPor:currentUser.name,createdAt:serverTimestamp()});
+  closeModal('modal-her'); toast('Herramienta registrada','success');
   ['her-nombre','her-codigo','her-obs'].forEach(id=>document.getElementById(id).value='');
 };
 
 // ── EPP ──
-const eppStockMax={'Casco de Seguridad':15,'Lentes de Seguridad':20,'Guantes de Cuero':30,'Guantes de Nitrilo':25,'Botas de Seguridad':8,'Chaleco Reflectivo':12,'Arnés de Seguridad':6,'Respirador N95':40,'Tapones Auditivos':50,'Careta Facial':10,'Traje Tyvek':5};
+const eppStock={'Casco de Seguridad':15,'Lentes de Seguridad':20,'Guantes de Cuero':30,'Guantes de Nitrilo':25,'Botas de Seguridad':8,'Chaleco Reflectivo':12,'Arnés de Seguridad':6,'Respirador N95':40,'Tapones Auditivos':50,'Careta Facial':10,'Traje Tyvek':5};
 function renderEPP(){
   const search=document.getElementById('epp-search')?.value?.toLowerCase()||'';
   const list=eppData.filter(e=>!search||(e.tecnico||'').toLowerCase().includes(search)||(e.epp||'').toLowerCase().includes(search));
   document.getElementById('epp-tbody').innerHTML=list.length?list.map(e=>`<tr><td>${e.tecnico}</td><td>${e.epp}</td><td style="font-family:var(--mono)">${e.cant}</td><td style="font-family:var(--mono);font-size:11px">${e.fecha||''}</td><td style="font-size:11px;color:var(--muted)">${e.entregadoPor||''}</td></tr>`).join(''):`<tr><td colspan="5">${emptyMsg('Sin registros')}</td></tr>`;
-  const consumido={};
-  eppData.forEach(e=>{consumido[e.epp]=(consumido[e.epp]||0)+parseInt(e.cant||0);});
-  document.getElementById('epp-stock').innerHTML=Object.entries(eppStockMax).map(([name,max])=>{
-    const rem=Math.max(0,max-(consumido[name]||0));
-    const pct=Math.round((rem/max)*100);
-    const color=pct<30?'var(--danger)':pct<60?'var(--warn)':'var(--accent2)';
-    return `<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>${name}</span><span style="font-family:var(--mono);color:${color}">${rem}/${max}</span></div><div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:${color}"></div></div></div>`;
-  }).join('');
+  const c={};eppData.forEach(e=>{c[e.epp]=(c[e.epp]||0)+parseInt(e.cant||0);});
+  document.getElementById('epp-stock').innerHTML=Object.entries(eppStock).map(([n,max])=>{const rem=Math.max(0,max-(c[n]||0));const pct=Math.round((rem/max)*100);const color=pct<30?'var(--danger)':pct<60?'var(--warn)':'var(--accent2)';return `<div style="margin-bottom:11px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span>${n}</span><span style="font-family:var(--mono);color:${color}">${rem}/${max}</span></div><div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:${color}"></div></div></div>`;}).join('');
 }
 window.saveEPP=async function(){
-  const tec=document.getElementById('epp-tec').value;
-  if(!tec){toast('Selecciona un técnico','error');return;}
-  const epp=document.getElementById('epp-tipo').value;
-  const cant=document.getElementById('epp-cant').value;
+  const tec=document.getElementById('epp-tec').value; if(!tec){toast('Selecciona técnico','error');return;}
+  const epp=document.getElementById('epp-tipo').value, cant=document.getElementById('epp-cant').value;
   await addDoc(collection(db,'epp'),{tecnico:tec,epp,cant,fecha:document.getElementById('epp-fecha').value||hoy(),motivo:document.getElementById('epp-motivo').value,entregadoPor:currentUser.name,createdAt:serverTimestamp()});
   await addActivity(`EPP: ${epp} (x${cant}) → ${tec}`,'epp');
-  closeModal('modal-epp');
-  toast(`EPP registrado para ${tec}`,'success');
+  closeModal('modal-epp'); toast('EPP registrado','success');
   document.getElementById('epp-motivo').value='';
-};
-
-// ── EQUIPOS ──
-function renderEquipos(){
-  const search=document.getElementById('eq-search')?.value?.toLowerCase()||'';
-  const list=eqData.filter(e=>!search||(e.nombre||'').toLowerCase().includes(search)||(e.tag||'').toLowerCase().includes(search)||(e.area||'').toLowerCase().includes(search));
-  const iconMap={Bomba:'🔄',Motor:'⚡',Compresor:'💨',Transportador:'🏗️',Caldera:'🔥',Reductor:'⚙️',Ventilador:'🌀',Otro:'🔩'};
-  const canWrite=ROLE_WRITE[currentUser.role];
-  document.getElementById('eqp-grid').innerHTML=list.length?list.map(e=>`<div class="eqp-card">
-    <div style="font-size:26px;margin-bottom:8px">${iconMap[e.tipo]||'🔩'}</div>
-    <div style="font-weight:600;font-size:14px">${e.nombre}</div>
-    <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px">${e.tag} · ${e.area||''}</div>
-    <div style="font-size:12px;color:var(--muted);margin-top:3px">${e.marca||''}</div>
-    <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">${criticidadBadge(e.crit)} ${equipoEstadoBadge(e.estado)}</div>
-    ${canWrite?`<div style="display:flex;gap:6px;margin-top:10px"><button class="btn btn-ghost btn-sm" style="flex:1" onclick="toggleEquipoEstado('${e.id}','${e.estado}')">${e.estado==='Operativo'?'⏸ Mantto':'▶ Operar'}</button><button class="btn btn-danger btn-sm" onclick="deleteEquipo('${e.id}')">✕</button></div>`:''}
-  </div>`).join(''):`<div style="padding:40px;text-align:center;color:var(--muted)">Sin equipos registrados</div>`;
-}
-window.toggleEquipoEstado=async function(id,estado){ await updateDoc(doc(db,'equipos',id),{estado:estado==='Operativo'?'En mantenimiento':'Operativo'}); };
-window.deleteEquipo=async function(id){ if(!confirm('¿Eliminar equipo?'))return; await deleteDoc(doc(db,'equipos',id)); };
-window.saveEquipo=async function(){
-  const nombre=document.getElementById('eq-nombre').value.trim();
-  const tag=document.getElementById('eq-tag').value.trim();
-  if(!nombre||!tag){toast('Nombre y TAG requeridos','error');return;}
-  await addDoc(collection(db,'equipos'),{nombre,tag,area:document.getElementById('eq-area').value,tipo:document.getElementById('eq-tipo').value,marca:document.getElementById('eq-marca').value,crit:document.getElementById('eq-crit').value,estado:'Operativo',createdAt:serverTimestamp()});
-  closeModal('modal-eq');
-  toast(`Equipo ${tag} registrado`,'success');
-  ['eq-nombre','eq-tag','eq-area','eq-marca'].forEach(id=>document.getElementById(id).value='');
 };
 
 // ── TÉCNICOS ──
@@ -1262,85 +1371,185 @@ function renderTecnicos(){
   const canWrite=ROLE_WRITE[currentUser.role];
   document.getElementById('tec-tbody').innerHTML=list.length?list.map(t=>{
     const otAct=otData.filter(o=>o.tecnico===t.nombre&&o.estado!=='Cerrada').length;
-    return `<tr><td style="font-family:var(--mono);font-size:12px;color:var(--accent)">${t.idTec||''}</td><td><strong>${t.nombre}</strong></td><td>${t.esp}</td><td>${t.turno}</td><td><span class="pill-num">${otAct}</span></td><td><span class="badge badge-green">Activo</span></td><td>${canWrite?`<button class="btn btn-danger btn-sm" onclick="deleteTecnico('${t.id}')">✕</button>`:''}</td></tr>`;
+    return `<tr><td style="font-family:var(--mono);font-size:11px;color:var(--accent)">${t.idTec||''}</td><td><strong>${t.nombre}</strong></td><td>${t.esp}</td><td>${t.turno}</td><td><span class="pill-num">${otAct}</span></td><td><span class="badge badge-green">Activo</span></td><td>${canWrite?`<button class="btn btn-danger btn-sm" onclick="deleteTec('${t.id}')">✕</button>`:''}</td></tr>`;
   }).join(''):`<tr><td colspan="7">${emptyMsg('Sin técnicos')}</td></tr>`;
 }
-window.deleteTecnico=async function(id){ if(!confirm('¿Eliminar técnico?'))return; await deleteDoc(doc(db,'tecnicos',id)); };
+window.deleteTec=async function(id){if(!confirm('¿Eliminar?'))return;await deleteDoc(doc(db,'tecnicos',id));};
 window.saveTecnico=async function(){
-  const nombre=document.getElementById('tec-nombre').value.trim();
-  if(!nombre){toast('Nombre requerido','error');return;}
+  const nombre=document.getElementById('tec-nombre').value.trim(); if(!nombre){toast('Nombre requerido','error');return;}
   await addDoc(collection(db,'tecnicos'),{nombre,idTec:document.getElementById('tec-id').value.trim()||`T-${String(tecData.length+1).padStart(3,'0')}`,esp:document.getElementById('tec-esp').value,turno:document.getElementById('tec-turno').value,createdAt:serverTimestamp()});
-  closeModal('modal-tec');
-  toast(`Técnico ${nombre} registrado`,'success');
+  closeModal('modal-tec'); toast('Técnico registrado','success');
   document.getElementById('tec-nombre').value=''; document.getElementById('tec-id').value='';
 };
 
+// ── USUARIOS ──
+function renderUsuarios(){
+  const search=document.getElementById('usr-search')?.value?.toLowerCase()||'';
+  const list=usrData.filter(u=>!search||(u.username||'').toLowerCase().includes(search)||(u.nombre||'').toLowerCase().includes(search));
+  document.getElementById('usr-tbody').innerHTML=list.length?list.map(u=>`<tr>
+    <td style="font-family:var(--mono);font-size:12px;color:var(--accent)">${u.username||u.id}</td>
+    <td><strong>${u.nombre||'—'}</strong></td>
+    <td><span class="badge role-badge-${u.rol||'jefatura'}">${ROLE_LABELS[u.rol]||u.rol}</span></td>
+    <td style="font-size:12px;color:var(--muted)">${u.tecnicoAsoc||'—'}</td>
+    <td style="font-family:var(--mono);font-size:11px">${fmtTs(u.createdAt)}</td>
+    <td style="display:flex;gap:4px">
+      <button class="btn btn-ghost btn-sm" onclick="editUsuario('${u.id}')">✏️</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteUsuario('${u.id}')">✕</button>
+    </td>
+  </tr>`).join(''):`<tr><td colspan="6">${emptyMsg('Sin usuarios creados. El usuario "planner" es el default.')}</td></tr>`;
+}
+window.toggleTecnicoSelect=function(){
+  const rol=document.getElementById('usr-rol').value;
+  document.getElementById('usr-tec-group').style.display=rol==='tecnico'?'block':'none';
+};
+window.editUsuario=function(id){
+  const u=usrData.find(x=>x.id===id); if(!u)return;
+  editingUsrId=id;
+  document.getElementById('usr-modal-title').textContent='EDITAR USUARIO';
+  document.getElementById('usr-username').value=u.username||u.id;
+  document.getElementById('usr-password').value=u.password||'';
+  document.getElementById('usr-nombre').value=u.nombre||'';
+  document.getElementById('usr-rol').value=u.rol||'jefatura';
+  document.getElementById('usr-tec-asoc').innerHTML='<option value="">— Sin asociar —</option>'+tecData.map(t=>`<option value="${t.nombre}">${t.nombre}</option>`).join('');
+  if(u.tecnicoAsoc) document.getElementById('usr-tec-asoc').value=u.tecnicoAsoc;
+  window.toggleTecnicoSelect();
+  openModal('modal-usr');
+};
+window.saveUsuario=async function(){
+  const username=document.getElementById('usr-username').value.trim().toLowerCase();
+  const password=document.getElementById('usr-password').value.trim();
+  const nombre=document.getElementById('usr-nombre').value.trim();
+  const rol=document.getElementById('usr-rol').value;
+  const tecnicoAsoc=rol==='tecnico'?document.getElementById('usr-tec-asoc').value:'';
+  if(!username||!password||!nombre){toast('Completa todos los campos','error');return;}
+  await setDoc(doc(db,'usuarios',username),{username,password,nombre,rol,tecnicoAsoc,createdAt:serverTimestamp()});
+  closeModal('modal-usr'); toast(`Usuario ${username} guardado`,'success');
+  editingUsrId=null;
+  document.getElementById('usr-modal-title').textContent='NUEVO USUARIO';
+  ['usr-username','usr-password','usr-nombre'].forEach(id=>document.getElementById(id).value='');
+};
+window.deleteUsuario=async function(id){if(!confirm(`¿Eliminar usuario ${id}?`))return;await deleteDoc(doc(db,'usuarios',id));toast('Usuario eliminado','success');};
+
 // ── REPORTES ──
 function renderReportes(){
-  const total=otData.length;
-  const cerr=otData.filter(o=>o.estado==='Cerrada').length;
+  const total=otData.length, cerr=otData.filter(o=>o.estado==='Cerrada').length;
   const ef=total?Math.round(cerr/total*100):0;
-  const hh=otData.reduce((a,o)=>a+(parseInt(o.horas)||0),0);
-  const svcTotal=svcData.reduce((a,s)=>a+(parseFloat(s.valor)||0),0);
+  const svcTotal=logData.reduce((a,s)=>a+(parseFloat(s.valor)||0),0);
   document.getElementById('kpi-reportes').innerHTML=`
     <div class="kpi-card yellow"><div class="kpi-label">Total OT</div><div class="kpi-value">${total}</div><div class="kpi-sub">Registradas</div></div>
-    <div class="kpi-card green"><div class="kpi-label">Eficiencia Cierre</div><div class="kpi-value">${ef}%</div><div class="kpi-sub">OT cerradas / total</div></div>
+    <div class="kpi-card green"><div class="kpi-label">Eficiencia</div><div class="kpi-value">${ef}%</div><div class="kpi-sub">OT cerradas / total</div></div>
     <div class="kpi-card blue"><div class="kpi-label">Materiales</div><div class="kpi-value">${matData.length}</div><div class="kpi-sub">En lista</div></div>
-    <div class="kpi-card red"><div class="kpi-label">Costo Servicios</div><div class="kpi-value" style="font-size:26px">S/${svcTotal.toLocaleString('es-PE',{minimumFractionDigits:0})}</div><div class="kpi-sub">Total acumulado</div></div>`;
+    <div class="kpi-card red"><div class="kpi-label">Costo Logística</div><div class="kpi-value" style="font-size:24px">S/${svcTotal.toLocaleString('es-PE',{minimumFractionDigits:0})}</div><div class="kpi-sub">Acumulado</div></div>`;
   const tipos={};otData.forEach(o=>tipos[o.tipo]=(tipos[o.tipo]||0)+1);
-  document.getElementById('rep-tipos').innerHTML=Object.entries(tipos).map(([k,v])=>`<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px"><span>${k}</span><span style="font-family:var(--mono)">${v} (${total?Math.round(v/total*100):0}%)</span></div><div class="prog-bar"><div class="prog-fill" style="width:${total?Math.round(v/total*100):0}%"></div></div></div>`).join('');
+  document.getElementById('rep-tipos').innerHTML=Object.entries(tipos).map(([k,v])=>`<div style="margin-bottom:11px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>${k}</span><span style="font-family:var(--mono)">${v} (${total?Math.round(v/total*100):0}%)</span></div><div class="prog-bar"><div class="prog-fill" style="width:${total?Math.round(v/total*100):0}%"></div></div></div>`).join('')||emptyMsg('Sin datos');
   const estados={};otData.forEach(o=>estados[o.estado]=(estados[o.estado]||0)+1);
   const ec={Abierta:'var(--info)','En proceso':'var(--accent)',Pausada:'var(--warn)',Cerrada:'var(--accent2)'};
-  document.getElementById('rep-estados').innerHTML=Object.entries(estados).map(([k,v])=>`<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px"><span>${k}</span><span style="font-family:var(--mono)">${v}</span></div><div class="prog-bar"><div class="prog-fill" style="width:${total?Math.round(v/total*100):0}%;background:${ec[k]||'var(--accent2)'}"></div></div></div>`).join('');
+  document.getElementById('rep-estados').innerHTML=Object.entries(estados).map(([k,v])=>`<div style="margin-bottom:11px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>${k}</span><span style="font-family:var(--mono)">${v}</span></div><div class="prog-bar"><div class="prog-fill" style="width:${total?Math.round(v/total*100):0}%;background:${ec[k]||'var(--accent2)'}"></div></div></div>`).join('')||emptyMsg('Sin datos');
 }
+
+// ── EXCEL IMPORT (universal) ──
+const IMPORT_MAP = {
+  ot: {Sistema:'sistema',Subsistema:'subsistema','Ubicación':'ubicacion','Equipo':'equipo','Descripción':'desc','Tipo':'tipo','Técnico':'tecnico','Fecha':'fecha','Estado':'estado','Avance':'avance','Observaciones':'obs'},
+  log: {'FE. SOL':'fesol','SOL.PEDIDO':'solped','PEDIDO':'pedido','TEXTO BREVE':'texto','PROVEEDOR':'proveedor','VALOR TOTAL':'valor','MONEDA':'moneda','N° FACTURA':'factura','INGRESO A MP':'ingreso','ESTADO':'estado','COMENTARIO':'comentario'},
+  sum: {'Status':'status','Pos.solicitud pedido':'posSol','Tipo de imputación':'tipoImp','Tipo de posición':'tipoPos','Material':'material','Texto breve':'texto','Cantidad solicitada':'cant','Unidad de medida':'um','Precio de valoración':'precio','Moneda':'moneda','Centro':'centro','Pedido':'pedido','Grupo artículos':'grupoArt','Valor total':'valorTotal','Posición de pedido':'posEd','Fecha orden compra':'fechaOC','Grupo de compras':'grupoComp','Solicitante':'solicitante','Creado por':'creadoPorSAP','Tipo de fe.entrega':'tipoFe','Fecha de entrega':'fechaEnt','Almacén':'almacen','Urgencia necesidad':'urgencia','Número de necesidad':'numNec','Status tratamiento':'statusTrat','Status tratamiento solicitud pedido':'statusTratSol'},
+  mat: {'Material':'cod','Texto breve de material':'texto','Unidad medida base':'um','Precio':'precio','Moneda':'moneda','Centro':'centro'}
+};
+window.loadExcelImport=function(input, type){
+  const file=input.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const wb=XLSX.read(e.target.result,{type:'array'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const json=XLSX.utils.sheet_to_json(ws,{defval:''});
+      if(!json.length){toast('Excel vacío','error');return;}
+      const colMap=IMPORT_MAP[type]||{};
+      const mapped=json.map(row=>{
+        const out={};
+        Object.entries(row).forEach(([k,v])=>{
+          const key=colMap[k.trim()]||colMap[k.toLowerCase().trim()];
+          if(key) out[key]=String(v);
+        });
+        return out;
+      }).filter(r=>Object.keys(r).length>0);
+      importBuffers[type]=mapped;
+      const countEl=document.getElementById('count-'+type);
+      const prevEl=document.getElementById('preview-'+type);
+      const btnEl=document.getElementById('btn-imp-'+type);
+      if(countEl) countEl.textContent=`✅ ${mapped.length} registros encontrados`;
+      if(prevEl) prevEl.style.display='block';
+      if(btnEl) btnEl.disabled=false;
+    }catch(err){toast('Error al leer Excel: '+err.message,'error');}
+  };
+  reader.readAsArrayBuffer(file);
+};
+window.dragOver=function(e){e.preventDefault();};
+window.dropFile=function(e,type){e.preventDefault();const f=e.dataTransfer.files[0];if(f){const inp=document.getElementById('excel-'+type);if(inp){const dt=new DataTransfer();dt.items.add(f);inp.files=dt.files;loadExcelImport(inp,type);}}};
+
+window.confirmImport=async function(type){
+  const data=importBuffers[type]; if(!data||!data.length) return;
+  const btnEl=document.getElementById('btn-imp-'+type);
+  if(btnEl){btnEl.disabled=true;btnEl.textContent='Importando...';}
+  const colMap={ot:'ot',log:'logistica',sum:'suministros',mat:'materiales'};
+  const colName=colMap[type]||type;
+  let count=0;
+  for(const row of data){
+    if(type==='ot') row.num=`OT-${String(otCounter+count).padStart(4,'0')}`;
+    await addDoc(collection(db,colName),{...row,creadoPor:currentUser.name,importado:true,createdAt:serverTimestamp()});
+    count++;
+  }
+  if(type==='ot') await addActivity(`${count} OT importadas desde Excel por ${currentUser.name}`,'ot');
+  const modalMap={ot:'modal-import-ot',log:'modal-import-log',sum:'modal-import-sum',mat:'modal-import-mat'};
+  document.getElementById(modalMap[type]).classList.remove('open');
+  toast(`${count} registros importados exitosamente`,'success');
+  importBuffers[type]=[];
+  if(btnEl){btnEl.disabled=false;btnEl.textContent='Importar';}
+};
 
 // ── EXPORT ──
 window.exportCSV=function(type){
-  const sources={ot:otData,servicios:svcData,materiales:matData,epp:eppData};
-  const names={ot:'ordenes_trabajo.csv',servicios:'servicios.csv',materiales:'materiales.csv',epp:'entregas_epp.csv'};
-  const data=sources[type];
-  if(!data?.length){toast('Sin datos','error');return;}
-  const skip=['id','createdAt','fotoUrl'];
+  const src={ot:otData,logistica:logData,suministros:sumData,materiales:matData,epp:eppData};
+  const names={ot:'ordenes_trabajo.csv',logistica:'sap_logistica.csv',suministros:'sap_suministros.csv',materiales:'materiales.csv',epp:'epp.csv'};
+  const data=src[type]; if(!data?.length){toast('Sin datos','error');return;}
+  const skip=['id','createdAt','fotoUrl','importado'];
   const keys=Object.keys(data[0]).filter(k=>!skip.includes(k));
   const csv=[keys.join(','),...data.map(r=>keys.map(k=>`"${(r[k]||'').toString().replace(/"/g,'""')}"`).join(','))].join('\n');
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}));
-  a.download=names[type];a.click();
-  toast(`${names[type]} descargado`,'success');
+  a.download=names[type]; a.click(); toast(`${names[type]} descargado`,'success');
 };
 
 // ── HELPERS ──
-async function addActivity(text,type){ await addDoc(collection(db,'activity'),{text,type,user:currentUser.name,ts:serverTimestamp()}); }
+async function addActivity(text,type){await addDoc(collection(db,'activity'),{text,type,user:currentUser.name,ts:serverTimestamp()});}
 function populateSelects(){
   const eqOpts='<option value="">— Seleccionar —</option>'+eqData.map(e=>`<option value="${e.tag}">${e.nombre} (${e.tag})</option>`).join('');
   const tecOpts='<option value="">— Seleccionar —</option>'+tecData.map(t=>`<option>${t.nombre}</option>`).join('');
-  document.getElementById('ot-equipo').innerHTML=eqOpts;
-  document.getElementById('ot-tecnico').innerHTML=tecOpts;
-  document.getElementById('epp-tec').innerHTML=tecOpts;
-  document.getElementById('her-tec').innerHTML=tecOpts;
+  const eid=document.getElementById('ot-equipo'); if(eid) eid.innerHTML=eqOpts;
+  const tid=document.getElementById('ot-tecnico'); if(tid) tid.innerHTML=tecOpts;
+  const eid2=document.getElementById('epp-tec'); if(eid2) eid2.innerHTML=tecOpts;
+  const hid=document.getElementById('her-tec'); if(hid) hid.innerHTML=tecOpts;
+  const uid=document.getElementById('usr-tec-asoc'); if(uid) uid.innerHTML='<option value="">— Sin asociar —</option>'+tecData.map(t=>`<option value="${t.nombre}">${t.nombre}</option>`).join('');
 }
 function populateMatSelect(){
-  const opts='<option value="">— Seleccionar material —</option>'+matData.map(m=>`<option value="${m.id}">${m.cod} · ${m.texto} (${m.um}) ${m.moneda} ${m.precio}</option>`).join('');
-  document.getElementById('ot-mat-sel').innerHTML=opts;
+  const el=document.getElementById('ot-mat-sel'); if(!el) return;
+  el.innerHTML='<option value="">— Seleccionar material —</option>'+matData.map(m=>`<option value="${m.id}">${m.cod||''} · ${m.texto} (${m.um}) ${m.moneda} ${m.precio}</option>`).join('');
 }
 function populateOTSelect(){
-  const opts='<option value="">— Sin OT —</option>'+otData.map(o=>`<option value="${o.num}">${o.num} — ${o.equipo||''}</option>`).join('');
-  document.getElementById('her-ot').innerHTML=opts;
+  const el=document.getElementById('her-ot'); if(!el) return;
+  el.innerHTML='<option value="">— Sin OT —</option>'+otData.map(o=>`<option value="${o.num}">${o.num} — ${o.equipo||''}</option>`).join('');
 }
-function setDefaultDates(){ ['ot-fecha','epp-fecha','her-fecha','her-fecha-dev','svc-fesol'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=hoy();}); }
+function setDefaultDates(){['ot-fecha','epp-fecha','her-fecha','her-fecha-dev','log-fesol'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=hoy();});}
 function hoy(){return new Date().toISOString().split('T')[0];}
 function fmtTs(ts){if(!ts)return'—';try{return ts.toDate().toLocaleString('es-PE',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});}catch(e){return'—';}}
-function emptyMsg(msg){return`<div style="text-align:center;color:var(--muted);padding:28px;font-size:13px">${msg}</div>`;}
+function emptyMsg(msg){return`<div style="text-align:center;color:var(--muted);padding:26px;font-size:13px">${msg}</div>`;}
 function estadoBadge(e){return`<span class="badge ${{Abierta:'badge-blue','En proceso':'badge-yellow',Pausada:'badge-gray',Cerrada:'badge-green'}[e]||'badge-gray'}">${e}</span>`;}
-function svcEstadoBadge(e){return`<span class="badge ${{Pendiente:'badge-yellow','En proceso':'badge-blue',Facturado:'badge-orange',Cerrado:'badge-green'}[e]||'badge-gray'}">${e}</span>`;}
+function logEstadoBadge(e){return`<span class="badge ${{Pendiente:'badge-yellow','En proceso':'badge-blue',Facturado:'badge-orange',Cerrado:'badge-green'}[e]||'badge-gray'}">${e}</span>`;}
 function tipoBadge(t){return`<span class="badge ${{Correctivo:'badge-red',Preventivo:'badge-green',Predictivo:'badge-blue',Mejora:'badge-orange'}[t]||'badge-gray'}">${t}</span>`;}
 function criticidadBadge(c){return`<span class="badge ${{Alta:'badge-red',Media:'badge-yellow',Baja:'badge-green'}[c]||'badge-gray'}">${c}</span>`;}
-function equipoEstadoBadge(e){return e==='Operativo'?`<span class="badge badge-green">Operativo</span>`:`<span class="badge badge-yellow">Mantto</span>`;}
 
-window.openModal=function(id){document.getElementById(id).classList.add('open');};
 window.closeModal=function(id){document.getElementById(id).classList.remove('open');};
 document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
-window.toast=function(msg,type='success'){const el=document.getElementById('toast');el.textContent=(type==='success'?'✅ ':type==='error'?'❌ ':'ℹ️ ')+msg;el.className=`show ${type}`;el.style.display='flex';clearTimeout(window._tt);window._tt=setTimeout(()=>el.style.display='none',3200);};
+window.toast=function(msg,type='success'){const el=document.getElementById('toast');el.textContent=(type==='success'?'✅ ':type==='error'?'❌ ':'ℹ️ ')+msg;el.className=`show ${type}`;el.style.display='flex';clearTimeout(window._tt);window._tt=setTimeout(()=>el.style.display='none',3400);};
 </script>
 </body>
 </html>
