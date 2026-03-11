@@ -168,6 +168,38 @@ textarea.form-control{resize:vertical;min-height:65px}
 .filter-chip{padding:4px 11px;border-radius:20px;border:1px solid var(--border);font-size:12px;cursor:pointer;transition:all .15s;background:transparent;color:var(--muted);font-family:var(--sans)}
 .filter-chip.active{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
 .prog-bar{background:var(--surface2);border-radius:4px;height:5px;overflow:hidden;margin-top:4px}
+
+/* ─── Dashboard filter bar ─── */
+.dash-filter-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 0 6px;border-bottom:1px solid var(--border);margin-bottom:10px}
+.dash-filter-input{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:4px 9px;font-size:12px;font-family:var(--sans);outline:none;height:28px}
+.dash-filter-input:focus{border-color:var(--accent)}
+/* ─── Últimas actualizaciones section ─── */
+.dash-updates-section{margin-top:18px}
+.dash-updates-title{font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--muted);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.updates-feed{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;max-height:320px;overflow-y:auto}
+/* ─── Delete mode ─── */
+.del-mode-bar{display:none;align-items:center;gap:10px;background:rgba(255,71,87,.07);border:1px solid rgba(255,71,87,.25);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--text)}
+.del-mode-bar.active{display:flex}
+.del-row-chk{accent-color:var(--danger);width:14px;height:14px;cursor:pointer;flex-shrink:0}
+.del-all-chk{accent-color:var(--danger);width:14px;height:14px;cursor:pointer}
+th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
+/* ─── Date range picker ─── */
+.date-range-wrap{position:relative;display:inline-flex}
+.date-range-panel{position:absolute;top:calc(100% + 4px);left:0;z-index:350;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 28px var(--shadow);padding:14px;min-width:270px;display:none;gap:12px;flex-direction:column}
+.date-range-panel.open{display:flex;animation:fadeIn .12s ease}
+.date-range-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.date-range-row input[type=date]{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:4px 8px;font-size:12px;font-family:var(--sans);outline:none}
+.date-range-row input[type=date]:focus{border-color:var(--accent)}
+.date-filter-active{border-color:var(--accent)!important;color:var(--accent)!important}
+/* ─── Pie chart donut ─── */
+.donut-wrap{display:flex;align-items:center;gap:16px;padding:14px 16px}
+.donut-legend-item{margin-bottom:10px}
+.donut-legend-val{font-family:var(--mono);font-size:22px;font-weight:700;line-height:1}
+.donut-legend-lbl{font-size:11px;color:var(--muted);margin-top:2px}
+/* ─── Bar chart in costo areas ─── */
+.bar-chart-wrap{padding:10px 14px 14px}
+.bar-chart-title{font-family:var(--mono);font-size:10px;letter-spacing:1.5px;color:var(--muted);margin-bottom:10px}
+
 .combo-mgr-item{display:flex;align-items:center;gap:7px;padding:8px 12px;border-bottom:1px solid var(--border);font-size:13px}
 .combo-mgr-item:last-child{border-bottom:none}
 .combo-mgr-lbl{flex:1}
@@ -283,8 +315,25 @@ textarea.form-control{resize:vertical;min-height:65px}
           </div>
         </div>
       </div>
+      <div class="dash-filter-bar" id="dash-filter-bar">
+        <span style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px;flex-shrink:0">FILTRAR:</span>
+        <button class="filter-chip active" id="dflt-all" onclick="setDashFilter('all',this)">⏺ Todo</button>
+        <button class="filter-chip" id="dflt-year" onclick="setDashFilter('year',this)">Año</button>
+        <button class="filter-chip" id="dflt-month" onclick="setDashFilter('month',this)">Mes</button>
+        <button class="filter-chip" id="dflt-week" onclick="setDashFilter('week',this)">Semana</button>
+        <div id="dash-filter-val-wrap" style="display:none;align-items:center;gap:6px">
+          <input type="text" id="dash-filter-val" class="dash-filter-input" placeholder="" oninput="applyDashFilter()">
+          <button class="btn btn-ghost btn-sm" onclick="clearDashFilter()">✕</button>
+        </div>
+        <span id="dash-filter-badge" style="display:none;font-family:var(--mono);font-size:10px;color:var(--accent);background:rgba(99,102,241,.12);border-radius:4px;padding:2px 7px"></span>
+      </div>
       <div class="kpi-grid" id="kpi-grid"></div>
       <div id="dash-widget-area"></div>
+      <!-- Últimas Actualizaciones -->
+      <div class="dash-updates-section" id="dash-updates-section">
+        <div class="dash-updates-title">⚡ ÚLTIMAS ACTUALIZACIONES</div>
+        <div class="updates-feed" id="updates-feed"></div>
+      </div>
     </div>
 
     <!-- OT -->
@@ -292,13 +341,21 @@ textarea.form-control{resize:vertical;min-height:65px}
       <div class="section-title">ÓRDENES DE TRABAJO</div>
       <div class="section-sub">Gestión y seguimiento de OT de mantenimiento</div>
       <div class="search-bar">
-        <input class="search-input" id="ot-search" placeholder="🔍 Buscar OT, equipo, técnico..." oninput="renderOT()">
+        <input class="search-input" id="ot-search" placeholder="🔍 Buscar OT, equipo, técnico, subsistema, ubicación..." oninput="renderOT()">
         <select class="form-control" style="width:140px" id="ot-f-estado" onchange="renderOT()">
           <option value="">Todos estados</option><option>Abierta</option><option>En proceso</option><option>Pausada</option><option>Cerrada</option>
         </select>
         <select class="form-control" style="width:140px" id="ot-f-tipo" onchange="renderOT()">
           <option value="">Todos tipos</option><option>Correctivo</option><option>Preventivo</option><option>Predictivo</option><option>Mejora</option>
         </select>
+        <div class="date-range-wrap">
+          <button class="btn btn-ghost" id="dr-btn-ot" onclick="toggleDateRange('ot',event)" title="Filtrar por fecha">📅 Fecha</button>
+          <div class="date-range-panel" id="drp-ot">
+            <div class="date-range-row"><span style="width:50px">Desde:</span><input type="date" id="dr-from-ot"></div>
+            <div class="date-range-row"><span style="width:50px">Hasta:</span><input type="date" id="dr-to-ot"></div>
+            <div style="display:flex;gap:8px"><button class="btn btn-primary btn-sm" onclick="applyDateRange('ot')">Aplicar</button><button class="btn btn-ghost btn-sm" onclick="clearDateRange('ot')">Limpiar</button></div>
+          </div>
+        </div>
         <div class="dropdown" id="dd-import-ot">
           <button class="btn btn-ghost" onclick="toggleDD('dd-import-ot')">⬆️ Importar ▾</button>
           <div class="dropdown-menu">
@@ -314,19 +371,20 @@ textarea.form-control{resize:vertical;min-height:65px}
             <div class="dropdown-item" onclick="exportData('ot','pdf')">📑 PDF</div>
           </div>
         </div>
-        <div class="dropdown" id="dd-delete-ot">
-          <button class="btn btn-ghost" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDD('dd-delete-ot')">🗑 Borrar ▾</button>
-          <div class="dropdown-menu">
-            <div class="dropdown-item danger" onclick="openDeleteModal('ot','all')">🗑 Borrar todos los datos</div>
-            <div class="dropdown-item danger" onclick="openDeleteModal('ot','dates')">📅 Borrar por rango de fechas</div>
-          </div>
-        </div>
+        <button class="btn btn-ghost" id="btn-del-ot" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDeleteMode('ot')">🗑 Borrar</button>
         <input type="file" id="file-ot" accept=".xlsx,.xls,.csv" style="display:none" onchange="loadFileImport(this,'ot')">
         <button class="btn btn-primary" id="btn-nueva-ot" onclick="editingOTId=null;document.getElementById('ot-modal-title').textContent='NUEVA ORDEN DE TRABAJO';document.getElementById('btn-save-ot').textContent='Crear OT';openModal('modal-ot')">+ Nueva OT</button>
       </div>
+      <div class="del-mode-bar" id="del-bar-ot">
+        <input type="checkbox" class="del-all-chk" id="del-all-ot-hdr" onchange="selectAllRows('ot',this)"> <span>Seleccionar todo</span>
+        <span style="margin-left:8px;color:var(--muted)">|</span>
+        <span><b class="del-count-sp">0</b> seleccionado(s)</span>
+        <button class="btn btn-danger btn-sm" onclick="execBulkDelete('ot')">🗑 Eliminar</button>
+        <button class="btn btn-ghost btn-sm" onclick="toggleDeleteMode('ot')">✕ Cancelar</button>
+      </div>
       <div class="stat-row" id="ot-stats"></div>
       <div class="card"><div class="table-wrap"><table id="ot-table">
-        <thead><tr>
+        <thead id="ot-thead"><tr id="ot-th-row">
           <th>N° OT</th><th>Temporada</th><th>Área Sol.</th><th>Sistema</th><th>Subsistema</th>
           <th>Ubicación</th><th>Equipo</th><th>Descripción</th><th>Tipo</th><th>Técnico</th>
           <th>Fecha</th><th>H.Ini</th><th>H.Fin</th><th>Duración</th><th>% Avance</th><th>Estado</th><th>Costo Mat.</th><th>Acciones</th>
@@ -342,22 +400,41 @@ textarea.form-control{resize:vertical;min-height:65px}
       <div class="search-bar">
         <input class="search-input" id="log-search" placeholder="🔍 Buscar sol. pedido, texto, proveedor..." oninput="renderLogistica()">
         <select class="form-control" style="width:160px" id="log-f-estado" onchange="renderLogistica()">
-          <option value="">Todos los estados</option>
-          <option>Pendiente</option><option>En proceso</option><option>Facturado</option><option>Cerrado</option>
+          <option value="">Todos estados MP</option>
+          <option>APROBADO</option><option>RECHAZADO</option>
         </select>
-        <button class="btn btn-ghost" onclick="openModal('modal-import-log')">⬆️ Importar Excel</button>
-        <div class="dropdown" id="dd-delete-log">
-          <button class="btn btn-ghost" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDD('dd-delete-log')">🗑 Borrar ▾</button>
-          <div class="dropdown-menu">
-            <div class="dropdown-item danger" onclick="openDeleteModal('log','all')">🗑 Borrar todos</div>
-            <div class="dropdown-item danger" onclick="openDeleteModal('log','dates')">📅 Por rango de fechas</div>
+        <select class="form-control" style="width:130px" id="log-f-sort" onchange="renderLogistica()">
+          <option value="desc">↓ Más reciente</option>
+          <option value="asc">↑ Más antiguo</option>
+        </select>
+        <div class="date-range-wrap">
+          <button class="btn btn-ghost" id="dr-btn-log" onclick="toggleDateRange('log',event)" title="Filtrar por fecha">📅 Fecha</button>
+          <div class="date-range-panel" id="drp-log">
+            <div class="date-range-row"><span style="width:50px">Desde:</span><input type="date" id="dr-from-log"></div>
+            <div class="date-range-row"><span style="width:50px">Hasta:</span><input type="date" id="dr-to-log"></div>
+            <div style="display:flex;gap:8px"><button class="btn btn-primary btn-sm" onclick="applyDateRange('log')">Aplicar</button><button class="btn btn-ghost btn-sm" onclick="clearDateRange('log')">Limpiar</button></div>
           </div>
         </div>
+        <div class="dropdown" id="dd-import-log">
+          <button class="btn btn-ghost" onclick="toggleDD('dd-import-log')">⬆️ Importar ▾</button>
+          <div class="dropdown-menu">
+            <div class="dropdown-item" onclick="document.getElementById('excel-log').accept='.xlsx,.xls';document.getElementById('excel-log').click()">📊 Excel (.xlsx)</div>
+            <div class="dropdown-item" onclick="document.getElementById('excel-log').accept='.csv';document.getElementById('excel-log').click()">📄 CSV</div>
+          </div>
+        </div>
+        <button class="btn btn-ghost" id="btn-del-log" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDeleteMode('log')">🗑 Borrar</button>
         <button class="btn btn-primary" id="btn-nueva-log" onclick="openModal('modal-log')">+ Nuevo</button>
       </div>
-      <div class="card"><div class="table-wrap"><table><thead><tr>
+      <div class="del-mode-bar" id="del-bar-log">
+        <input type="checkbox" class="del-all-chk" onchange="selectAllRows('log',this)"> <span>Seleccionar todo</span>
+        <span style="margin-left:8px;color:var(--muted)">|</span>
+        <span><b class="del-count-sp">0</b> seleccionado(s)</span>
+        <button class="btn btn-danger btn-sm" onclick="execBulkDelete('log')">🗑 Eliminar</button>
+        <button class="btn btn-ghost btn-sm" onclick="toggleDeleteMode('log')">✕ Cancelar</button>
+      </div>
+      <div class="card"><div class="table-wrap"><table id="log-table"><thead><tr id="log-th-row">
         <th>Fe.Sol.</th><th>Sol.Pedido</th><th>Pedido</th><th>Texto Breve</th><th>Proveedor</th>
-        <th>Valor</th><th>Moneda</th><th>N°Factura</th><th>Ingreso MP</th><th>Estado</th><th>Comentario</th><th>Acc.</th>
+        <th>Valor</th><th>Moneda</th><th>Estado</th><th>N°Factura</th><th>Ingreso MP</th><th>Estado MP</th><th>Comentario</th><th>Acc.</th>
       </tr></thead><tbody id="log-tbody"></tbody></table></div></div>
     </div>
 
@@ -368,15 +445,30 @@ textarea.form-control{resize:vertical;min-height:65px}
       <div class="search-bar">
         <input class="search-input" id="sum-search" placeholder="🔍 Buscar material, pedido, solicitante..." oninput="renderSuministros()">
         <button class="btn btn-ghost btn-sm" onclick="openModal('modal-sum-cols')">⚙️ Columnas</button>
-        <button class="btn btn-ghost" onclick="openModal('modal-import-sum')">⬆️ Importar Excel</button>
-        <div class="dropdown" id="dd-delete-sum">
-          <button class="btn btn-ghost" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDD('dd-delete-sum')">🗑 Borrar ▾</button>
-          <div class="dropdown-menu">
-            <div class="dropdown-item danger" onclick="openDeleteModal('sum','all')">🗑 Borrar todos los datos</div>
-            <div class="dropdown-item danger" onclick="openDeleteModal('sum','specific')">🔍 Borrar por búsqueda</div>
+        <div class="date-range-wrap">
+          <button class="btn btn-ghost" id="dr-btn-sum" onclick="toggleDateRange('sum',event)" title="Filtrar por fecha">📅 Fecha</button>
+          <div class="date-range-panel" id="drp-sum">
+            <div class="date-range-row"><span style="width:50px">Desde:</span><input type="date" id="dr-from-sum"></div>
+            <div class="date-range-row"><span style="width:50px">Hasta:</span><input type="date" id="dr-to-sum"></div>
+            <div style="display:flex;gap:8px"><button class="btn btn-primary btn-sm" onclick="applyDateRange('sum')">Aplicar</button><button class="btn btn-ghost btn-sm" onclick="clearDateRange('sum')">Limpiar</button></div>
           </div>
         </div>
+        <div class="dropdown" id="dd-import-sum">
+          <button class="btn btn-ghost" onclick="toggleDD('dd-import-sum')">⬆️ Importar ▾</button>
+          <div class="dropdown-menu">
+            <div class="dropdown-item" onclick="openModal('modal-import-sum')">📊 Excel (.xlsx)</div>
+            <div class="dropdown-item" onclick="openModal('modal-import-sum')">📄 CSV</div>
+          </div>
+        </div>
+        <button class="btn btn-ghost" id="btn-del-sum" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDeleteMode('sum')">🗑 Borrar</button>
         <button class="btn btn-primary" id="btn-nueva-sum" onclick="openModal('modal-sum')">+ Nuevo</button>
+      </div>
+      <div class="del-mode-bar" id="del-bar-sum">
+        <input type="checkbox" class="del-all-chk" onchange="selectAllRows('sum',this)"> <span>Seleccionar todo</span>
+        <span style="margin-left:8px;color:var(--muted)">|</span>
+        <span><b class="del-count-sp">0</b> seleccionado(s)</span>
+        <button class="btn btn-danger btn-sm" onclick="execBulkDelete('sum')">🗑 Eliminar</button>
+        <button class="btn btn-ghost btn-sm" onclick="toggleDeleteMode('sum')">✕ Cancelar</button>
       </div>
       <div class="card" id="sum-table-card"></div>
     </div>
@@ -387,7 +479,15 @@ textarea.form-control{resize:vertical;min-height:65px}
       <div class="section-sub">Registro de activos de la planta</div>
       <div class="search-bar">
         <input class="search-input" id="eq-search" placeholder="🔍 Buscar equipo, TAG..." oninput="renderEquipos()">
+        <button class="btn btn-ghost" id="btn-del-eq" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDeleteMode('eq')">🗑 Borrar</button>
         <button class="btn btn-primary" id="btn-nuevo-eq" onclick="openModal('modal-eq')">+ Nuevo Equipo</button>
+      </div>
+      <div class="del-mode-bar" id="del-bar-eq">
+        <input type="checkbox" class="del-all-chk" onchange="selectAllEq(this)"> <span>Seleccionar todo</span>
+        <span style="margin-left:8px;color:var(--muted)">|</span>
+        <span><b class="del-count-sp-eq">0</b> seleccionado(s)</span>
+        <button class="btn btn-danger btn-sm" onclick="execBulkDelete('eq')">🗑 Eliminar</button>
+        <button class="btn btn-ghost btn-sm" onclick="toggleDeleteMode('eq')">✕ Cancelar</button>
       </div>
       <div class="eqp-grid" id="eqp-grid"></div>
     </div>
@@ -405,14 +505,15 @@ textarea.form-control{resize:vertical;min-height:65px}
             <div class="dropdown-item" onclick="triggerImport('mat','csv')">📄 CSV</div>
           </div>
         </div>
-        <div class="dropdown" id="dd-delete-mat">
-          <button class="btn btn-ghost" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDD('dd-delete-mat')">🗑 Borrar ▾</button>
-          <div class="dropdown-menu">
-            <div class="dropdown-item danger" onclick="openDeleteModal('mat','all')">🗑 Borrar todos los materiales</div>
-            <div class="dropdown-item danger" onclick="openDeleteModal('mat','specific')">🔍 Borrar por búsqueda</div>
-          </div>
-        </div>
+        <button class="btn btn-ghost" id="btn-del-mat" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDeleteMode('mat')">🗑 Borrar</button>
         <button class="btn btn-primary" id="btn-nuevo-mat" onclick="openModal('modal-mat')">+ Nuevo Material</button>
+      </div>
+      <div class="del-mode-bar" id="del-bar-mat">
+        <input type="checkbox" class="del-all-chk" onchange="selectAllRows('mat',this)"> <span>Seleccionar todo</span>
+        <span style="margin-left:8px;color:var(--muted)">|</span>
+        <span><b class="del-count-sp">0</b> seleccionado(s)</span>
+        <button class="btn btn-danger btn-sm" onclick="execBulkDelete('mat')">🗑 Eliminar</button>
+        <button class="btn btn-ghost btn-sm" onclick="toggleDeleteMode('mat')">✕ Cancelar</button>
       </div>
       <div class="card"><div class="table-wrap"><table><thead><tr>
         <th>Código Material</th><th>Texto Breve</th><th>Unidad Medida Base</th><th>Precio</th><th>Moneda</th><th>Centro</th><th>Acc.</th>
@@ -425,7 +526,15 @@ textarea.form-control{resize:vertical;min-height:65px}
       <div class="section-sub">Control de entrega y devolución</div>
       <div class="search-bar">
         <input class="search-input" id="her-search" placeholder="🔍 Buscar herramienta, técnico..." oninput="renderHerramientas()">
+        <button class="btn btn-ghost" id="btn-del-her" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDeleteMode('her')">🗑 Borrar</button>
         <button class="btn btn-primary" id="btn-nueva-her" onclick="openModal('modal-her-tipo')">+ Registrar</button>
+      </div>
+      <div class="del-mode-bar" id="del-bar-her">
+        <input type="checkbox" class="del-all-chk" onchange="selectAllRows('her',this)"> <span>Seleccionar todo</span>
+        <span style="margin-left:8px;color:var(--muted)">|</span>
+        <span><b class="del-count-sp">0</b> seleccionado(s)</span>
+        <button class="btn btn-danger btn-sm" onclick="execBulkDelete('her')">🗑 Eliminar</button>
+        <button class="btn btn-ghost btn-sm" onclick="toggleDeleteMode('her')">✕ Cancelar</button>
       </div>
       <div class="grid2">
         <div class="card"><div class="card-header"><span class="card-title">HISTORIAL</span></div>
@@ -443,7 +552,15 @@ textarea.form-control{resize:vertical;min-height:65px}
       <div class="search-bar">
         <input class="search-input" id="epp-search" placeholder="🔍 Buscar técnico o EPP..." oninput="renderEPP()">
         <button class="btn btn-ghost" id="btn-gestionar-epp" onclick="openModal('modal-gestion-epp')">⚙️ Gestionar EPPs</button>
+        <button class="btn btn-ghost" id="btn-del-epp" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDeleteMode('epp')">🗑 Borrar</button>
         <button class="btn btn-primary" id="btn-nuevo-epp" onclick="openModal('modal-epp')">📋 Registro de Entrega</button>
+      </div>
+      <div class="del-mode-bar" id="del-bar-epp">
+        <input type="checkbox" class="del-all-chk" onchange="selectAllRows('epp',this)"> <span>Seleccionar todo</span>
+        <span style="margin-left:8px;color:var(--muted)">|</span>
+        <span><b class="del-count-sp">0</b> seleccionado(s)</span>
+        <button class="btn btn-danger btn-sm" onclick="execBulkDelete('epp')">🗑 Eliminar</button>
+        <button class="btn btn-ghost btn-sm" onclick="toggleDeleteMode('epp')">✕ Cancelar</button>
       </div>
       <div class="grid2">
         <div class="card"><div class="card-header"><span class="card-title">HISTORIAL DE ENTREGAS</span></div>
@@ -460,7 +577,15 @@ textarea.form-control{resize:vertical;min-height:65px}
       <div class="section-sub">Personal de mantenimiento</div>
       <div class="search-bar">
         <input class="search-input" id="tec-search" placeholder="🔍 Buscar técnico..." oninput="renderTecnicos()">
+        <button class="btn btn-ghost" id="btn-del-tec" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDeleteMode('tec')">🗑 Borrar</button>
         <button class="btn btn-primary" id="btn-nuevo-tec" onclick="openModal('modal-tec')">+ Nuevo Técnico</button>
+      </div>
+      <div class="del-mode-bar" id="del-bar-tec">
+        <input type="checkbox" class="del-all-chk" onchange="selectAllRows('tec',this)"> <span>Seleccionar todo</span>
+        <span style="margin-left:8px;color:var(--muted)">|</span>
+        <span><b class="del-count-sp">0</b> seleccionado(s)</span>
+        <button class="btn btn-danger btn-sm" onclick="execBulkDelete('tec')">🗑 Eliminar</button>
+        <button class="btn btn-ghost btn-sm" onclick="toggleDeleteMode('tec')">✕ Cancelar</button>
       </div>
       <div class="card"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Nombre</th><th>Especialidad</th><th>Turno</th><th>OT Activas</th><th>Estado</th><th>Acc.</th></tr></thead>
       <tbody id="tec-tbody"></tbody></table></div></div>
@@ -472,7 +597,15 @@ textarea.form-control{resize:vertical;min-height:65px}
       <div class="section-sub">Crear y administrar accesos al sistema</div>
       <div class="search-bar">
         <input class="search-input" id="usr-search" placeholder="🔍 Buscar usuario..." oninput="renderUsuarios()">
+        <button class="btn btn-ghost" id="btn-del-usr" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDeleteMode('usr')">🗑 Borrar</button>
         <button class="btn btn-primary" onclick="openModal('modal-usr')">+ Nuevo Usuario</button>
+      </div>
+      <div class="del-mode-bar" id="del-bar-usr">
+        <input type="checkbox" class="del-all-chk" onchange="selectAllRows('usr',this)"> <span>Seleccionar todo</span>
+        <span style="margin-left:8px;color:var(--muted)">|</span>
+        <span><b class="del-count-sp">0</b> seleccionado(s)</span>
+        <button class="btn btn-danger btn-sm" onclick="execBulkDelete('usr')">🗑 Eliminar</button>
+        <button class="btn btn-ghost btn-sm" onclick="toggleDeleteMode('usr')">✕ Cancelar</button>
       </div>
       <div class="card"><div class="table-wrap"><table><thead><tr><th>Usuario</th><th>Nombre</th><th>Rol</th><th>Técnico asoc.</th><th>Acciones</th></tr></thead>
       <tbody id="usr-tbody"></tbody></table></div></div>
@@ -674,7 +807,8 @@ textarea.form-control{resize:vertical;min-height:65px}
       <div class="form-group"><label>Moneda</label><select class="form-control" id="log-moneda"><option>PEN</option><option>USD</option><option>EUR</option></select></div>
       <div class="form-group"><label>N° Factura</label><input type="text" class="form-control" id="log-factura"></div>
       <div class="form-group"><label>Ingreso MP</label><input type="date" class="form-control" id="log-ingreso"></div>
-      <div class="form-group"><label>Estado</label><select class="form-control" id="log-estado"><option>Pendiente</option><option>En proceso</option><option>Facturado</option><option>Cerrado</option></select></div>
+      <div class="form-group"><label>Estado MP</label><select class="form-control" id="log-estadoMP"><option value="">— Seleccionar —</option><option>APROBADO</option><option>RECHAZADO</option></select></div>
+      <div class="form-group"><label>Estado</label><select class="form-control" id="log-estadoOP"><option value="">— Seleccionar —</option><option>PENDIENTE</option><option>FINALIZADO</option><option>CANCELADO</option></select></div>
       <div class="form-group form-full"><label>Comentario</label><textarea class="form-control" id="log-comentario"></textarea></div>
     </div></div>
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-log')">Cancelar</button><button class="btn btn-primary" onclick="saveLogistica()">Registrar</button></div>
@@ -692,7 +826,8 @@ textarea.form-control{resize:vertical;min-height:65px}
       <div class="form-group"><label>Moneda</label><select class="form-control" id="elog-moneda"><option>PEN</option><option>USD</option><option>EUR</option></select></div>
       <div class="form-group"><label>N° Factura</label><input type="text" class="form-control" id="elog-factura"></div>
       <div class="form-group"><label>Ingreso MP</label><input type="date" class="form-control" id="elog-ingreso"></div>
-      <div class="form-group"><label>Estado</label><select class="form-control" id="elog-estado"><option>Pendiente</option><option>En proceso</option><option>Facturado</option><option>Cerrado</option></select></div>
+      <div class="form-group"><label>Estado MP</label><select class="form-control" id="elog-estadoMP"><option value="">— Seleccionar —</option><option>APROBADO</option><option>RECHAZADO</option></select></div>
+      <div class="form-group"><label>Estado</label><select class="form-control" id="elog-estadoOP"><option value="">— Seleccionar —</option><option>PENDIENTE</option><option>FINALIZADO</option><option>CANCELADO</option></select></div>
       <div class="form-group form-full"><label>Comentario</label><textarea class="form-control" id="elog-comentario"></textarea></div>
     </div></div>
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-edit-log')">Cancelar</button><button class="btn btn-primary" onclick="saveEditLog()">Guardar</button></div>
@@ -954,6 +1089,7 @@ let visibleSumCols=SUM_COLS.map(c=>c.key);
 
 /* ── DASHBOARD LAYOUT ── */
 const DEFAULT_KPI=[
+  {id:'kpi-ot-total',label:'Total OT',icon:'📊',color:'blue',link:'ot',visible:true,custom:false},
   {id:'kpi-ot-act',label:'OT Activas',icon:'🔧',color:'yellow',link:'ot',visible:true,custom:false},
   {id:'kpi-alta-prior',label:'Alta Prioridad',icon:'🚨',color:'red',link:'ot',visible:true,custom:false},
   {id:'kpi-servicios',label:'Servicios',icon:'📋',color:'blue',link:'logistica',visible:true,custom:false},
@@ -961,9 +1097,9 @@ const DEFAULT_KPI=[
 ];
 const DEFAULT_WIDGETS=[
   {id:'ot-recientes',label:'OT Recientes',icon:'🔧',full:false,visible:true,custom:false},
+  {id:'ot-estados-pie',label:'Estados de OT',icon:'🥧',full:false,visible:true,custom:false},
   {id:'svc-pendientes',label:'Servicios Pendientes',icon:'📋',full:false,visible:true,custom:false},
   {id:'costo-areas',label:'Costo por Área',icon:'💰',full:false,visible:true,custom:false},
-  {id:'actividad',label:'Actividad en Tiempo Real',icon:'⚡',full:true,visible:true,custom:false},
 ];
 let kpiLayout=JSON.parse(localStorage.getItem('mantex_kpi_layout')||'null')||DEFAULT_KPI.map(k=>({...k}));
 let widgetLayout=JSON.parse(localStorage.getItem('mantex_widget_layout')||'null')||DEFAULT_WIDGETS.map(w=>({...w}));
@@ -1025,7 +1161,7 @@ function subscribeAll(){
   unsubscribers.push(onSnapshot(collection(db,'epp'),snap=>{eppData=snap.docs.map(d=>({id:d.id,...d.data()}));if(isActive('page-epp'))renderEPP();}));
   unsubscribers.push(onSnapshot(collection(db,'herramientas'),snap=>{herData=snap.docs.map(d=>({id:d.id,...d.data()}));if(isActive('page-herramientas'))renderHerramientas();}));
   unsubscribers.push(onSnapshot(collection(db,'materiales'),snap=>{matData=snap.docs.map(d=>({id:d.id,...d.data()}));populateMatSelect();if(isActive('page-materiales'))renderMateriales();}));
-  unsubscribers.push(onSnapshot(query(collection(db,'activity'),orderBy('ts','desc')),snap=>{actData=snap.docs.map(d=>({id:d.id,...d.data()}));if(isActive('page-dashboard'))renderDashboard();}));
+  unsubscribers.push(onSnapshot(query(collection(db,'activity'),orderBy('ts','desc')),snap=>{actData=snap.docs.map(d=>({id:d.id,...d.data()}));if(isActive('page-dashboard')){renderDashboard();}}));
   unsubscribers.push(onSnapshot(collection(db,'usuarios'),snap=>{usrData=snap.docs.map(d=>({id:d.id,...d.data()}));if(isActive('page-usuarios'))renderUsuarios();}));
   unsubscribers.push(onSnapshot(collection(db,'epp_catalogo'),snap=>{eppCatData=snap.docs.map(d=>({id:d.id,...d.data()}));populateEPPSelect();renderEPPCatalogo();}));
   ['temporadas','areas','sistemas','subsistemas','ubicaciones'].forEach(col=>{unsubscribers.push(onSnapshot(collection(db,col),snap=>{listasData[col]=snap.docs.map(d=>d.data().valor).filter(Boolean).sort();populateCombos();}));});
@@ -1058,6 +1194,11 @@ window.navigate=function(page,el){
 function renderDashboard(){
   renderKPIGrid();
   renderWidgetArea();
+  renderActivity();
+}
+function renderActivity(){
+  const feed=document.getElementById('updates-feed');if(!feed)return;
+  feed.innerHTML=actData.slice(0,12).map(a=>`<div style="display:flex;gap:10px;align-items:flex-start;padding:9px 16px;border-bottom:1px solid var(--border)"><div style="font-size:15px;flex-shrink:0">${a.type==='ot'?'🔧':a.type==='log'?'📋':a.type==='mat'?'📦':'🦺'}</div><div><div style="font-family:var(--mono);font-size:10px;color:var(--accent)">${a.user||'Sistema'}</div><div style="font-size:13px;margin-top:2px">${a.text}</div><div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px">${fmtTs(a.ts)}</div></div></div>`).join('')||emptyMsg('Sin actividad reciente');
 }
 
 /* ── Edit mode ── */
@@ -1084,12 +1225,34 @@ window.resetDashLayout=function(){
 };
 
 /* ── KPI Grid ── */
+function getDashOT(){
+  const base=filterOTByUser();
+  const {type,val}=dashFilter;
+  if(type==='all'||!val)return base;
+  return base.filter(o=>{
+    if(!o.fecha)return false;
+    const d=o.fecha; // 'YYYY-MM-DD'
+    if(type==='year')return d.startsWith(val);
+    if(type==='month')return d.startsWith(val); // 'YYYY-MM'
+    if(type==='week'){// val='YYYY-Www'
+      const [y,w]=val.split('-W');
+      const jan4=new Date(parseInt(y),0,4);
+      const weekStart=new Date(jan4.getTime()+((parseInt(w)-1)*7-(jan4.getDay()||7)+1)*86400000);
+      const weekEnd=new Date(weekStart.getTime()+6*86400000);
+      const dd=new Date(d+'T12:00:00');
+      return dd>=weekStart&&dd<=weekEnd;
+    }
+    return true;
+  });
+}
 function getKPIValue(k){
+  const dot=getDashOT();
   switch(k.id){
-    case 'kpi-ot-act': return {val:filterOTByUser().filter(o=>o.estado!=='Cerrada').length,sub:'En proceso y abiertas'};
-    case 'kpi-alta-prior': return {val:filterOTByUser().filter(o=>o.prior==='Alta'&&o.estado!=='Cerrada').length,sub:'Requieren atención'};
-    case 'kpi-servicios': return {val:logData.filter(s=>s.estado==='Pendiente'||s.estado==='En proceso').length,sub:'Pendiente / En proceso'};
-    case 'kpi-ot-cerr': return {val:filterOTByUser().filter(o=>o.estado==='Cerrada').length,sub:'Completadas'};
+    case 'kpi-ot-total': return {val:dot.length,sub:'Total registradas'};
+    case 'kpi-ot-act': return {val:dot.filter(o=>o.estado!=='Cerrada').length,sub:'En proceso y abiertas'};
+    case 'kpi-alta-prior': return {val:dot.filter(o=>o.prior==='Alta'&&o.estado!=='Cerrada').length,sub:'Requieren atención'};
+    case 'kpi-servicios': return {val:logData.filter(s=>s.estadoOP==='PENDIENTE'||s.estado==='Pendiente'||s.estado==='En proceso').length,sub:'Pendiente / En proceso'};
+    case 'kpi-ot-cerr': return {val:dot.filter(o=>o.estado==='Cerrada').length,sub:'Completadas'};
     default: return {val:'—',sub:k.sub||''};
   }
 }
@@ -1099,7 +1262,7 @@ function renderKPIGrid(){
   grid.style.gridTemplateColumns=`repeat(${Math.min(visible.length,4)},1fr)`;
   grid.innerHTML=visible.map(k=>{
     const {val,sub}=getKPIValue(k);
-    const editBtns=`<div class="kpi-edit-btns"><button class="kpi-icon-btn" title="Renombrar" onclick="startRenameKPI('${k.id}')">✏️</button><button class="kpi-icon-btn del" title="Ocultar" onclick="hideKPI('${k.id}')">✕</button></div>`;
+    const editBtns=`<div class="kpi-edit-btns" onclick="event.stopPropagation()"><button class="kpi-icon-btn" title="Renombrar" onclick="event.stopPropagation();startRenameKPI('${k.id}')">✏️</button><button class="kpi-icon-btn del" title="Ocultar" onclick="event.stopPropagation();hideKPI('${k.id}')">✕</button></div>`;
     const verBtn=k.link&&!dashEditMode?`<button class="kpi-ver-btn" onclick="navigate('${k.link}',null)">VER →</button>`:'';
     const drag=dashEditMode?`draggable="true" ondragstart="onKPIDragStart(event,'${k.id}')" ondragover="onKPIDragOver(event,'${k.id}')" ondrop="onKPIDrop(event,'${k.id}')" ondragleave="onKPIDragLeave('${k.id}')"`:'' ;
     return `<div class="kpi-card ${k.color} ${dashEditMode?'edit-mode':''}" id="kpi-card-${k.id}" ${drag}>${editBtns}<div class="kpi-label">${k.label}</div><div class="kpi-value">${val}</div><div class="kpi-sub">${sub}</div><div class="kpi-trend">${k.icon}</div>${verBtn}</div>`;
@@ -1132,7 +1295,7 @@ function renderWidgetArea(){
   vis.forEach(w=>{
     const drag=dashEditMode?`draggable="true" ondragstart="onWidgetDragStart(event,'${w.id}')" ondragover="onWidgetDragOver(event,'${w.id}')" ondrop="onWidgetDrop(event,'${w.id}')" ondragleave="onWidgetDragLeave('${w.id}')"`:'' ;
     html+=`<div class="dash-widget ${w.full?'full-width':''} ${dashEditMode?'edit-mode':''}" id="dw-${w.id}" ${drag}>`;
-    html+=`<div class="card-header"><span class="card-title">${w.icon} ${w.label.toUpperCase()}</span>${dashEditMode?`<button class="kpi-icon-btn del" onclick="hideWidget('${w.id}')">✕</button>`:''}</div>`;
+    html+=`<div class="card-header"><span class="card-title">${w.icon} ${w.label.toUpperCase()}</span>${dashEditMode?`<div onclick="event.stopPropagation()" style="display:flex;gap:4px"><button class="kpi-icon-btn" title="Renombrar" onclick="event.stopPropagation();startRenameWidget('${w.id}')">✏️</button><button class="kpi-icon-btn del" onclick="event.stopPropagation();hideWidget('${w.id}')">✕</button></div>`:''}</div>`;
     html+=`<div id="dw-content-${w.id}"></div></div>`;
   });
   html+='</div>';
@@ -1164,8 +1327,11 @@ function fillWidgetContent(w){
     el.innerHTML=pend.length?`<table><thead><tr><th>Sol.Pedido</th><th>Texto</th><th>Estado</th></tr></thead><tbody>${pend.map(s=>`<tr><td style="font-family:var(--mono);font-size:11px">${s.solped||'—'}</td><td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.texto||''}</td><td>${logEstadoBadge(s.estado)}</td></tr>`).join('')}</tbody></table>`:emptyMsg('Sin servicios pendientes ✅');
   } else if(w.id==='costo-areas'){
     renderCostoAreas(el);
-  } else if(w.id==='actividad'){
-    el.innerHTML=actData.slice(0,8).map(a=>`<div style="display:flex;gap:10px;align-items:flex-start;padding:9px 16px;border-bottom:1px solid var(--border)"><div style="font-size:15px;flex-shrink:0">${a.type==='ot'?'🔧':a.type==='log'?'📋':a.type==='mat'?'📦':'🦺'}</div><div><div style="font-family:var(--mono);font-size:10px;color:var(--accent)">${a.user||'Sistema'}</div><div style="font-size:13px;margin-top:2px">${a.text}</div><div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px">${fmtTs(a.ts)}</div></div></div>`).join('')||emptyMsg('Sin actividad');
+  } else if(w.id==='ot-estados-pie'){
+    const dot=getDashOT();
+    const abiertas=dot.filter(o=>o.estado!=='Cerrada').length;
+    const cerradas=dot.filter(o=>o.estado==='Cerrada').length;
+    el.innerHTML=svgDonut([{value:abiertas,color:'var(--accent)',label:'Abiertas'},{value:cerradas,color:'var(--accent2)',label:'Cerradas'}]);
   } else if(w.custom){
     el.innerHTML=`<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">Widget personalizado</div>`;
   }
@@ -1413,17 +1579,26 @@ function renderOT(){
   const search=document.getElementById('ot-search')?.value?.toLowerCase()||'';
   const fE=document.getElementById('ot-f-estado')?.value||'';
   const fT=document.getElementById('ot-f-tipo')?.value||'';
+  const isDelMode=deleteMode['ot'];
+  const bar=document.getElementById('del-bar-ot');
+  const btnDel=document.getElementById('btn-del-ot');
+  if(bar){bar.classList.toggle('active',isDelMode);}
+  if(btnDel){btnDel.textContent=isDelMode?'✕ Salir':'🗑 Borrar';btnDel.style.color=isDelMode?'':'';}
   let list=filterOTByUser().filter(o=>{
-    const m=!search||(o.num||'').toLowerCase().includes(search)||(o.desc||'').toLowerCase().includes(search)||(o.equipo||'').toLowerCase().includes(search)||(o.tecnico||'').toLowerCase().includes(search);
-    return m&&(!fE||o.estado===fE)&&(!fT||o.tipo===fT);
+    const m=!search||(o.num||'').toLowerCase().includes(search)||(o.desc||'').toLowerCase().includes(search)||(o.equipo||'').toLowerCase().includes(search)||(o.tecnico||'').toLowerCase().includes(search)||(o.subsistema||'').toLowerCase().includes(search)||(o.ubicacion||'').toLowerCase().includes(search);
+    return m&&(!fE||o.estado===fE)&&(!fT||o.tipo===fT)&&inDateRange(o.fecha||'','ot');
   });
   lastFilteredOT=[...list];
   const stats={Abierta:0,'En proceso':0,Pausada:0,Cerrada:0};
   filterOTByUser().forEach(o=>stats[o.estado]=(stats[o.estado]||0)+1);
   document.getElementById('ot-stats').innerHTML=Object.entries(stats).map(([k,v])=>`<div class="stat-box"><div class="val">${v}</div><div class="lbl">${k}</div></div>`).join('');
+  // Update del-col header
+  const thRow=document.getElementById('ot-th-row');
+  if(thRow){const existing=thRow.querySelector('th.del-col');if(isDelMode&&!existing){const th=document.createElement('th');th.className='del-col';th.innerHTML=`<input type="checkbox" class="del-all-chk" onchange="selectAllRows('ot',this)">`;thRow.insertBefore(th,thRow.firstChild);}else if(!isDelMode&&existing){existing.remove();}}
   const canWrite=ROLE_WRITE[currentUser.role];
-  document.getElementById('btn-nueva-ot').style.display=canWrite?'':'none';
+  document.getElementById('btn-nueva-ot').style.display=canWrite&&!isDelMode?'':'none';
   document.getElementById('ot-tbody').innerHTML=list.length?list.map(o=>`<tr>
+    ${isDelMode?`<td class="del-col"><input type="checkbox" class="del-row-chk del-row-chk-ot" value="${o.id}" onchange="updDelCount('ot')"></td>`:''}
     <td><span class="pill-num">${o.num}</span></td>
     <td style="font-size:12px">${o.temporada||'—'}</td>
     <td style="font-size:12px">${o.areaSol||'—'}</td>
@@ -1443,8 +1618,8 @@ function renderOT(){
     <td style="font-family:var(--mono);font-size:11px">${o.costoMat||'—'}</td>
     <td style="display:flex;gap:3px;flex-wrap:nowrap">
       <button class="btn btn-ghost btn-sm" onclick="verOT('${o.id}')">👁</button>
-      ${canWrite?`<button class="btn btn-ghost btn-sm" title="Editar OT" onclick="openEditOT('${o.id}')">✏️</button><button class="btn btn-ghost btn-sm" onclick="openCambioEstadoOT('${o.id}','${o.num}','${o.estado}','${o.avance||0}')">Estado</button><button class="btn btn-danger btn-sm" onclick="deleteOT('${o.id}')">✕</button>`:''}
-    </td></tr>`).join(''):`<tr><td colspan="18">${emptyMsg('Sin órdenes de trabajo')}</td></tr>`;
+      ${canWrite&&!isDelMode?`<button class="btn btn-ghost btn-sm" title="Editar OT" onclick="openEditOT('${o.id}')">✏️</button><button class="btn btn-ghost btn-sm" onclick="openCambioEstadoOT('${o.id}','${o.num}','${o.estado}','${o.avance||0}')">Estado</button>`:isDelMode?'':''}
+    </td></tr>`).join(''):`<tr><td colspan="${isDelMode?19:18}">${emptyMsg('Sin órdenes de trabajo')}</td></tr>`;
 }
 window.openEditOT=function(id){
   const o=otData.find(x=>x.id===id);if(!o)return;
@@ -1656,9 +1831,20 @@ function exportPDF(title,data,keys){
 function renderLogistica(){
   const search=document.getElementById('log-search')?.value?.toLowerCase()||'';
   const fEstado=document.getElementById('log-f-estado')?.value||'';
-  const list=logData.filter(s=>{const m=!search||(s.solped||'').toLowerCase().includes(search)||(s.texto||'').toLowerCase().includes(search)||(s.proveedor||'').toLowerCase().includes(search)||(s.pedido||'').toLowerCase().includes(search);return m&&(!fEstado||s.estado===fEstado);});
+  const sortDir=document.getElementById('log-f-sort')?.value||'desc';
+  const isDelMode=deleteMode['log'];
+  const bar=document.getElementById('del-bar-log');if(bar)bar.classList.toggle('active',isDelMode);
+  const btnDel=document.getElementById('btn-del-log');if(btnDel)btnDel.textContent=isDelMode?'✕ Salir':'🗑 Borrar';
+  let list=logData.filter(s=>{
+    const m=!search||(s.solped||'').toLowerCase().includes(search)||(s.texto||'').toLowerCase().includes(search)||(s.proveedor||'').toLowerCase().includes(search)||(s.pedido||'').toLowerCase().includes(search);
+    return m&&(!fEstado||s.estadoMP===fEstado)&&inDateRange(s.fesol||'','log');
+  });
+  list=list.sort((a,b)=>{const da=a.fesol||'',db=b.fesol||'';return sortDir==='asc'?da.localeCompare(db):db.localeCompare(da);});
   const canWrite=ROLE_WRITE[currentUser.role];
+  const thRow=document.getElementById('log-th-row');
+  if(thRow){const ec=thRow.querySelector('th.del-col');if(isDelMode&&!ec){const th=document.createElement('th');th.className='del-col';th.innerHTML=`<input type="checkbox" class="del-all-chk" onchange="selectAllRows('log',this)">`;thRow.insertBefore(th,thRow.firstChild);}else if(!isDelMode&&ec)ec.remove();}
   document.getElementById('log-tbody').innerHTML=list.length?list.map(s=>`<tr>
+    ${isDelMode?`<td class="del-col"><input type="checkbox" class="del-row-chk del-row-chk-log" value="${s.id}" onchange="updDelCount('log')"></td>`:''}
     <td style="font-family:var(--mono);font-size:11px">${s.fesol||'—'}</td>
     <td style="font-family:var(--mono);font-size:11px;color:var(--accent)">${s.solped||'—'}</td>
     <td style="font-family:var(--mono);font-size:11px">${s.pedido||'—'}</td>
@@ -1666,25 +1852,30 @@ function renderLogistica(){
     <td>${s.proveedor||'—'}</td>
     <td style="font-family:var(--mono);text-align:right">${s.valor?Number(s.valor).toLocaleString('es-PE',{minimumFractionDigits:2}):'—'}</td>
     <td><span class="badge badge-gray">${s.moneda||'PEN'}</span></td>
+    <td>${s.estadoOP?`<span class="badge ${{PENDIENTE:'badge-yellow',FINALIZADO:'badge-green',CANCELADO:'badge-red'}[s.estadoOP]||'badge-gray'}">${s.estadoOP}</span>`:'—'}</td>
     <td style="font-family:var(--mono);font-size:11px">${s.factura||'—'}</td>
     <td style="font-family:var(--mono);font-size:11px">${s.ingreso||'—'}</td>
-    <td>${logEstadoBadge(s.estado)}</td>
+    <td>${s.estadoMP?`<span class="badge ${{APROBADO:'badge-green',RECHAZADO:'badge-red'}[s.estadoMP]||'badge-gray'}">${s.estadoMP}</span>`:'—'}</td>
     <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:var(--muted)">${s.comentario||'—'}</td>
-    <td style="display:flex;gap:3px">${canWrite?`<button class="btn btn-ghost btn-sm" onclick="editLog('${s.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteLog('${s.id}')">✕</button>`:'—'}</td>
-  </tr>`).join(''):`<tr><td colspan="12">${emptyMsg('Sin registros SAP Servicios')}</td></tr>`;
+    <td style="display:flex;gap:3px">${canWrite&&!isDelMode?`<button class="btn btn-ghost btn-sm" onclick="editLog('${s.id}')">✏️</button>`:''}</td>
+  </tr>`).join(''):`<tr><td colspan="${isDelMode?14:13}">${emptyMsg('Sin registros SAP Servicios')}</td></tr>`;
 }
-window.saveLogistica=async function(){const texto=document.getElementById('log-texto').value.trim();if(!texto){toast('Texto breve requerido','error');return;}await addDoc(collection(db,'logistica'),{fesol:document.getElementById('log-fesol').value,solped:document.getElementById('log-solped').value,pedido:document.getElementById('log-pedido').value,texto,proveedor:document.getElementById('log-proveedor').value,valor:document.getElementById('log-valor').value,moneda:document.getElementById('log-moneda').value,factura:document.getElementById('log-factura').value,ingreso:document.getElementById('log-ingreso').value,estado:document.getElementById('log-estado').value,comentario:document.getElementById('log-comentario').value,creadoPor:currentUser.name,createdAt:serverTimestamp()});closeModal('modal-log');toast('Registro guardado','success');['log-solped','log-pedido','log-texto','log-proveedor','log-valor','log-factura','log-comentario'].forEach(id=>document.getElementById(id).value='');};
-window.editLog=function(id){const s=logData.find(x=>x.id===id);if(!s)return;editingLogId=id;['fesol','solped','pedido','texto','proveedor','valor','moneda','factura','ingreso','estado','comentario'].forEach(f=>{const el=document.getElementById('elog-'+f);if(el)el.value=s[f]||'';});document.getElementById('modal-edit-log').classList.add('open');};
-window.saveEditLog=async function(){const data={};['fesol','solped','pedido','texto','proveedor','valor','moneda','factura','ingreso','estado','comentario'].forEach(f=>{data[f]=document.getElementById('elog-'+f)?.value||'';});await updateDoc(doc(db,'logistica',editingLogId),data);closeModal('modal-edit-log');toast('Actualizado','success');};
+window.saveLogistica=async function(){const texto=document.getElementById('log-texto').value.trim();if(!texto){toast('Texto breve requerido','error');return;}await addDoc(collection(db,'logistica'),{fesol:document.getElementById('log-fesol').value,solped:document.getElementById('log-solped').value,pedido:document.getElementById('log-pedido').value,texto,proveedor:document.getElementById('log-proveedor').value,valor:document.getElementById('log-valor').value,moneda:document.getElementById('log-moneda').value,factura:document.getElementById('log-factura').value,ingreso:document.getElementById('log-ingreso').value,estadoMP:document.getElementById('log-estadoMP').value,estadoOP:document.getElementById('log-estadoOP').value,comentario:document.getElementById('log-comentario').value,creadoPor:currentUser.name,createdAt:serverTimestamp()});closeModal('modal-log');toast('Registro guardado','success');['log-solped','log-pedido','log-texto','log-proveedor','log-valor','log-factura','log-comentario'].forEach(id=>document.getElementById(id).value='');};
+window.editLog=function(id){const s=logData.find(x=>x.id===id);if(!s)return;editingLogId=id;['fesol','solped','pedido','texto','proveedor','valor','moneda','factura','ingreso','estadoMP','estadoOP','comentario'].forEach(f=>{const el=document.getElementById('elog-'+f);if(el)el.value=s[f]||'';});document.getElementById('modal-edit-log').classList.add('open');};
+window.saveEditLog=async function(){const data={};['fesol','solped','pedido','texto','proveedor','valor','moneda','factura','ingreso','estadoMP','estadoOP','comentario'].forEach(f=>{data[f]=document.getElementById('elog-'+f)?.value||'';});await updateDoc(doc(db,'logistica',editingLogId),data);closeModal('modal-edit-log');toast('Actualizado','success');};
 window.deleteLog=async function(id){if(!confirm('¿Eliminar?'))return;await deleteDoc(doc(db,'logistica',id));};
 
 /* ── SUMINISTROS ── */
 function renderSuministros(){
   const search=document.getElementById('sum-search')?.value?.toLowerCase()||'';
-  const list=sumData.filter(s=>!search||Object.values(s).some(v=>String(v).toLowerCase().includes(search)));
+  const isDelMode=deleteMode['sum'];
+  const bar=document.getElementById('del-bar-sum');if(bar)bar.classList.toggle('active',isDelMode);
+  const btnDel=document.getElementById('btn-del-sum');if(btnDel)btnDel.textContent=isDelMode?'✕ Salir':'🗑 Borrar';
+  const list=sumData.filter(s=>(!search||Object.values(s).some(v=>String(v).toLowerCase().includes(search)))&&inDateRange(s.fechaOC||s.fechaEnt||'','sum'));
   const cols=SUM_COLS.filter(c=>visibleSumCols.includes(c.key));
   const canWrite=ROLE_WRITE[currentUser.role];
-  document.getElementById('sum-table-card').innerHTML=`<div class="table-wrap"><table><thead><tr>${cols.map(c=>`<th>${c.label}</th>`).join('')}${canWrite?'<th>Acc.</th>':''}</tr></thead><tbody>${list.length?list.map(s=>`<tr>${cols.map(c=>`<td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px">${s[c.key]||'—'}</td>`).join('')}${canWrite?`<td><button class="btn btn-danger btn-sm" onclick="deleteSum('${s.id}')">✕</button></td>`:''}</tr>`).join(''):`<tr><td colspan="${cols.length+(canWrite?1:0)}">${emptyMsg('Sin suministros')}</td></tr>`}</tbody></table></div>`;
+  const delTh=isDelMode?'<th class="del-col"><input type="checkbox" class="del-all-chk" onchange="selectAllRows(&#39;sum&#39;,this)"></th>':'';
+  document.getElementById('sum-table-card').innerHTML=`<div class="table-wrap"><table><thead><tr>${delTh}${cols.map(c=>`<th>${c.label}</th>`).join('')}</tr></thead><tbody>${list.length?list.map(s=>`<tr>${isDelMode?`<td class="del-col"><input type="checkbox" class="del-row-chk del-row-chk-sum" value="${s.id}" onchange="updDelCount('sum')"></td>`:''}${cols.map(c=>`<td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px">${s[c.key]||'—'}</td>`).join('')}</tr>`).join(''):`<tr><td colspan="${cols.length+(isDelMode?1:0)}">${emptyMsg('Sin suministros')}</td></tr>`}</tbody></table></div>`;
 }
 window.saveSum=async function(){const fields={status:'sum-status',posSol:'sum-pos-sol',tipoImp:'sum-tipo-imp',tipoPos:'sum-tipo-pos',material:'sum-material',texto:'sum-texto',cant:'sum-cant',um:'sum-um',precio:'sum-precio',moneda:'sum-moneda',centro:'sum-centro',pedido:'sum-pedido',grupoArt:'sum-grupo-art',valorTotal:'sum-valor-total',posEd:'sum-pos-ped',fechaOC:'sum-fecha-oc',grupoComp:'sum-grupo-comp',solicitante:'sum-solicitante',creadoPorSAP:'sum-creado-por',tipoFe:'sum-tipo-fe',fechaEnt:'sum-fecha-ent',almacen:'sum-almacen',urgencia:'sum-urgencia',numNec:'sum-num-nec',statusTrat:'sum-status-trat',statusTratSol:'sum-status-trat-sol'};const data={createdAt:serverTimestamp(),creadoPor:currentUser.name};Object.entries(fields).forEach(([k,id])=>{const el=document.getElementById(id);if(el)data[k]=el.value;});await addDoc(collection(db,'suministros'),data);closeModal('modal-sum');toast('Suministro registrado','success');};
 window.deleteSum=async function(id){if(!confirm('¿Eliminar?'))return;await deleteDoc(doc(db,'suministros',id));};
@@ -1693,17 +1884,23 @@ window.saveColsConfig=function(){visibleSumCols=SUM_COLS.filter(c=>document.getE
 /* ── MATERIALES ── */
 function renderMateriales(){
   const search=document.getElementById('mat-search')?.value?.toLowerCase()||'';
+  const isDelMode=deleteMode['mat'];
+  const bar=document.getElementById('del-bar-mat');if(bar)bar.classList.toggle('active',isDelMode);
+  const btnDel=document.getElementById('btn-del-mat');if(btnDel)btnDel.textContent=isDelMode?'✕ Salir':'🗑 Borrar';
   const list=matData.filter(m=>!search||(m.cod||'').toLowerCase().includes(search)||(m.texto||'').toLowerCase().includes(search)||(m.centro||'').toLowerCase().includes(search));
   const canWrite=ROLE_WRITE[currentUser.role];
+  // Update header
+  const mat_th=document.querySelector('#mat-tbody')?.closest('table')?.querySelector('thead tr');
+  if(mat_th){const ec=mat_th.querySelector('th.del-col');if(isDelMode&&!ec){const th=document.createElement('th');th.className='del-col';th.innerHTML=`<input type="checkbox" class="del-all-chk" onchange="selectAllRows('mat',this)">`;mat_th.insertBefore(th,mat_th.firstChild);}else if(!isDelMode&&ec)ec.remove();}
   document.getElementById('mat-tbody').innerHTML=list.length?list.map(m=>`<tr>
+    ${isDelMode?`<td class="del-col"><input type="checkbox" class="del-row-chk del-row-chk-mat" value="${m.id}" onchange="updDelCount('mat')"></td>`:''}
     <td style="font-family:var(--mono);font-size:12px;color:var(--accent)">${m.cod||'—'}</td>
     <td>${m.texto||'—'}</td>
     <td><span class="badge badge-gray">${m.um||'—'}</span></td>
     <td style="font-family:var(--mono);text-align:right">${m.precio?Number(m.precio).toFixed(2):'—'}</td>
     <td><span class="badge badge-blue">${m.moneda||'—'}</span></td>
     <td style="font-family:var(--mono);font-size:12px">${m.centro||'—'}</td>
-    <td>${canWrite?`<button class="btn btn-danger btn-sm" onclick="deleteMat('${m.id}')">✕</button>`:'—'}</td>
-  </tr>`).join(''):`<tr><td colspan="7">${emptyMsg('Sin materiales')}</td></tr>`;
+  </tr>`).join(''):`<tr><td colspan="${isDelMode?7:6}">${emptyMsg('Sin materiales')}</td></tr>`;
 }
 window.saveMaterial=async function(){const cod=document.getElementById('mat-cod').value.trim(),texto=document.getElementById('mat-texto').value.trim();if(!cod||!texto){toast('Código y texto requeridos','error');return;}await addDoc(collection(db,'materiales'),{cod,texto,um:document.getElementById('mat-um').value,precio:document.getElementById('mat-precio').value,moneda:document.getElementById('mat-moneda').value,centro:document.getElementById('mat-centro').value,createdAt:serverTimestamp()});closeModal('modal-mat');toast('Material guardado','success');['mat-cod','mat-texto','mat-precio','mat-centro'].forEach(id=>document.getElementById(id).value='');};
 window.deleteMat=async function(id){if(!confirm('¿Eliminar?'))return;await deleteDoc(doc(db,'materiales',id));};
@@ -1728,7 +1925,12 @@ window.openHerForm=function(tipo){
 function renderHerramientas(){
   const search=document.getElementById('her-search')?.value?.toLowerCase()||'';
   const list=herData.filter(h=>!search||(h.tecnico||'').toLowerCase().includes(search)||(h.nombre||'').toLowerCase().includes(search));
-  document.getElementById('her-tbody').innerHTML=list.length?list.map(h=>`<tr><td>${h.movTipo==='devolucion'?'<span class="badge badge-green">↩ Dev.</span>':'<span class="badge badge-yellow">🛠 Entrega</span>'}</td><td>${h.tecnico}</td><td>${h.nombre}</td><td style="font-family:var(--mono)">${h.cant}</td><td style="font-family:var(--mono);font-size:11px">${h.otRel||'—'}</td><td style="font-family:var(--mono);font-size:11px">${h.fecha||''}</td><td>${h.devuelto?'<span class="badge badge-green">Devuelta</span>':'<span class="badge badge-yellow">Pendiente</span>'}</td></tr>`).join(''):`<tr><td colspan="7">${emptyMsg('Sin registros')}</td></tr>`;
+  const isDelHer=deleteMode['her'];
+  const barHer=document.getElementById('del-bar-her');if(barHer)barHer.classList.toggle('active',isDelHer);
+  const btnDelHer=document.getElementById('btn-del-her');if(btnDelHer)btnDelHer.textContent=isDelHer?'✕ Salir':'🗑 Borrar';
+  const her_th=document.querySelector('#her-tbody')?.closest('table')?.querySelector('thead tr');
+  if(her_th){const ec=her_th.querySelector('th.del-col');if(isDelHer&&!ec){const th=document.createElement('th');th.className='del-col';th.innerHTML=`<input type="checkbox" class="del-all-chk" onchange="selectAllRows('her',this)">`;her_th.insertBefore(th,her_th.firstChild);}else if(!isDelHer&&ec)ec.remove();}
+  document.getElementById('her-tbody').innerHTML=list.length?list.map(h=>`<tr>${isDelHer?`<td class="del-col"><input type="checkbox" class="del-row-chk del-row-chk-her" value="${h.id}" onchange="updDelCount('her')"></td>`:''}<td>${h.movTipo==='devolucion'?'<span class="badge badge-green">↩ Dev.</span>':'<span class="badge badge-yellow">🛠 Entrega</span>'}</td><td>${h.tecnico}</td><td>${h.nombre}</td><td style="font-family:var(--mono)">${h.cant}</td><td style="font-family:var(--mono);font-size:11px">${h.otRel||'—'}</td><td style="font-family:var(--mono);font-size:11px">${h.fecha||''}</td><td>${h.devuelto?'<span class="badge badge-green">Devuelta</span>':'<span class="badge badge-yellow">Pendiente</span>'}</td></tr>`).join(''):`<tr><td colspan="${isDelHer?8:7}">${emptyMsg('Sin registros')}</td></tr>`;
   const pend=herData.filter(h=>!h.devuelto);
   document.getElementById('her-pendientes').innerHTML=pend.length?pend.map(h=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:13px;font-weight:600">${h.nombre}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${h.tecnico} · ${h.fecha||''}</div></div><button class="btn btn-success btn-sm" onclick="quickDevolver('${h.id}')">✓ Devuelta</button></div>`).join(''):`<div style="text-align:center;color:var(--muted);padding:20px;font-size:13px">✅ Sin pendientes</div>`;
 }
@@ -1745,6 +1947,8 @@ window.saveDevolucion=async function(){
   await addDoc(collection(db,'herramientas'),{movTipo:'devolucion',nombre:herData.find(h=>h.id===id)?.nombre||'',tecnico:herData.find(h=>h.id===id)?.tecnico||'',cant:herData.find(h=>h.id===id)?.cant||1,fecha:hoy(),devuelto:true,refId:id,creadoPor:currentUser.name,createdAt:serverTimestamp()});
   closeModal('modal-her-devolucion');toast('Devolución registrada','success');
 };
+window.selectAllEq=function(chk){document.querySelectorAll('.del-row-chk-eq').forEach(c=>c.checked=chk.checked);updDelCountEq();};
+window.updDelCountEq=function(){const n=document.querySelectorAll('.del-row-chk-eq:checked').length;document.querySelectorAll('.del-count-sp-eq').forEach(s=>s.textContent=n);};
 window.quickDevolver=async function(id){await updateDoc(doc(db,'herramientas',id),{devuelto:true,fechaDevReal:hoy()});toast('Herramienta marcada como devuelta','success');};
 
 /* ── EPP ── */
@@ -1753,13 +1957,19 @@ function renderEPP(){
   const search=document.getElementById('epp-search')?.value?.toLowerCase()||'';
   const list=eppData.filter(e=>!search||(e.tecnico||'').toLowerCase().includes(search)||(e.epp||'').toLowerCase().includes(search));
   const canWrite=ROLE_WRITE[currentUser.role];
+  const isDelEPP=deleteMode['epp'];
+  const barEPP=document.getElementById('del-bar-epp');if(barEPP)barEPP.classList.toggle('active',isDelEPP);
+  const btnDelEPP=document.getElementById('btn-del-epp');if(btnDelEPP)btnDelEPP.textContent=isDelEPP?'✕ Salir':'🗑 Borrar';
+  const epp_th=document.querySelector('#epp-tbody')?.closest('table')?.querySelector('thead tr');
+  if(epp_th){const ec=epp_th.querySelector('th.del-col');if(isDelEPP&&!ec){const th=document.createElement('th');th.className='del-col';th.innerHTML=`<input type="checkbox" class="del-all-chk" onchange="selectAllRows('epp',this)">`;epp_th.insertBefore(th,epp_th.firstChild);}else if(!isDelEPP&&ec)ec.remove();}
   document.getElementById('epp-tbody').innerHTML=list.length?list.map(e=>`<tr>
+    ${isDelEPP?`<td class="del-col"><input type="checkbox" class="del-row-chk del-row-chk-epp" value="${e.id}" onchange="updDelCount('epp')"></td>`:''}
     <td>${e.tecnico}</td><td>${e.epp}</td>
     <td style="font-family:var(--mono)">${e.cant}</td>
     <td style="font-family:var(--mono);font-size:11px">${e.fecha||''}</td>
     <td style="font-size:11px;color:var(--muted)">${e.entregadoPor||''}</td>
-    <td>${canWrite?`<button class="btn btn-ghost btn-sm" onclick="editEPP('${e.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteEPPReg('${e.id}')">✕</button>`:''}</td>
-  </tr>`).join(''):`<tr><td colspan="6">${emptyMsg('Sin registros')}</td></tr>`;
+    <td>${canWrite&&!isDelEPP?`<button class="btn btn-ghost btn-sm" onclick="editEPP('${e.id}')">✏️</button>`:''}</td>
+  </tr>`).join(''):`<tr><td colspan="${isDelEPP?7:6}">${emptyMsg('Sin registros')}</td></tr>`;
   const consumido={};eppData.forEach(e=>{consumido[e.epp]=(consumido[e.epp]||0)+parseInt(e.cant||0);});
   if(eppCatData.length){
     document.getElementById('epp-stock').innerHTML=eppCatData.map(cat=>{
@@ -1827,10 +2037,13 @@ window.deleteEPPCat=async function(id){if(!confirm('¿Eliminar este EPP del cat�
 /* ── EQUIPOS ── */
 function renderEquipos(){
   const search=document.getElementById('eq-search')?.value?.toLowerCase()||'';
+  const isDelEq=deleteMode['eq'];
+  const barEq=document.getElementById('del-bar-eq');if(barEq)barEq.classList.toggle('active',isDelEq);
+  const btnDelEq=document.getElementById('btn-del-eq');if(btnDelEq)btnDelEq.textContent=isDelEq?'✕ Salir':'🗑 Borrar';
   const list=eqData.filter(e=>!search||(e.nombre||'').toLowerCase().includes(search)||(e.tag||'').toLowerCase().includes(search));
   const iconMap={Bomba:'🔄',Motor:'⚡',Compresor:'💨',Transportador:'🏗️',Caldera:'🔥',Reductor:'⚙️',Ventilador:'🌀',Otro:'🔩'};
   const canWrite=ROLE_WRITE[currentUser.role];
-  document.getElementById('eqp-grid').innerHTML=list.length?list.map(e=>`<div class="eqp-card"><div style="font-size:24px;margin-bottom:7px">${iconMap[e.tipo]||'🔩'}</div><div style="font-weight:600;font-size:14px">${e.nombre}</div><div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px">${e.tag} · ${e.area||''}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${e.marca||''}</div><div style="display:flex;gap:5px;margin-top:9px;flex-wrap:wrap">${criticidadBadge(e.crit)} ${e.estado==='Operativo'?'<span class="badge badge-green">Operativo</span>':'<span class="badge badge-yellow">Mantto</span>'}</div>${canWrite?`<div style="display:flex;gap:5px;margin-top:9px"><button class="btn btn-ghost btn-sm" style="flex:1" onclick="toggleEquipo('${e.id}','${e.estado}')">${e.estado==='Operativo'?'⏸ Mantto':'▶ Operar'}</button><button class="btn btn-danger btn-sm" onclick="deleteEquipo('${e.id}')">✕</button></div>`:''}</div>`).join(''):`<div style="padding:40px;text-align:center;color:var(--muted)">Sin equipos</div>`;
+  document.getElementById('eqp-grid').innerHTML=list.length?list.map(e=>`<div class="eqp-card"><div style="font-size:24px;margin-bottom:7px">${iconMap[e.tipo]||'🔩'}</div><div style="font-weight:600;font-size:14px">${e.nombre}</div><div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px">${e.tag} · ${e.area||''}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${e.marca||''}</div><div style="display:flex;gap:5px;margin-top:9px;flex-wrap:wrap">${criticidadBadge(e.crit)} ${e.estado==='Operativo'?'<span class="badge badge-green">Operativo</span>':'<span class="badge badge-yellow">Mantto</span>'}</div>${canWrite?`<div style="display:flex;gap:5px;margin-top:9px"><button class="btn btn-ghost btn-sm" style="flex:1" onclick="toggleEquipo('${e.id}','${e.estado}')">${e.estado==='Operativo'?'⏸ Mantto':'▶ Operar'}</button>${isDelEq?`<input type='checkbox' class='del-row-chk-eq del-all-chk' value='${e.id}' onchange='updDelCountEq()' style='width:18px;height:18px;accent-color:var(--danger);cursor:pointer' title='Seleccionar para eliminar'>`:''}</div>`:''}</div>`).join(''):`<div style="padding:40px;text-align:center;color:var(--muted)">Sin equipos</div>`;
 }
 window.toggleEquipo=async function(id,e){await updateDoc(doc(db,'equipos',id),{estado:e==='Operativo'?'En mantenimiento':'Operativo'});};
 window.deleteEquipo=async function(id){if(!confirm('¿Eliminar?'))return;await deleteDoc(doc(db,'equipos',id));};
@@ -1895,7 +2108,12 @@ function renderTecnicos(){
   const search=document.getElementById('tec-search')?.value?.toLowerCase()||'';
   const list=tecData.filter(t=>!search||(t.nombre||'').toLowerCase().includes(search));
   const canWrite=ROLE_WRITE[currentUser.role];
-  document.getElementById('tec-tbody').innerHTML=list.length?list.map(t=>{const otAct=otData.filter(o=>o.tecnico===t.nombre&&o.estado!=='Cerrada').length;return `<tr><td style="font-family:var(--mono);font-size:11px;color:var(--accent)">${t.idTec||''}</td><td><strong>${t.nombre}</strong></td><td>${t.esp}</td><td>${t.turno}</td><td><span class="pill-num">${otAct}</span></td><td><span class="badge badge-green">Activo</span></td><td>${canWrite?`<button class="btn btn-danger btn-sm" onclick="deleteTec('${t.id}')">✕</button>`:''}</td></tr>`;}).join(''):`<tr><td colspan="7">${emptyMsg('Sin técnicos')}</td></tr>`;
+  const isDelTec=deleteMode['tec'];
+  const barTec=document.getElementById('del-bar-tec');if(barTec)barTec.classList.toggle('active',isDelTec);
+  const btnDelTec=document.getElementById('btn-del-tec');if(btnDelTec)btnDelTec.textContent=isDelTec?'✕ Salir':'🗑 Borrar';
+  const tec_th=document.querySelector('#tec-tbody')?.closest('table')?.querySelector('thead tr');
+  if(tec_th){const ec=tec_th.querySelector('th.del-col');if(isDelTec&&!ec){const th=document.createElement('th');th.className='del-col';th.innerHTML=`<input type="checkbox" class="del-all-chk" onchange="selectAllRows('tec',this)">`;tec_th.insertBefore(th,tec_th.firstChild);}else if(!isDelTec&&ec)ec.remove();}
+  document.getElementById('tec-tbody').innerHTML=list.length?list.map(t=>{const otAct=otData.filter(o=>o.tecnico===t.nombre&&o.estado!=='Cerrada').length;return `<tr>${isDelTec?`<td class="del-col"><input type="checkbox" class="del-row-chk del-row-chk-tec" value="${t.id}" onchange="updDelCount('tec')"></td>`:''}<td style="font-family:var(--mono);font-size:11px;color:var(--accent)">${t.idTec||''}</td><td><strong>${t.nombre}</strong></td><td>${t.esp}</td><td>${t.turno}</td><td><span class="pill-num">${otAct}</span></td><td><span class="badge badge-green">Activo</span></td></tr>`;}).join(''):`<tr><td colspan="${isDelTec?8:7}">${emptyMsg('Sin técnicos')}</td></tr>`;
 }
 window.deleteTec=async function(id){if(!confirm('¿Eliminar?'))return;await deleteDoc(doc(db,'tecnicos',id));};
 window.saveTecnico=async function(){const nombre=document.getElementById('tec-nombre').value.trim();if(!nombre){toast('Nombre requerido','error');return;}await addDoc(collection(db,'tecnicos'),{nombre,idTec:document.getElementById('tec-id').value.trim()||`T-${String(tecData.length+1).padStart(3,'0')}`,esp:document.getElementById('tec-esp').value,turno:document.getElementById('tec-turno').value,createdAt:serverTimestamp()});closeModal('modal-tec');toast('Técnico registrado','success');document.getElementById('tec-nombre').value='';document.getElementById('tec-id').value='';};
@@ -1904,7 +2122,12 @@ window.saveTecnico=async function(){const nombre=document.getElementById('tec-no
 function renderUsuarios(){
   const search=document.getElementById('usr-search')?.value?.toLowerCase()||'';
   const list=usrData.filter(u=>!search||(u.username||'').toLowerCase().includes(search)||(u.nombre||'').toLowerCase().includes(search));
-  document.getElementById('usr-tbody').innerHTML=list.length?list.map(u=>`<tr><td style="font-family:var(--mono);font-size:12px;color:var(--accent)">${u.username||u.id}</td><td><strong>${u.nombre||'—'}</strong></td><td><span class="badge role-badge-${u.rol||'jefatura'}">${ROLE_LABELS[u.rol]||u.rol}</span></td><td style="font-size:12px;color:var(--muted)">${u.tecnicoAsoc||'—'}</td><td style="display:flex;gap:4px"><button class="btn btn-ghost btn-sm" onclick="editUsuario('${u.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteUsuario('${u.id}')">✕</button></td></tr>`).join(''):`<tr><td colspan="5">${emptyMsg('Sin usuarios. Acceso default: planner/planner2024')}</td></tr>`;
+  const isDelUsr=deleteMode['usr'];
+  const barUsr=document.getElementById('del-bar-usr');if(barUsr)barUsr.classList.toggle('active',isDelUsr);
+  const btnDelUsr=document.getElementById('btn-del-usr');if(btnDelUsr)btnDelUsr.textContent=isDelUsr?'✕ Salir':'🗑 Borrar';
+  const usr_th=document.querySelector('#usr-tbody')?.closest('table')?.querySelector('thead tr');
+  if(usr_th){const ec=usr_th.querySelector('th.del-col');if(isDelUsr&&!ec){const th=document.createElement('th');th.className='del-col';th.innerHTML=`<input type="checkbox" class="del-all-chk" onchange="selectAllRows('usr',this)">`;usr_th.insertBefore(th,usr_th.firstChild);}else if(!isDelUsr&&ec)ec.remove();}
+  document.getElementById('usr-tbody').innerHTML=list.length?list.map(u=>`<tr>${isDelUsr?`<td class="del-col"><input type="checkbox" class="del-row-chk del-row-chk-usr" value="${u.id}" onchange="updDelCount('usr')"></td>`:''}<td style="font-family:var(--mono);font-size:12px;color:var(--accent)">${u.username||u.id}</td><td><strong>${u.nombre||'—'}</strong></td><td><span class="badge role-badge-${u.rol||'jefatura'}">${ROLE_LABELS[u.rol]||u.rol}</span></td><td style="font-size:12px;color:var(--muted)">${u.tecnicoAsoc||'—'}</td><td>${!isDelUsr?`<button class="btn btn-ghost btn-sm" onclick="editUsuario('${u.id}')">✏️</button>`:''}</td></tr>`).join(''):`<tr><td colspan="${isDelUsr?6:5}">${emptyMsg('Sin usuarios. Acceso default: planner/planner2024')}</td></tr>`;
 }
 window.toggleTecnicoSelect=function(){const rol=document.getElementById('usr-rol').value;document.getElementById('usr-tec-group').style.display=rol==='tecnico'?'block':'none';};
 window.editUsuario=function(id){const u=usrData.find(x=>x.id===id);if(!u)return;editingUsrId=id;document.getElementById('usr-modal-title').textContent='EDITAR USUARIO';const unInp=document.getElementById('usr-username');unInp.value=u.username||u.id;unInp.readOnly=true;unInp.style.opacity='0.6';document.getElementById('usr-password').value=u.password||'';document.getElementById('usr-nombre').value=u.nombre||'';document.getElementById('usr-rol').value=u.rol||'jefatura';document.getElementById('usr-tec-asoc').innerHTML='<option value="">— Sin asociar —</option>'+tecData.map(t=>`<option value="${t.nombre}">${t.nombre}</option>`).join('');if(u.tecnicoAsoc)document.getElementById('usr-tec-asoc').value=u.tecnicoAsoc;window.toggleTecnicoSelect();document.getElementById('modal-usr').classList.add('open');};
@@ -1952,6 +2175,156 @@ function tipoBadge(t){return`<span class="badge ${{Correctivo:'badge-red',Preven
 function criticidadBadge(c){return`<span class="badge ${{Alta:'badge-red',Media:'badge-yellow',Baja:'badge-green'}[c]||'badge-gray'}">${c||'—'}</span>`;}
 
 /* ── MODAL / DROPDOWN ── */
+
+
+/* ── DASHBOARD FILTER ── */
+let dashFilter={type:'all',val:''};
+
+window.setDashFilter=function(type,btn){
+  document.querySelectorAll('.filter-chip[id^="dflt-"]').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  dashFilter.type=type;
+  dashFilter.val='';
+  const wrap=document.getElementById('dash-filter-val-wrap');
+  const inp=document.getElementById('dash-filter-val');
+  const badge=document.getElementById('dash-filter-badge');
+  if(type==='all'){
+    wrap.style.display='none';
+    badge.style.display='none';
+    renderDashboard();
+    return;
+  }
+  wrap.style.display='flex';
+  badge.style.display='none';
+  if(type==='year'){inp.type='number';inp.placeholder='Ej: 2024';inp.min='2020';inp.max='2030';}
+  else if(type==='month'){inp.type='month';inp.placeholder='';}
+  else if(type==='week'){inp.type='week';inp.placeholder='';}
+  inp.value='';
+  inp.focus();
+};
+window.applyDashFilter=function(){
+  const inp=document.getElementById('dash-filter-val');
+  dashFilter.val=inp?.value||'';
+  const badge=document.getElementById('dash-filter-badge');
+  if(dashFilter.val&&badge){badge.textContent='● Filtrado';badge.style.display='inline';}
+  else if(badge){badge.style.display='none';}
+  renderDashboard();
+};
+window.clearDashFilter=function(){
+  dashFilter={type:'all',val:''};
+  document.querySelectorAll('.filter-chip[id^="dflt-"]').forEach(b=>b.classList.remove('active'));
+  document.getElementById('dflt-all')?.classList.add('active');
+  document.getElementById('dash-filter-val-wrap').style.display='none';
+  document.getElementById('dash-filter-badge').style.display='none';
+  document.getElementById('dash-filter-val').value='';
+  renderDashboard();
+};
+
+/* ── SVG DONUT CHART ── */
+function svgDonut(slices){
+  const total=slices.reduce((s,x)=>s+x.value,0);
+  if(!total)return`<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">Sin datos de OT</div>`;
+  const cx=75,cy=75,r=60,ir=35;
+  let angle=-Math.PI/2;
+  const paths=slices.map(s=>{
+    const sweep=(s.value/total)*2*Math.PI;
+    if(sweep===0)return null;
+    const x1=cx+r*Math.cos(angle),y1=cy+r*Math.sin(angle);
+    const x2=cx+r*Math.cos(angle+sweep),y2=cy+r*Math.sin(angle+sweep);
+    const ix1=cx+ir*Math.cos(angle+sweep),iy1=cy+ir*Math.sin(angle+sweep);
+    const ix2=cx+ir*Math.cos(angle),iy2=cy+ir*Math.sin(angle);
+    const lg=sweep>Math.PI?1:0;
+    const d=`M${x1.toFixed(1)} ${y1.toFixed(1)} A${r} ${r} 0 ${lg} 1 ${x2.toFixed(1)} ${y2.toFixed(1)} L${ix1.toFixed(1)} ${iy1.toFixed(1)} A${ir} ${ir} 0 ${lg} 0 ${ix2.toFixed(1)} ${iy2.toFixed(1)}Z`;
+    angle+=sweep;
+    return{d,color:s.color,label:s.label,value:s.value,pct:Math.round(s.value/total*100)};
+  }).filter(Boolean);
+  return`<div class="donut-wrap"><svg width="150" height="150" viewBox="0 0 150 150">${paths.map(p=>`<path d="${p.d}" fill="${p.color}" stroke="var(--surface)" stroke-width="3"><title>${p.label}: ${p.value}</title></path>`).join('')}</svg><div>${paths.map(p=>`<div class="donut-legend-item"><div style="display:flex;align-items:center;gap:6px;margin-bottom:3px"><div style="width:10px;height:10px;border-radius:2px;background:${p.color}"></div><span style="font-size:12px;color:var(--muted)">${p.label}</span></div><div class="donut-legend-val" style="color:${p.color}">${p.value}</div><div class="donut-legend-lbl">${p.pct}% del total</div></div>`).join('')}</div></div>`;
+}
+
+/* ── RENAME WIDGET ── */
+let renamingWidgetId=null;
+window.startRenameWidget=function(id){
+  renamingWidgetId=id;
+  const w=widgetLayout.find(x=>x.id===id);
+  // Reuse rename-kpi modal
+  document.getElementById('rename-kpi-val').value=w?.label||'';
+  document.querySelector('#modal-rename-kpi h2').textContent='RENOMBRAR WIDGET';
+  document.querySelector('#modal-rename-kpi .btn-primary').onclick=confirmRenameWidget;
+  openModal('modal-rename-kpi');
+};
+window.confirmRenameWidget=function(){
+  const w=widgetLayout.find(x=>x.id===renamingWidgetId);
+  if(w){w.label=document.getElementById('rename-kpi-val').value.trim()||w.label;localStorage.setItem('mantex_widget_layout',JSON.stringify(widgetLayout));renderWidgetArea();}
+  closeModal('modal-rename-kpi');
+  // Restore KPI rename function
+  document.querySelector('#modal-rename-kpi h2').textContent='RENOMBRAR TARJETA';
+  document.querySelector('#modal-rename-kpi .btn-primary').onclick=confirmRenameKPI;
+};
+
+/* ── DELETE MODE (global) ── */
+let deleteMode={};
+window.toggleDeleteMode=function(mod){
+  deleteMode[mod]=!deleteMode[mod];
+  const renderMap={ot:renderOT,log:renderLogistica,sum:renderSuministros,mat:renderMateriales,epp:renderEPP,tec:renderTecnicos,usr:renderUsuarios,her:renderHerramientas,eq:renderEquipos};
+  renderMap[mod]?.();
+};
+window.selectAllRows=function(mod,chk){
+  document.querySelectorAll('.del-row-chk-'+mod).forEach(c=>c.checked=chk.checked);
+  updDelCount(mod);
+};
+window.updDelCount=function(mod){
+  const n=document.querySelectorAll('.del-row-chk-'+mod+':checked').length;
+  const bar=document.getElementById('del-bar-'+mod);
+  if(bar){const sp=bar.querySelector('.del-count-sp');if(sp)sp.textContent=n;}
+};
+window.execBulkDelete=async function(mod){
+  const ids=[...document.querySelectorAll('.del-row-chk-'+mod+':checked')].map(c=>c.value);
+  if(!ids.length){toast('Selecciona al menos un registro','error');return;}
+  if(!confirm('¿Eliminar '+ids.length+' registro(s) seleccionados?'))return;
+  const colMap={ot:'ot',log:'logistica',sum:'suministros',mat:'materiales',epp:'epp',tec:'tecnicos',usr:'usuarios',her:'herramientas',eq:'equipos'};
+  const col=colMap[mod];if(!col)return;
+  try{
+    const batch=writeBatch(db);
+    ids.forEach(id=>batch.delete(doc(db,col,id)));
+    await batch.commit();
+    deleteMode[mod]=false;
+    toast(ids.length+' registro(s) eliminados','success');
+  }catch(e){toast('Error: '+e.message,'error');}
+};
+
+/* ── DATE FILTER FOR OPERACIONES ── */
+let dateFlt={ot:{from:'',to:''},log:{from:'',to:''},sum:{from:'',to:''}};
+window.toggleDateRange=function(mod,e){
+  e.stopPropagation();
+  const p=document.getElementById('drp-'+mod);
+  if(p)p.classList.toggle('open');
+};
+window.applyDateRange=function(mod){
+  const f=document.getElementById('dr-from-'+mod)?.value||'';
+  const t=document.getElementById('dr-to-'+mod)?.value||'';
+  dateFlt[mod]={from:f,to:t};
+  const btn=document.getElementById('dr-btn-'+mod);
+  if(btn){if(f||t){btn.classList.add('date-filter-active');btn.title=(f?'Desde: '+f:'')+(t?' Hasta: '+t:'');}else{btn.classList.remove('date-filter-active');btn.title='';}}
+  document.getElementById('drp-'+mod)?.classList.remove('open');
+  const rm={ot:renderOT,log:renderLogistica,sum:renderSuministros};rm[mod]?.();
+};
+window.clearDateRange=function(mod){
+  dateFlt[mod]={from:'',to:''};
+  const f=document.getElementById('dr-from-'+mod),t=document.getElementById('dr-to-'+mod);
+  if(f)f.value='';if(t)t.value='';
+  const btn=document.getElementById('dr-btn-'+mod);if(btn){btn.classList.remove('date-filter-active');btn.title='';}
+  document.getElementById('drp-'+mod)?.classList.remove('open');
+  const rm={ot:renderOT,log:renderLogistica,sum:renderSuministros};rm[mod]?.();
+};
+document.addEventListener('click',function(e2){if(!e2.target.closest('.date-range-wrap'))document.querySelectorAll('.date-range-panel').forEach(p=>p.classList.remove('open'));});
+
+function inDateRange(dateStr,mod){
+  const {from,to}=dateFlt[mod]||{};
+  if(!from&&!to)return true;
+  if(from&&dateStr<from)return false;
+  if(to&&dateStr>to)return false;
+  return true;
+}
 
 /* ── EXPONER FUNCIONES DE RENDER AL SCOPE GLOBAL (fix oninput) ── */
 window.renderOT=renderOT;
