@@ -258,6 +258,43 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
 .area-bar-track{flex:1;background:var(--surface2);border-radius:4px;height:8px;overflow:hidden}
 .area-bar-fill{height:100%;border-radius:4px;background:var(--accent);transition:width .5s}
 .area-bar-val{font-family:var(--mono);font-size:11px;color:var(--accent);min-width:70px;text-align:right}
+
+/* ── Sidebar toggle ── */
+.sidebar-toggle{position:fixed;top:12px;left:12px;z-index:200;background:var(--surface);border:1px solid var(--border);border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--muted);transition:all .2s;box-shadow:0 2px 8px var(--shadow)}
+.sidebar-toggle:hover{color:var(--accent);border-color:var(--accent)}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:98}
+.sidebar-overlay.visible{display:block}
+.sidebar{transition:transform .25s ease,background .25s}
+.sidebar.collapsed{transform:translateX(-232px)}
+.main{transition:margin-left .25s ease}
+.main.expanded{margin-left:0}
+
+/* ── Responsive mobile ── */
+@media(max-width:768px){
+  .sidebar{transform:translateX(-232px)}
+  .sidebar.mobile-open{transform:translateX(0);z-index:200}
+  .main{margin-left:0!important}
+  .sidebar-toggle{display:flex!important}
+  .topbar{padding:0 10px 0 52px}
+  .topbar-title{font-size:15px}
+  .search-bar{flex-wrap:wrap;gap:6px}
+  .search-input{min-width:160px;flex:1}
+  .table-wrap{font-size:12px}
+  th,td{padding:6px 8px!important}
+  .kpi-grid{grid-template-columns:repeat(2,1fr)!important}
+  .dash-widget-grid{grid-template-columns:1fr!important}
+  .form-grid,.form-grid3{grid-template-columns:1fr!important}
+  .grid2{grid-template-columns:1fr!important}
+  .modal{max-width:96vw;margin:10px}
+  .content{padding:12px 10px}
+}
+@media(min-width:769px){
+  .sidebar-toggle{display:flex}
+  .sidebar{transform:translateX(0)}
+  .sidebar.collapsed{transform:translateX(-232px)}
+  .main{margin-left:232px}
+  .main.expanded{margin-left:0}
+}
 </style>
 </head>
 <body>
@@ -275,6 +312,8 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
   </div>
 </div>
 
+<button class="sidebar-toggle" id="sidebar-toggle-btn" onclick="toggleSidebar()" title="Mostrar/Ocultar menú">☰</button>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebarOverlay()"></div>
 <div id="app" style="display:none">
 <nav class="sidebar">
   <div class="logo"><h1>MANTEX</h1><p>Gestión · Mantenimiento</p></div>
@@ -296,7 +335,7 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
     </div>
     <div class="topbar-right">
       <button class="theme-btn" onclick="toggleTheme()" id="theme-btn">🌙 OSCURO</button>
-      <span class="topbar-date" id="topbar-date"></span>
+      <span class="topbar-date" id="topbar-date"></span><span class="topbar-date" id="topbar-clock" style="margin-left:6px;min-width:58px"></span>
     </div>
   </div>
   <div class="content">
@@ -373,9 +412,9 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
             <div class="dropdown-item" onclick="exportData('ot','pdf')">📑 PDF</div>
           </div>
         </div>
-        <button class="btn btn-danger" id="btn-del-ot" onclick="toggleDeleteMode('ot')">🗑 Borrar</button>
+        <button class="btn btn-ghost" id="btn-del-ot" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDeleteMode('ot')">🗑 Borrar</button>
         <input type="file" id="file-ot" accept=".xlsx,.xls,.csv" style="display:none" onchange="loadFileImport(this,'ot')">
-        <button class="btn btn-primary" id="btn-nueva-ot" onclick="editingOTId=null;document.getElementById('ot-modal-title').textContent='NUEVA ORDEN DE TRABAJO';document.getElementById('btn-save-ot').textContent='Crear OT';openModal('modal-ot')">+ Nueva OT</button>
+        <button class="btn btn-primary" id="btn-nueva-ot" onclick="openNuevaOT()">+ Nueva OT</button>
       </div>
       <div class="del-mode-bar" id="del-bar-ot">
         <input type="checkbox" class="del-all-chk" id="del-all-ot-hdr" onchange="selectAllRows('ot',this)"> <span>Seleccionar todo</span>
@@ -1144,6 +1183,7 @@ function bootApp(){
   document.getElementById('user-role-label').textContent=ROLE_LABELS[currentUser.role]||currentUser.role;
   document.getElementById('user-avatar').textContent=currentUser.avatar;
   document.getElementById('topbar-date').textContent=new Date().toLocaleDateString('es-PE',{weekday:'short',year:'numeric',month:'short',day:'numeric'}).toUpperCase();
+  (function startClock(){const tick=()=>{const n=new Date();const hh=String(n.getHours()).padStart(2,'0');const mm=String(n.getMinutes()).padStart(2,'0');const ss=String(n.getSeconds()).padStart(2,'0');const el=document.getElementById('topbar-clock');if(el)el.textContent=hh+':'+mm+':'+ss;};tick();setInterval(tick,1000);})();
   buildNav();subscribeAll();setDefaultDates();
   navigate(NAV_CONFIG[currentUser.role][0],null);
 }
@@ -1588,7 +1628,7 @@ function renderOT(){
   const btnDel=document.getElementById('btn-del-ot');
   if(bar){bar.classList.toggle('active',!!isDelMode);}
   if(btnDel){btnDel.textContent=isDelMode?'✕ Salir':'🗑 Borrar';btnDel.style.color=isDelMode?'':'';}
-  let list=filterOTByUser().filter(o=>{
+  let list=filterOTByUser().slice().sort((a,b)=>{const na=parseInt((a.num||'').replace(/\D/g,''))||0,nb=parseInt((b.num||'').replace(/\D/g,''))||0;return nb-na;}).filter(o=>{
     const m=!search||(o.num||'').toLowerCase().includes(search)||(o.desc||'').toLowerCase().includes(search)||(o.equipo||'').toLowerCase().includes(search)||(o.tecnico||'').toLowerCase().includes(search)||(o.subsistema||'').toLowerCase().includes(search)||(o.ubicacion||'').toLowerCase().includes(search);
     return m&&(!fE||o.estado===fE)&&(!fT||o.tipo===fT)&&inDateRange(o.fecha||'','ot');
   });
@@ -1681,11 +1721,14 @@ window.addMatToOT=function(){const sel=document.getElementById('ot-mat-sel');con
 function renderOTMats(){document.getElementById('ot-mats-selected').innerHTML=otMatsSelected.map(m=>`<span class="material-tag">${m.texto}<button onclick="removeMatOT('${m.id}')">×</button></span>`).join('');const c=otMatsSelected.reduce((a,m)=>a+(parseFloat(m.precio)||0),0);document.getElementById('ot-costo-mat').textContent=`Costo: S/ ${c.toFixed(2)}`;}
 window.removeMatOT=function(id){otMatsSelected=otMatsSelected.filter(m=>m.id!==id);renderOTMats();};
 window.previewFoto=function(input){const f=input.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{const img=document.getElementById('ot-foto-preview');img.src=e.target.result;img.style.display='block';};r.readAsDataURL(f);};
+let _savingOT=false;
 window.saveOT=async function(){
+  if(_savingOT)return;_savingOT=true;
+  const btnSave=document.getElementById('btn-save-ot');if(btnSave){btnSave.disabled=true;btnSave.textContent='Guardando...';}
   const desc=document.getElementById('ot-desc').value.trim();
   const equipo=document.getElementById('ot-equipo').value;
   const tecnico=document.getElementById('ot-tecnico').value;
-  if(!desc||!equipo||!tecnico){toast('Completa los campos requeridos (*)','error');return;}
+  if(!desc||!equipo||!tecnico){toast('Completa los campos requeridos (*)','error');_savingOT=false;if(btnSave){btnSave.disabled=false;btnSave.textContent=editingOTId?'Guardar cambios':'Crear OT';}return;}
   const ini=document.getElementById('ot-hora-ini').value,fin=document.getElementById('ot-hora-fin').value;
   let duracion='—';
   if(ini&&fin){const [ih,im]=ini.split(':').map(Number),[fh,fm]=fin.split(':').map(Number);let m=(fh*60+fm)-(ih*60+im);if(m<0)m+=1440;duracion=`${Math.floor(m/60)}h ${m%60}m`;}
@@ -1711,13 +1754,37 @@ window.saveOT=async function(){
   }
   editingOTId=null;
   document.getElementById('ot-modal-title').textContent='NUEVA ORDEN DE TRABAJO';
-  document.getElementById('btn-save-ot').textContent='Crear OT';
+  const _btnSave2=document.getElementById('btn-save-ot');if(_btnSave2){_btnSave2.disabled=false;_btnSave2.textContent='Crear OT';}
   closeModal('modal-ot');
+  _savingOT=false;
   otMatsSelected=[];['ot-desc','ot-obs'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('ot-hora-ini').value='';document.getElementById('ot-hora-fin').value='';
   document.getElementById('ot-avance').value=0;document.getElementById('ot-avance-val').textContent='0%';
   document.getElementById('ot-duracion').textContent='—';document.getElementById('ot-foto-preview').style.display='none';
   renderOTMats();
+};
+
+window.openNuevaOT=function(){
+  editingOTId=null;
+  document.getElementById('ot-modal-title').textContent='NUEVA ORDEN DE TRABAJO';
+  document.getElementById('btn-save-ot').textContent='Crear OT';
+  // Reset ALL fields
+  ['ot-desc','ot-obs'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['ot-hora-ini','ot-hora-fin'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['ot-temporada','ot-area-sol','ot-sistema','ot-subsistema','ot-ubicacion'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  document.getElementById('ot-tipo').value='Correctivo';
+  document.getElementById('ot-estado').value='Abierta';
+  const otTec=document.getElementById('ot-tecnico');if(otTec)otTec.value='';
+  const otEq=document.getElementById('ot-equipo');if(otEq)otEq.value='';
+  document.getElementById('ot-avance').value=0;
+  document.getElementById('ot-avance-val').textContent='0%';
+  document.getElementById('ot-duracion').textContent='—';
+  document.getElementById('ot-fecha').value=hoy();
+  const prev=document.getElementById('ot-foto-preview');if(prev)prev.style.display='none';
+  const foto=document.getElementById('ot-foto');if(foto)foto.value='';
+  otMatsSelected=[];
+  renderOTMats();
+  openModal('modal-ot');
 };
 window.openCambioEstadoOT=function(id,num,estado,avance){editingOTId=id;document.getElementById('est-ot-num').textContent=num;document.getElementById('est-ot-val').value=estado;document.getElementById('est-ot-avance').value=avance||0;document.getElementById('est-ot-comment').value='';document.getElementById('modal-estado-ot').classList.add('open');};
 window.confirmEstadoOT=async function(){const nuevoEstado=document.getElementById('est-ot-val').value;const avance=document.getElementById('est-ot-avance').value;const comment=document.getElementById('est-ot-comment').value.trim();await updateDoc(doc(db,'ot',editingOTId),{estado:nuevoEstado,avance:parseInt(avance)});const ot=otData.find(o=>o.id===editingOTId);await addActivity(`${ot?.num} → "${nuevoEstado}" ${avance}%${comment?' — '+comment:''}`,'ot');closeModal('modal-estado-ot');toast(`OT: ${nuevoEstado}`,'success');};
@@ -1895,7 +1962,7 @@ function renderMateriales(){
   const canWrite=ROLE_WRITE[currentUser.role];
   // Update header
   const mat_th=document.querySelector('#mat-tbody')?.closest('table')?.querySelector('thead tr');
-  if(mat_th){const ec=mat_th.querySelector('th.del-col');if(isDelMode&&!ec){const th=document.createElement('th');th.className='del-col';th.innerHTML=`<input type="checkbox" class="del-all-chk" onchange="selectAllRows('mat',this)">`;mat_th.insertBefore(th,mat_th.firstChild);}else if(!isDelMode&&ec)ec.remove();}
+  if(mat_th){const ec=mat_th.querySelector('th.del-col');if(isDelMode&&!ec){const th=document.createElement('th');th.className='del-col';th.style.cssText='width:28px';th.innerHTML='';mat_th.insertBefore(th,mat_th.firstChild);}else if(!isDelMode&&ec)ec.remove();}
   document.getElementById('mat-tbody').innerHTML=list.length?list.map(m=>`<tr>
     ${isDelMode?`<td class="del-col"><input type="checkbox" class="del-row-chk del-row-chk-mat" value="${m.id}" onchange="updDelCount('mat')"></td>`:''}
     <td style="font-family:var(--mono);font-size:12px;color:var(--accent)">${m.cod||'—'}</td>
@@ -1906,7 +1973,8 @@ function renderMateriales(){
     <td style="font-family:var(--mono);font-size:12px">${m.centro||'—'}</td>
   </tr>`).join(''):`<tr><td colspan="${isDelMode?7:6}">${emptyMsg('Sin materiales')}</td></tr>`;
 }
-window.saveMaterial=async function(){const cod=document.getElementById('mat-cod').value.trim(),texto=document.getElementById('mat-texto').value.trim();if(!cod||!texto){toast('Código y texto requeridos','error');return;}await addDoc(collection(db,'materiales'),{cod,texto,um:document.getElementById('mat-um').value,precio:document.getElementById('mat-precio').value,moneda:document.getElementById('mat-moneda').value,centro:document.getElementById('mat-centro').value,createdAt:serverTimestamp()});closeModal('modal-mat');toast('Material guardado','success');['mat-cod','mat-texto','mat-precio','mat-centro'].forEach(id=>document.getElementById(id).value='');};
+let _savingMat=false;
+window.saveMaterial=async function(){if(_savingMat)return;_savingMat=true;const cod=document.getElementById('mat-cod').value.trim(),texto=document.getElementById('mat-texto').value.trim();if(!cod||!texto){toast('Código y texto requeridos','error');_savingMat=false;return;}await addDoc(collection(db,'materiales'),{cod,texto,um:document.getElementById('mat-um').value,precio:document.getElementById('mat-precio').value,moneda:document.getElementById('mat-moneda').value,centro:document.getElementById('mat-centro').value,createdAt:serverTimestamp()});closeModal('modal-mat');_savingMat=false;toast('Material guardado','success');['mat-cod','mat-texto','mat-precio','mat-centro'].forEach(id=>document.getElementById(id).value='');};
 window.deleteMat=async function(id){if(!confirm('¿Eliminar?'))return;await deleteDoc(doc(db,'materiales',id));};
 
 /* ── HERRAMIENTAS ── */
@@ -1933,16 +2001,18 @@ function renderHerramientas(){
   const barHer=document.getElementById('del-bar-her');if(barHer)barHer.classList.toggle('active',!!isDelHer);
   const btnDelHer=document.getElementById('btn-del-her');if(btnDelHer)btnDelHer.textContent=isDelHer?'✕ Salir':'🗑 Borrar';
   const her_th=document.querySelector('#her-tbody')?.closest('table')?.querySelector('thead tr');
-  if(her_th){const ec=her_th.querySelector('th.del-col');if(isDelHer&&!ec){const th=document.createElement('th');th.className='del-col';th.innerHTML=`<input type="checkbox" class="del-all-chk" onchange="selectAllRows('her',this)">`;her_th.insertBefore(th,her_th.firstChild);}else if(!isDelHer&&ec)ec.remove();}
+  if(her_th){const ec=her_th.querySelector('th.del-col');if(isDelHer&&!ec){const th=document.createElement('th');th.className='del-col';th.style.cssText='width:28px';th.innerHTML='';her_th.insertBefore(th,her_th.firstChild);}else if(!isDelHer&&ec)ec.remove();}
   document.getElementById('her-tbody').innerHTML=list.length?list.map(h=>`<tr>${isDelHer?`<td class="del-col"><input type="checkbox" class="del-row-chk del-row-chk-her" value="${h.id}" onchange="updDelCount('her')"></td>`:''}<td>${h.movTipo==='devolucion'?'<span class="badge badge-green">↩ Dev.</span>':'<span class="badge badge-yellow">🛠 Entrega</span>'}</td><td>${h.tecnico}</td><td>${h.nombre}</td><td style="font-family:var(--mono)">${h.cant}</td><td style="font-family:var(--mono);font-size:11px">${h.otRel||'—'}</td><td style="font-family:var(--mono);font-size:11px">${h.fecha||''}</td><td>${h.devuelto?'<span class="badge badge-green">Devuelta</span>':'<span class="badge badge-yellow">Pendiente</span>'}</td></tr>`).join(''):`<tr><td colspan="${isDelHer?8:7}">${emptyMsg('Sin registros')}</td></tr>`;
   const pend=herData.filter(h=>!h.devuelto);
   document.getElementById('her-pendientes').innerHTML=pend.length?pend.map(h=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:13px;font-weight:600">${h.nombre}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${h.tecnico} · ${h.fecha||''}</div></div><button class="btn btn-success btn-sm" onclick="quickDevolver('${h.id}')">✓ Devuelta</button></div>`).join(''):`<div style="text-align:center;color:var(--muted);padding:20px;font-size:13px">✅ Sin pendientes</div>`;
 }
+let _savingHer=false;
 window.saveHerramienta=async function(tipo){
+  if(_savingHer)return;_savingHer=true;
   const tec=document.getElementById('her-tec-e').value,nombre=document.getElementById('her-nombre-e').value.trim();
-  if(!tec||!nombre){toast('Técnico y herramienta requeridos','error');return;}
+  if(!tec||!nombre){toast('Técnico y herramienta requeridos','error');_savingHer=false;return;}
   await addDoc(collection(db,'herramientas'),{movTipo:'entrega',tecnico:tec,nombre,codigo:document.getElementById('her-codigo-e').value,cant:document.getElementById('her-cant-e').value,otRel:document.getElementById('her-ot-e').value,fecha:document.getElementById('her-fecha-e').value||hoy(),fechaDev:document.getElementById('her-fecha-dev-e').value,condicion:document.getElementById('her-condicion-e').value,obs:document.getElementById('her-obs-e').value,devuelto:false,entregadoPor:currentUser.name,createdAt:serverTimestamp()});
-  closeModal('modal-her-entrega');toast(`Herramienta entregada a ${tec}`,'success');
+  closeModal('modal-her-entrega');_savingHer=false;toast(`Herramienta entregada a ${tec}`,'success');
   ['her-nombre-e','her-codigo-e','her-obs-e'].forEach(id=>document.getElementById(id).value='');
 };
 window.saveDevolucion=async function(){
@@ -1965,7 +2035,7 @@ function renderEPP(){
   const barEPP=document.getElementById('del-bar-epp');if(barEPP)barEPP.classList.toggle('active',!!isDelEPP);
   const btnDelEPP=document.getElementById('btn-del-epp');if(btnDelEPP)btnDelEPP.textContent=isDelEPP?'✕ Salir':'🗑 Borrar';
   const epp_th=document.querySelector('#epp-tbody')?.closest('table')?.querySelector('thead tr');
-  if(epp_th){const ec=epp_th.querySelector('th.del-col');if(isDelEPP&&!ec){const th=document.createElement('th');th.className='del-col';th.innerHTML=`<input type="checkbox" class="del-all-chk" onchange="selectAllRows('epp',this)">`;epp_th.insertBefore(th,epp_th.firstChild);}else if(!isDelEPP&&ec)ec.remove();}
+  if(epp_th){const ec=epp_th.querySelector('th.del-col');if(isDelEPP&&!ec){const th=document.createElement('th');th.className='del-col';th.style.cssText='width:28px';th.innerHTML='';epp_th.insertBefore(th,epp_th.firstChild);}else if(!isDelEPP&&ec)ec.remove();}
   document.getElementById('epp-tbody').innerHTML=list.length?list.map(e=>`<tr>
     ${isDelEPP?`<td class="del-col"><input type="checkbox" class="del-row-chk del-row-chk-epp" value="${e.id}" onchange="updDelCount('epp')"></td>`:''}
     <td>${e.tecnico}</td><td>${e.epp}</td>
@@ -2005,9 +2075,11 @@ window.editEPP=function(id){
   document.getElementById('modal-epp').classList.add('open');
 };
 window.deleteEPPReg=async function(id){if(!confirm('¿Eliminar este registro?'))return;await deleteDoc(doc(db,'epp',id));toast('Registro eliminado','success');};
+let _savingEPP=false;
 window.saveEPP=async function(){
-  const tec=document.getElementById('epp-tec').value;if(!tec){toast('Selecciona técnico','error');return;}
-  const epp=document.getElementById('epp-tipo').value;if(!epp){toast('Selecciona un EPP','error');return;}
+  if(_savingEPP)return;_savingEPP=true;
+  const tec=document.getElementById('epp-tec').value;if(!tec){toast('Selecciona técnico','error');_savingEPP=false;return;}
+  const epp=document.getElementById('epp-tipo').value;if(!epp){toast('Selecciona un EPP','error');_savingEPP=false;return;}
   const cant=document.getElementById('epp-cant').value;
   const data={tecnico:tec,epp,cant,fecha:document.getElementById('epp-fecha').value||hoy(),motivo:document.getElementById('epp-motivo').value,entregadoPor:currentUser.name};
   if(editingEPPId){
@@ -2019,6 +2091,7 @@ window.saveEPP=async function(){
     toast('EPP registrado','success');
   }
   closeModal('modal-epp');
+  _savingEPP=false;
   editingEPPId=null;
   document.getElementById('epp-modal-title').textContent='📋 REGISTRO DE ENTREGA EPP';
   document.getElementById('btn-save-epp').textContent='Registrar';
@@ -2051,7 +2124,8 @@ function renderEquipos(){
 }
 window.toggleEquipo=async function(id,e){await updateDoc(doc(db,'equipos',id),{estado:e==='Operativo'?'En mantenimiento':'Operativo'});};
 window.deleteEquipo=async function(id){if(!confirm('¿Eliminar?'))return;await deleteDoc(doc(db,'equipos',id));};
-window.saveEquipo=async function(){const nombre=document.getElementById('eq-nombre').value.trim(),tag=document.getElementById('eq-tag').value.trim();if(!nombre||!tag){toast('Nombre y TAG requeridos','error');return;}await addDoc(collection(db,'equipos'),{nombre,tag,area:document.getElementById('eq-area').value,tipo:document.getElementById('eq-tipo').value,marca:document.getElementById('eq-marca').value,crit:document.getElementById('eq-crit').value,estado:'Operativo',createdAt:serverTimestamp()});closeModal('modal-eq');toast(`Equipo ${tag} registrado`,'success');['eq-nombre','eq-tag','eq-area','eq-marca'].forEach(id=>document.getElementById(id).value='');};
+let _savingEq=false;
+window.saveEquipo=async function(){if(_savingEq)return;_savingEq=true;const nombre=document.getElementById('eq-nombre').value.trim(),tag=document.getElementById('eq-tag').value.trim();if(!nombre||!tag){toast('Nombre y TAG requeridos','error');_savingEq=false;return;}await addDoc(collection(db,'equipos'),{nombre,tag,area:document.getElementById('eq-area').value,tipo:document.getElementById('eq-tipo').value,marca:document.getElementById('eq-marca').value,crit:document.getElementById('eq-crit').value,estado:'Operativo',createdAt:serverTimestamp()});closeModal('modal-eq');_savingEq=false;toast(`Equipo ${tag} registrado`,'success');['eq-nombre','eq-tag','eq-area','eq-marca'].forEach(id=>document.getElementById(id).value='');};
 
 /* ── COMBOS ── */
 /* ── COMBO MANAGER (agregar + editar + eliminar) ── */
@@ -2116,7 +2190,7 @@ function renderTecnicos(){
   const barTec=document.getElementById('del-bar-tec');if(barTec)barTec.classList.toggle('active',!!isDelTec);
   const btnDelTec=document.getElementById('btn-del-tec');if(btnDelTec)btnDelTec.textContent=isDelTec?'✕ Salir':'🗑 Borrar';
   const tec_th=document.querySelector('#tec-tbody')?.closest('table')?.querySelector('thead tr');
-  if(tec_th){const ec=tec_th.querySelector('th.del-col');if(isDelTec&&!ec){const th=document.createElement('th');th.className='del-col';th.innerHTML=`<input type="checkbox" class="del-all-chk" onchange="selectAllRows('tec',this)">`;tec_th.insertBefore(th,tec_th.firstChild);}else if(!isDelTec&&ec)ec.remove();}
+  if(tec_th){const ec=tec_th.querySelector('th.del-col');if(isDelTec&&!ec){const th=document.createElement('th');th.className='del-col';th.style.cssText='width:28px';th.innerHTML='';tec_th.insertBefore(th,tec_th.firstChild);}else if(!isDelTec&&ec)ec.remove();}
   document.getElementById('tec-tbody').innerHTML=list.length?list.map(t=>{const otAct=otData.filter(o=>o.tecnico===t.nombre&&o.estado!=='Cerrada').length;return `<tr>${isDelTec?`<td class="del-col"><input type="checkbox" class="del-row-chk del-row-chk-tec" value="${t.id}" onchange="updDelCount('tec')"></td>`:''}<td style="font-family:var(--mono);font-size:11px;color:var(--accent)">${t.idTec||''}</td><td><strong>${t.nombre}</strong></td><td>${t.esp}</td><td>${t.turno}</td><td><span class="pill-num">${otAct}</span></td><td><span class="badge badge-green">Activo</span></td></tr>`;}).join(''):`<tr><td colspan="${isDelTec?8:7}">${emptyMsg('Sin técnicos')}</td></tr>`;
 }
 window.deleteTec=async function(id){if(!confirm('¿Eliminar?'))return;await deleteDoc(doc(db,'tecnicos',id));};
@@ -2130,7 +2204,7 @@ function renderUsuarios(){
   const barUsr=document.getElementById('del-bar-usr');if(barUsr)barUsr.classList.toggle('active',!!isDelUsr);
   const btnDelUsr=document.getElementById('btn-del-usr');if(btnDelUsr)btnDelUsr.textContent=isDelUsr?'✕ Salir':'🗑 Borrar';
   const usr_th=document.querySelector('#usr-tbody')?.closest('table')?.querySelector('thead tr');
-  if(usr_th){const ec=usr_th.querySelector('th.del-col');if(isDelUsr&&!ec){const th=document.createElement('th');th.className='del-col';th.innerHTML=`<input type="checkbox" class="del-all-chk" onchange="selectAllRows('usr',this)">`;usr_th.insertBefore(th,usr_th.firstChild);}else if(!isDelUsr&&ec)ec.remove();}
+  if(usr_th){const ec=usr_th.querySelector('th.del-col');if(isDelUsr&&!ec){const th=document.createElement('th');th.className='del-col';th.style.cssText='width:28px';th.innerHTML='';usr_th.insertBefore(th,usr_th.firstChild);}else if(!isDelUsr&&ec)ec.remove();}
   document.getElementById('usr-tbody').innerHTML=list.length?list.map(u=>`<tr>${isDelUsr?`<td class="del-col"><input type="checkbox" class="del-row-chk del-row-chk-usr" value="${u.id}" onchange="updDelCount('usr')"></td>`:''}<td style="font-family:var(--mono);font-size:12px;color:var(--accent)">${u.username||u.id}</td><td><strong>${u.nombre||'—'}</strong></td><td><span class="badge role-badge-${u.rol||'jefatura'}">${ROLE_LABELS[u.rol]||u.rol}</span></td><td style="font-size:12px;color:var(--muted)">${u.tecnicoAsoc||'—'}</td><td>${!isDelUsr?`<button class="btn btn-ghost btn-sm" onclick="editUsuario('${u.id}')">✏️</button>`:''}</td></tr>`).join(''):`<tr><td colspan="${isDelUsr?6:5}">${emptyMsg('Sin usuarios. Acceso default: planner/planner2024')}</td></tr>`;
 }
 window.toggleTecnicoSelect=function(){const rol=document.getElementById('usr-rol').value;document.getElementById('usr-tec-group').style.display=rol==='tecnico'?'block':'none';};
@@ -2342,6 +2416,43 @@ window.closeModal=function(id){document.getElementById(id)?.classList.remove('op
 document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
 window.toggleDD=function(wrapId){const menu=document.getElementById(wrapId)?.querySelector('.dropdown-menu');document.querySelectorAll('.dropdown-menu').forEach(m=>{if(m!==menu)m.classList.remove('open');});menu?.classList.toggle('open');};
 document.addEventListener('click',e=>{if(!e.target.closest('.dropdown'))document.querySelectorAll('.dropdown-menu').forEach(m=>m.classList.remove('open'));});
+
+/* ── SIDEBAR TOGGLE ── */
+window.toggleSidebar=function(){
+  const sb=document.querySelector('.sidebar');
+  const main=document.querySelector('.main');
+  const isMobile=window.innerWidth<=768;
+  if(isMobile){
+    sb.classList.toggle('mobile-open');
+    document.getElementById('sidebar-overlay').classList.toggle('visible',sb.classList.contains('mobile-open'));
+  } else {
+    const collapsed=sb.classList.toggle('collapsed');
+    main.classList.toggle('expanded',collapsed);
+    localStorage.setItem('mantex_sidebar_collapsed',collapsed?'1':'0');
+  }
+};
+window.closeSidebarOverlay=function(){
+  document.querySelector('.sidebar')?.classList.remove('mobile-open');
+  document.getElementById('sidebar-overlay')?.classList.remove('visible');
+};
+// Restore sidebar state on load
+(function(){
+  if(window.innerWidth>768){
+    const c=localStorage.getItem('mantex_sidebar_collapsed');
+    if(c==='1'){
+      document.querySelector('.sidebar')?.classList.add('collapsed');
+      document.querySelector('.main')?.classList.add('expanded');
+    }
+  }
+  // Close overlay on resize
+  window.addEventListener('resize',()=>{
+    if(window.innerWidth>768){
+      document.querySelector('.sidebar')?.classList.remove('mobile-open');
+      document.getElementById('sidebar-overlay')?.classList.remove('visible');
+    }
+  });
+})();
+
 window.toast=function(msg,type='success'){const el=document.getElementById('toast');el.textContent=(type==='success'?'✅ ':type==='error'?'❌ ':'ℹ️ ')+msg;el.className=`show ${type}`;el.style.display='flex';clearTimeout(window._tt);window._tt=setTimeout(()=>el.style.display='none',3400);};
 </script>
 </body>
