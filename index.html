@@ -373,7 +373,7 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
             <div class="dropdown-item" onclick="exportData('ot','pdf')">📑 PDF</div>
           </div>
         </div>
-        <button class="btn btn-ghost" id="btn-del-ot" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDeleteMode('ot')">🗑 Borrar</button>
+        <button class="btn btn-danger" id="btn-del-ot" onclick="toggleDeleteMode('ot')">🗑 Borrar</button>
         <input type="file" id="file-ot" accept=".xlsx,.xls,.csv" style="display:none" onchange="loadFileImport(this,'ot')">
         <button class="btn btn-primary" id="btn-nueva-ot" onclick="editingOTId=null;document.getElementById('ot-modal-title').textContent='NUEVA ORDEN DE TRABAJO';document.getElementById('btn-save-ot').textContent='Crear OT';openModal('modal-ot')">+ Nueva OT</button>
       </div>
@@ -1073,6 +1073,7 @@ const PAGE_TITLES={dashboard:'DASHBOARD',ot:'ÓRDENES DE TRABAJO',logistica:'SAP
 let app,db;
 let currentUser=null;
 let otData=[],logData=[],sumData=[],eqData=[],tecData=[],eppData=[],herData=[],matData=[],actData=[],usrData=[],listasData={},eppCatData=[];
+let deleteMode={};
 let editingOTId=null,editingLogId=null,editingUsrId=null,editingEPPId=null;
 let otCounter=1;
 let unsubscribers=[];
@@ -1138,8 +1139,6 @@ window.doLogout=function(){unsubscribers.forEach(u=>u());sessionStorage.removeIt
 
 /* ── BOOT ── */
 function bootApp(){
-  // Limpiar modo borrado al iniciar
-  Object.keys(deleteMode).forEach(k=>{deleteMode[k]=false;});
   document.getElementById('app').style.display='block';
   document.getElementById('user-display-name').textContent=currentUser.name;
   document.getElementById('user-role-label').textContent=ROLE_LABELS[currentUser.role]||currentUser.role;
@@ -1168,7 +1167,7 @@ function subscribeAll(){
   unsubscribers.push(onSnapshot(query(collection(db,'activity'),orderBy('ts','desc')),snap=>{actData=snap.docs.map(d=>({id:d.id,...d.data()}));if(isActive('page-dashboard')){renderDashboard();}}));
   unsubscribers.push(onSnapshot(collection(db,'usuarios'),snap=>{usrData=snap.docs.map(d=>({id:d.id,...d.data()}));if(isActive('page-usuarios'))renderUsuarios();}));
   unsubscribers.push(onSnapshot(collection(db,'epp_catalogo'),snap=>{eppCatData=snap.docs.map(d=>({id:d.id,...d.data()}));populateEPPSelect();renderEPPCatalogo();}));
-  ['temporadas','areas','sistemas','subsistemas','ubicaciones'].forEach(col=>{unsubscribers.push(onSnapshot(collection(db,col),snap=>{listasData[col]=snap.docs.map(d=>d.data().valor).filter(Boolean).sort();populateCombos();}));});
+  ['temporadas','areas','sistemas','subsistemas','ubicaciones'].forEach(col=>{unsubscribers.push(onSnapshot(collection(db,col),snap=>{listasData[col]=snap.docs.map(d=>d.data().valor).filter(Boolean).sort();window._comboFullData[col]=snap.docs.map(d=>({id:d.id,valor:d.data().valor||''})).filter(x=>x.valor).sort((a,b)=>a.valor.localeCompare(b.valor));populateCombos();if(comboTarget.collection===col&&document.getElementById('modal-combo-mgr')?.classList.contains('open'))renderComboMgrList();}));});
 }
 function isActive(id){return document.getElementById(id)?.classList.contains('active');}
 
@@ -1181,8 +1180,7 @@ function computeOTCounter(){
 
 /* ── NAV ── */
 window.navigate=function(page,el){
-  // Reset delete mode al navegar (nunca quede activo en otra página)
-  Object.keys(deleteMode).forEach(k=>{deleteMode[k]=false;});
+  ['ot','log','sum','mat','epp','tec','usr','her','eq'].forEach(k=>{deleteMode[k]=false;});
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   const pg=document.getElementById('page-'+page);if(!pg)return;
@@ -1588,7 +1586,7 @@ function renderOT(){
   const isDelMode=deleteMode['ot'];
   const bar=document.getElementById('del-bar-ot');
   const btnDel=document.getElementById('btn-del-ot');
-  if(bar){bar.classList.toggle('active',isDelMode);}
+  if(bar){bar.classList.toggle('active',!!isDelMode);}
   if(btnDel){btnDel.textContent=isDelMode?'✕ Salir':'🗑 Borrar';btnDel.style.color=isDelMode?'':'';}
   let list=filterOTByUser().filter(o=>{
     const m=!search||(o.num||'').toLowerCase().includes(search)||(o.desc||'').toLowerCase().includes(search)||(o.equipo||'').toLowerCase().includes(search)||(o.tecnico||'').toLowerCase().includes(search)||(o.subsistema||'').toLowerCase().includes(search)||(o.ubicacion||'').toLowerCase().includes(search);
@@ -1839,7 +1837,7 @@ function renderLogistica(){
   const fEstadoOP=document.getElementById('log-f-estadoOP')?.value||'';
   const sortDir='desc';
   const isDelMode=deleteMode['log'];
-  const bar=document.getElementById('del-bar-log');if(bar)bar.classList.toggle('active',isDelMode);
+  const bar=document.getElementById('del-bar-log');if(bar)bar.classList.toggle('active',!!isDelMode);
   const btnDel=document.getElementById('btn-del-log');if(btnDel)btnDel.textContent=isDelMode?'✕ Salir':'🗑 Borrar';
   let list=logData.filter(s=>{
     const m=!search||(s.solped||'').toLowerCase().includes(search)||(s.texto||'').toLowerCase().includes(search)||(s.proveedor||'').toLowerCase().includes(search)||(s.pedido||'').toLowerCase().includes(search)||(s.factura||'').toLowerCase().includes(search);
@@ -1875,7 +1873,7 @@ window.deleteLog=async function(id){if(!confirm('¿Eliminar?'))return;await dele
 function renderSuministros(){
   const search=document.getElementById('sum-search')?.value?.toLowerCase()||'';
   const isDelMode=deleteMode['sum'];
-  const bar=document.getElementById('del-bar-sum');if(bar)bar.classList.toggle('active',isDelMode);
+  const bar=document.getElementById('del-bar-sum');if(bar)bar.classList.toggle('active',!!isDelMode);
   const btnDel=document.getElementById('btn-del-sum');if(btnDel)btnDel.textContent=isDelMode?'✕ Salir':'🗑 Borrar';
   const list=sumData.filter(s=>(!search||Object.values(s).some(v=>String(v).toLowerCase().includes(search)))&&inDateRange(s.fechaOC||s.fechaEnt||'','sum'));
   const cols=SUM_COLS.filter(c=>visibleSumCols.includes(c.key));
@@ -1891,7 +1889,7 @@ window.saveColsConfig=function(){visibleSumCols=SUM_COLS.filter(c=>document.getE
 function renderMateriales(){
   const search=document.getElementById('mat-search')?.value?.toLowerCase()||'';
   const isDelMode=deleteMode['mat'];
-  const bar=document.getElementById('del-bar-mat');if(bar)bar.classList.toggle('active',isDelMode);
+  const bar=document.getElementById('del-bar-mat');if(bar)bar.classList.toggle('active',!!isDelMode);
   const btnDel=document.getElementById('btn-del-mat');if(btnDel)btnDel.textContent=isDelMode?'✕ Salir':'🗑 Borrar';
   const list=matData.filter(m=>!search||(m.cod||'').toLowerCase().includes(search)||(m.texto||'').toLowerCase().includes(search)||(m.centro||'').toLowerCase().includes(search));
   const canWrite=ROLE_WRITE[currentUser.role];
@@ -1932,7 +1930,7 @@ function renderHerramientas(){
   const search=document.getElementById('her-search')?.value?.toLowerCase()||'';
   const list=herData.filter(h=>!search||(h.tecnico||'').toLowerCase().includes(search)||(h.nombre||'').toLowerCase().includes(search));
   const isDelHer=deleteMode['her'];
-  const barHer=document.getElementById('del-bar-her');if(barHer)barHer.classList.toggle('active',isDelHer);
+  const barHer=document.getElementById('del-bar-her');if(barHer)barHer.classList.toggle('active',!!isDelHer);
   const btnDelHer=document.getElementById('btn-del-her');if(btnDelHer)btnDelHer.textContent=isDelHer?'✕ Salir':'🗑 Borrar';
   const her_th=document.querySelector('#her-tbody')?.closest('table')?.querySelector('thead tr');
   if(her_th){const ec=her_th.querySelector('th.del-col');if(isDelHer&&!ec){const th=document.createElement('th');th.className='del-col';th.innerHTML=`<input type="checkbox" class="del-all-chk" onchange="selectAllRows('her',this)">`;her_th.insertBefore(th,her_th.firstChild);}else if(!isDelHer&&ec)ec.remove();}
@@ -1964,7 +1962,7 @@ function renderEPP(){
   const list=eppData.filter(e=>!search||(e.tecnico||'').toLowerCase().includes(search)||(e.epp||'').toLowerCase().includes(search));
   const canWrite=ROLE_WRITE[currentUser.role];
   const isDelEPP=deleteMode['epp'];
-  const barEPP=document.getElementById('del-bar-epp');if(barEPP)barEPP.classList.toggle('active',isDelEPP);
+  const barEPP=document.getElementById('del-bar-epp');if(barEPP)barEPP.classList.toggle('active',!!isDelEPP);
   const btnDelEPP=document.getElementById('btn-del-epp');if(btnDelEPP)btnDelEPP.textContent=isDelEPP?'✕ Salir':'🗑 Borrar';
   const epp_th=document.querySelector('#epp-tbody')?.closest('table')?.querySelector('thead tr');
   if(epp_th){const ec=epp_th.querySelector('th.del-col');if(isDelEPP&&!ec){const th=document.createElement('th');th.className='del-col';th.innerHTML=`<input type="checkbox" class="del-all-chk" onchange="selectAllRows('epp',this)">`;epp_th.insertBefore(th,epp_th.firstChild);}else if(!isDelEPP&&ec)ec.remove();}
@@ -2044,7 +2042,7 @@ window.deleteEPPCat=async function(id){if(!confirm('¿Eliminar este EPP del cat�
 function renderEquipos(){
   const search=document.getElementById('eq-search')?.value?.toLowerCase()||'';
   const isDelEq=deleteMode['eq'];
-  const barEq=document.getElementById('del-bar-eq');if(barEq)barEq.classList.toggle('active',isDelEq);
+  const barEq=document.getElementById('del-bar-eq');if(barEq)barEq.classList.toggle('active',!!isDelEq);
   const btnDelEq=document.getElementById('btn-del-eq');if(btnDelEq)btnDelEq.textContent=isDelEq?'✕ Salir':'🗑 Borrar';
   const list=eqData.filter(e=>!search||(e.nombre||'').toLowerCase().includes(search)||(e.tag||'').toLowerCase().includes(search));
   const iconMap={Bomba:'🔄',Motor:'⚡',Compresor:'💨',Transportador:'🏗️',Caldera:'🔥',Reductor:'⚙️',Ventilador:'🌀',Otro:'🔩'};
@@ -2080,7 +2078,7 @@ function renderComboMgrList(){
 window.comboMgrSaveNew=async function(){
   const val=document.getElementById('combo-mgr-new-val').value.trim();
   if(!val){toast('Escribe un valor','error');return;}
-  if((listasData[comboTarget.collection]||[]).includes(val)){toast('Ya existe esa opción','info');return;}
+  const existingVals=(listasData[comboTarget.collection]||[]).map(x=>x.toLowerCase());if(existingVals.includes(val.toLowerCase())){toast('"'+val+'" ya existe en la lista','error');return;}
   await addDoc(collection(db,comboTarget.collection),{valor:val,createdAt:serverTimestamp()});
   document.getElementById('combo-mgr-new-val').value='';
   toast(`"${val}" agregado`,'success');
@@ -2115,7 +2113,7 @@ function renderTecnicos(){
   const list=tecData.filter(t=>!search||(t.nombre||'').toLowerCase().includes(search));
   const canWrite=ROLE_WRITE[currentUser.role];
   const isDelTec=deleteMode['tec'];
-  const barTec=document.getElementById('del-bar-tec');if(barTec)barTec.classList.toggle('active',isDelTec);
+  const barTec=document.getElementById('del-bar-tec');if(barTec)barTec.classList.toggle('active',!!isDelTec);
   const btnDelTec=document.getElementById('btn-del-tec');if(btnDelTec)btnDelTec.textContent=isDelTec?'✕ Salir':'🗑 Borrar';
   const tec_th=document.querySelector('#tec-tbody')?.closest('table')?.querySelector('thead tr');
   if(tec_th){const ec=tec_th.querySelector('th.del-col');if(isDelTec&&!ec){const th=document.createElement('th');th.className='del-col';th.innerHTML=`<input type="checkbox" class="del-all-chk" onchange="selectAllRows('tec',this)">`;tec_th.insertBefore(th,tec_th.firstChild);}else if(!isDelTec&&ec)ec.remove();}
@@ -2129,7 +2127,7 @@ function renderUsuarios(){
   const search=document.getElementById('usr-search')?.value?.toLowerCase()||'';
   const list=usrData.filter(u=>!search||(u.username||'').toLowerCase().includes(search)||(u.nombre||'').toLowerCase().includes(search));
   const isDelUsr=deleteMode['usr'];
-  const barUsr=document.getElementById('del-bar-usr');if(barUsr)barUsr.classList.toggle('active',isDelUsr);
+  const barUsr=document.getElementById('del-bar-usr');if(barUsr)barUsr.classList.toggle('active',!!isDelUsr);
   const btnDelUsr=document.getElementById('btn-del-usr');if(btnDelUsr)btnDelUsr.textContent=isDelUsr?'✕ Salir':'🗑 Borrar';
   const usr_th=document.querySelector('#usr-tbody')?.closest('table')?.querySelector('thead tr');
   if(usr_th){const ec=usr_th.querySelector('th.del-col');if(isDelUsr&&!ec){const th=document.createElement('th');th.className='del-col';th.innerHTML=`<input type="checkbox" class="del-all-chk" onchange="selectAllRows('usr',this)">`;usr_th.insertBefore(th,usr_th.firstChild);}else if(!isDelUsr&&ec)ec.remove();}
@@ -2268,7 +2266,6 @@ window.confirmRenameWidget=function(){
 };
 
 /* ── DELETE MODE (global) ── */
-let deleteMode={};
 window.toggleDeleteMode=function(mod){
   deleteMode[mod]=!deleteMode[mod];
   const renderMap={ot:renderOT,log:renderLogistica,sum:renderSuministros,mat:renderMateriales,epp:renderEPP,tec:renderTecnicos,usr:renderUsuarios,her:renderHerramientas,eq:renderEquipos};
