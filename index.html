@@ -168,6 +168,19 @@ textarea.form-control{resize:vertical;min-height:65px}
 .filter-chip{padding:4px 11px;border-radius:20px;border:1px solid var(--border);font-size:12px;cursor:pointer;transition:all .15s;background:transparent;color:var(--muted);font-family:var(--sans)}
 .filter-chip.active{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
 .prog-bar{background:var(--surface2);border-radius:4px;height:5px;overflow:hidden;margin-top:4px}
+.combo-mgr-item{display:flex;align-items:center;gap:7px;padding:8px 12px;border-bottom:1px solid var(--border);font-size:13px}
+.combo-mgr-item:last-child{border-bottom:none}
+.combo-mgr-lbl{flex:1}
+.combo-mgr-edit-inp{flex:1;background:var(--surface2);border:1px solid var(--accent);border-radius:5px;color:var(--text);padding:3px 8px;font-size:12px;font-family:var(--sans);outline:none}
+/* Costo por área – dropdown multiselect */
+.area-ms-wrap{position:relative;display:inline-block}
+.area-ms-btn{display:inline-flex;align-items:center;gap:7px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:6px 12px;font-size:12px;cursor:pointer;font-family:var(--sans);min-width:170px;white-space:nowrap;transition:border-color .15s}
+.area-ms-btn:hover{border-color:var(--accent)}
+.area-ms-panel{position:absolute;top:calc(100% + 4px);left:0;z-index:350;background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 28px var(--shadow);min-width:200px;max-height:240px;overflow-y:auto;display:none}
+.area-ms-panel.open{display:block;animation:fadeIn .12s ease}
+.area-ms-item{display:flex;align-items:center;gap:9px;padding:8px 13px;cursor:pointer;font-size:13px;transition:background .1s}
+.area-ms-item:hover{background:var(--surface2)}
+.area-ms-item input[type=checkbox]{accent-color:var(--accent);cursor:pointer;flex-shrink:0}
 .prog-fill{height:100%;border-radius:4px;background:var(--accent2);transition:width .3s}
 .pill-num{display:inline-block;background:var(--accent);color:#fff;border-radius:4px;font-family:var(--mono);font-size:11px;padding:1px 6px;font-weight:600}
 .loading-overlay{position:fixed;inset:0;background:rgba(10,12,15,.92);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px}
@@ -309,7 +322,7 @@ textarea.form-control{resize:vertical;min-height:65px}
           </div>
         </div>
         <input type="file" id="file-ot" accept=".xlsx,.xls,.csv" style="display:none" onchange="loadFileImport(this,'ot')">
-        <button class="btn btn-primary" id="btn-nueva-ot" onclick="openModal('modal-ot')">+ Nueva OT</button>
+        <button class="btn btn-primary" id="btn-nueva-ot" onclick="editingOTId=null;document.getElementById('ot-modal-title').textContent='NUEVA ORDEN DE TRABAJO';document.getElementById('btn-save-ot').textContent='Crear OT';openModal('modal-ot')">+ Nueva OT</button>
       </div>
       <div class="stat-row" id="ot-stats"></div>
       <div class="card"><div class="table-wrap"><table id="ot-table">
@@ -328,14 +341,18 @@ textarea.form-control{resize:vertical;min-height:65px}
       <div class="section-sub">Seguimiento de solicitudes, pedidos y servicios</div>
       <div class="search-bar">
         <input class="search-input" id="log-search" placeholder="🔍 Buscar sol. pedido, texto, proveedor..." oninput="renderLogistica()">
-        <div style="display:flex;gap:5px;flex-wrap:wrap">
-          <button class="filter-chip active" onclick="setLogFilter('Todos',this)">Todos</button>
-          <button class="filter-chip" onclick="setLogFilter('Pendiente',this)">Pendiente</button>
-          <button class="filter-chip" onclick="setLogFilter('En proceso',this)">En proceso</button>
-          <button class="filter-chip" onclick="setLogFilter('Facturado',this)">Facturado</button>
-          <button class="filter-chip" onclick="setLogFilter('Cerrado',this)">Cerrado</button>
-        </div>
+        <select class="form-control" style="width:160px" id="log-f-estado" onchange="renderLogistica()">
+          <option value="">Todos los estados</option>
+          <option>Pendiente</option><option>En proceso</option><option>Facturado</option><option>Cerrado</option>
+        </select>
         <button class="btn btn-ghost" onclick="openModal('modal-import-log')">⬆️ Importar Excel</button>
+        <div class="dropdown" id="dd-delete-log">
+          <button class="btn btn-ghost" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDD('dd-delete-log')">🗑 Borrar ▾</button>
+          <div class="dropdown-menu">
+            <div class="dropdown-item danger" onclick="openDeleteModal('log','all')">🗑 Borrar todos</div>
+            <div class="dropdown-item danger" onclick="openDeleteModal('log','dates')">📅 Por rango de fechas</div>
+          </div>
+        </div>
         <button class="btn btn-primary" id="btn-nueva-log" onclick="openModal('modal-log')">+ Nuevo</button>
       </div>
       <div class="card"><div class="table-wrap"><table><thead><tr>
@@ -873,11 +890,18 @@ textarea.form-control{resize:vertical;min-height:65px}
   </div>
 </div>
 
-<!-- MODAL COMBO ADD -->
-<div class="modal-overlay" id="modal-combo-add">
-  <div class="modal modal-sm"><div class="modal-header"><h2 id="combo-modal-title">AGREGAR OPCIÓN</h2><button class="modal-close" onclick="closeModal('modal-combo-add')">✕</button></div>
-    <div class="modal-body"><div class="form-group"><label id="combo-modal-label">Nueva opción</label><input type="text" class="form-control" id="combo-new-val" placeholder="Escribe el nuevo valor..."></div></div>
-    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-combo-add')">Cancelar</button><button class="btn btn-primary" onclick="saveComboOption()">Agregar</button></div>
+<!-- MODAL COMBO MANAGER (agregar + editar + eliminar) -->
+<div class="modal-overlay" id="modal-combo-mgr">
+  <div class="modal modal-sm">
+    <div class="modal-header"><h2 id="combo-mgr-title">GESTIONAR LISTA</h2><button class="modal-close" onclick="closeModal('modal-combo-mgr')">✕</button></div>
+    <div class="modal-body">
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <input type="text" class="form-control" id="combo-mgr-new-val" placeholder="Nueva opción..." onkeydown="if(event.key==='Enter')comboMgrSaveNew()">
+        <button class="btn btn-primary btn-sm" onclick="comboMgrSaveNew()">+ Agregar</button>
+      </div>
+      <div id="combo-mgr-list" style="max-height:340px;overflow-y:auto;border:1px solid var(--border);border-radius:8px"></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-combo-mgr')">Cerrar</button></div>
   </div>
 </div>
 
@@ -912,18 +936,18 @@ const PAGE_TITLES={dashboard:'DASHBOARD',ot:'ÓRDENES DE TRABAJO',logistica:'SAP
 let app,db;
 let currentUser=null;
 let otData=[],logData=[],sumData=[],eqData=[],tecData=[],eppData=[],herData=[],matData=[],actData=[],usrData=[],listasData={},eppCatData=[];
-let logFilterVal='Todos';
 let editingOTId=null,editingLogId=null,editingUsrId=null,editingEPPId=null;
 let otCounter=1;
 let unsubscribers=[];
 let importBuffers={ot:[],log:[],sum:[],mat:[]};
 let otMatsSelected=[];
+let lastFilteredOT=[];
 let comboTarget={selectId:'',collection:''};
 let currentImportType='excel';
 let dashEditMode=false;
 let renamingKPIId=null;
 let deleteContext={type:'',mode:''};
-let dashAreaFilter='all';
+let dashAreaFilter=new Set(['__ALL__']); // __ALL__ = todas las áreas
 
 const SUM_COLS=[{key:'status',label:'Status'},{key:'posSol',label:'Pos.Sol.Pedido'},{key:'tipoImp',label:'Tipo Imputación'},{key:'tipoPos',label:'Tipo Posición'},{key:'material',label:'Material'},{key:'texto',label:'Texto Breve'},{key:'cant',label:'Cantidad'},{key:'um',label:'UM'},{key:'precio',label:'Precio Val.'},{key:'moneda',label:'Moneda'},{key:'centro',label:'Centro'},{key:'pedido',label:'Pedido'},{key:'grupoArt',label:'Grupo Art.'},{key:'valorTotal',label:'Valor Total'},{key:'posEd',label:'Pos.Pedido'},{key:'fechaOC',label:'Fe.Orden Compra'},{key:'grupoComp',label:'Grupo Compras'},{key:'solicitante',label:'Solicitante'},{key:'creadoPorSAP',label:'Creado Por'},{key:'tipoFe',label:'Tipo Fe.Entrega'},{key:'fechaEnt',label:'Fe.Entrega'},{key:'almacen',label:'Almacén'},{key:'urgencia',label:'Urgencia'},{key:'numNec',label:'N° Necesidad'},{key:'statusTrat',label:'Status Trat.'},{key:'statusTratSol',label:'Status Trat.Sol.'}];
 let visibleSumCols=SUM_COLS.map(c=>c.key);
@@ -1149,7 +1173,6 @@ function fillWidgetContent(w){
 
 /* ── Costo por Área ── */
 function renderCostoAreas(el){
-  // recolectar costos por área desde OT (campo costoMat)
   const map={};
   filterOTByUser().forEach(o=>{
     const area=o.areaSol||'Sin área';
@@ -1157,22 +1180,51 @@ function renderCostoAreas(el){
     map[area]=(map[area]||0)+val;
   });
   const areas=Object.keys(map).sort((a,b)=>map[b]-map[a]);
-  const maxVal=areas.length?Math.max(...areas.map(a=>map[a])):1;
-  const allAreas=['all',...areas];
-  // filtro
   if(!areas.length){el.innerHTML=`<div style="padding:16px">${emptyMsg('Sin datos de costo por área')}</div>`;return;}
-  const filterHtml=`<div style="display:flex;gap:6px;flex-wrap:wrap;padding:10px 14px 6px;border-bottom:1px solid var(--border)">
-    ${allAreas.map(a=>`<button class="filter-chip ${dashAreaFilter===a?'active':''}" onclick="setDashAreaFilter('${a}')">${a==='all'?'Todas las áreas':a}</button>`).join('')}
-  </div>`;
-  const filtered=dashAreaFilter==='all'?areas:areas.filter(a=>a===dashAreaFilter);
+  const isAll=dashAreaFilter.has('__ALL__');
+  const selCount=isAll?areas.length:[...dashAreaFilter].filter(a=>areas.includes(a)).length;
+  const btnLabel=isAll?'Todas las áreas':`${selCount} área${selCount!==1?'s':''} seleccionada${selCount!==1?'s':''}`;
+  const panelHtml=`<div class="area-ms-item" onclick="areaToggleAll(${JSON.stringify(areas).replace(/"/g,'&quot;')})">
+    <input type="checkbox" id="ams-all" ${isAll?'checked':''} onclick="event.stopPropagation()"> <span>Todas las áreas</span>
+  </div>
+  <div style="height:1px;background:var(--border);margin:2px 0"></div>
+  ${areas.map(a=>{const checked=isAll||dashAreaFilter.has(a);return`<div class="area-ms-item" onclick="areaToggleOne(${JSON.stringify(a).replace(/"/g,'&quot;')},${JSON.stringify(areas).replace(/"/g,'&quot;')})">
+    <input type="checkbox" ${checked?'checked':''} onclick="event.stopPropagation()"> <span>${a}</span>
+  </div>`;}).join('')}`;
+  const filtered=isAll?areas:areas.filter(a=>dashAreaFilter.has(a));
+  const maxVal=filtered.length?Math.max(...filtered.map(a=>map[a])):1;
   const barsHtml=filtered.map(a=>{
     const pct=maxVal>0?Math.round(map[a]/maxVal*100):0;
     return `<div class="area-bar-row"><div class="area-bar-label" title="${a}">${a}</div><div class="area-bar-track"><div class="area-bar-fill" style="width:${pct}%"></div></div><div class="area-bar-val">S/ ${map[a].toFixed(0)}</div></div>`;
   }).join('');
-  const total=filtered.reduce((s,a)=>s+map[a],0);
-  el.innerHTML=filterHtml+`<div style="padding:14px">${barsHtml}<div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:10px;padding-top:8px;border-top:1px solid var(--border)">Total: <span style="color:var(--accent)">S/ ${total.toFixed(2)}</span></div></div>`;
+  const total=filtered.reduce((s,a)=>s+(map[a]||0),0);
+  el.innerHTML=`<div style="padding:10px 14px 8px;border-bottom:1px solid var(--border)">
+    <div class="area-ms-wrap">
+      <button class="area-ms-btn" onclick="toggleAreaPanel(event)">📊 ${btnLabel} ▾</button>
+      <div class="area-ms-panel" id="area-ms-panel">${panelHtml}</div>
+    </div>
+  </div>
+  <div style="padding:14px">${barsHtml||emptyMsg('Selecciona al menos un área')}<div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:10px;padding-top:8px;border-top:1px solid var(--border)">Total: <span style="color:var(--accent)">S/ ${total.toFixed(2)}</span></div></div>`;
 }
-window.setDashAreaFilter=function(area){dashAreaFilter=area;const w=widgetLayout.find(x=>x.id==='costo-areas');if(w)fillWidgetContent(w);};
+window.toggleAreaPanel=function(e){
+  e.stopPropagation();
+  const panel=document.getElementById('area-ms-panel');
+  if(panel)panel.classList.toggle('open');
+};
+window.areaToggleAll=function(areas){
+  if(dashAreaFilter.has('__ALL__')){dashAreaFilter=new Set();}
+  else{dashAreaFilter=new Set(['__ALL__']);}
+  const w=widgetLayout.find(x=>x.id==='costo-areas');if(w)fillWidgetContent(w);
+};
+window.areaToggleOne=function(area,areas){
+  if(dashAreaFilter.has('__ALL__')){dashAreaFilter=new Set(areas);}
+  if(dashAreaFilter.has(area))dashAreaFilter.delete(area);
+  else dashAreaFilter.add(area);
+  if(dashAreaFilter.size===0)dashAreaFilter=new Set(['__ALL__']);
+  const w=widgetLayout.find(x=>x.id==='costo-areas');if(w)fillWidgetContent(w);
+};
+// Cerrar panel al hacer click fuera
+document.addEventListener('click',function(e){if(!e.target.closest('.area-ms-wrap')){const p=document.getElementById('area-ms-panel');if(p)p.classList.remove('open');}});
 
 /* Dashboard config modal */
 window.openDashConfig=function(){
@@ -1185,8 +1237,9 @@ window.openDashConfig=function(){
   // Widget list
   const wList=document.getElementById('widget-config-list');
   wList.innerHTML=widgetLayout.map(w=>`<div class="widget-row" id="wcfg-${w.id}">
-    <label><input type="checkbox" id="wchk-${w.id}" ${w.visible?'checked':''} style="accent-color:var(--accent)"> ${w.icon} ${w.label}</label>
-    <label style="font-size:12px;color:var(--muted);cursor:pointer"><input type="checkbox" id="wfull-${w.id}" ${w.full?'checked':''} style="accent-color:var(--accent)"> Ancho completo</label>
+    <label style="display:flex;align-items:center;gap:5px;flex-shrink:0"><input type="checkbox" id="wchk-${w.id}" ${w.visible?'checked':''} style="accent-color:var(--accent)"> ${w.icon}</label>
+    <input type="text" id="wlbl-${w.id}" value="${w.label.replace(/"/g,'&quot;')}" class="form-control" style="flex:1;padding:3px 8px;font-size:12px" placeholder="Nombre del widget" onclick="event.stopPropagation()">
+    <label style="font-size:12px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:4px;flex-shrink:0"><input type="checkbox" id="wfull-${w.id}" ${w.full?'checked':''} style="accent-color:var(--accent)"> Completo</label>
     ${w.custom?`<button class="kpi-icon-btn del" onclick="removeCustomWidget('${w.id}')">✕</button>`:''}
   </div>`).join('');
   openModal('modal-dash-config');
@@ -1199,6 +1252,8 @@ window.applyDashConfig=function(){
   widgetLayout.forEach(w=>{
     w.visible=document.getElementById('wchk-'+w.id)?.checked||false;
     w.full=document.getElementById('wfull-'+w.id)?.checked||false;
+    const wlbl=document.getElementById('wlbl-'+w.id)?.value?.trim();
+    if(wlbl)w.label=wlbl;
   });
   localStorage.setItem('mantex_kpi_layout',JSON.stringify(kpiLayout));
   localStorage.setItem('mantex_widget_layout',JSON.stringify(widgetLayout));
@@ -1237,7 +1292,7 @@ function filterOTByUser(){if(currentUser.role==='tecnico'&&currentUser.tecnicoAs
 window.openDeleteModal=function(type,mode){
   document.querySelectorAll('.dropdown-menu').forEach(m=>m.classList.remove('open'));
   deleteContext={type,mode};
-  const colNames={ot:'Órdenes de Trabajo',sum:'Suministros',mat:'Materiales'};
+  const colNames={ot:'Órdenes de Trabajo',log:'SAP Servicios',sum:'Suministros',mat:'Materiales'};
   document.getElementById('del-title').textContent=`BORRAR ${colNames[type]||type}`;
   const body=document.getElementById('del-body');
   const footer=document.getElementById('del-footer');
@@ -1251,7 +1306,7 @@ window.openDeleteModal=function(type,mode){
     <div class="form-group"><label>Escribe <b>BORRAR TODO</b> para confirmar</label><input type="text" class="form-control" id="del-confirm-text" placeholder="BORRAR TODO"></div>`;
     footer.innerHTML=`<button class="btn btn-ghost" onclick="closeModal('modal-delete')">Cancelar</button><button class="btn btn-danger" onclick="confirmDeleteAll()">Eliminar todo</button>`;
   } else if(mode==='dates'){
-    body.innerHTML=`<p style="color:var(--muted);font-size:13px;margin-bottom:16px">Eliminar OT cuya fecha esté dentro del rango indicado.</p>
+    body.innerHTML=`<p style="color:var(--muted);font-size:13px;margin-bottom:16px">Eliminar registros cuya fecha esté dentro del rango indicado.</p>
     <div class="form-grid">
       <div class="form-group"><label>Fecha Desde</label><input type="date" class="form-control" id="del-fecha-desde"></div>
       <div class="form-group"><label>Fecha Hasta</label><input type="date" class="form-control" id="del-fecha-hasta"></div>
@@ -1275,8 +1330,11 @@ function previewDeleteDates(){
   const hasta=document.getElementById('del-fecha-hasta')?.value||'';
   const prev=document.getElementById('del-count-preview');
   if(!desde||!hasta||!prev)return;
-  const count=otData.filter(o=>o.fecha>=desde&&o.fecha<=hasta).length;
-  prev.textContent=`Se eliminarán ${count} OT en este rango.`;
+  const {type}=deleteContext;
+  const srcMap={ot:{data:otData,dateField:'fecha'},log:{data:logData,dateField:'fesol'}};
+  const cfg=srcMap[type]||{data:otData,dateField:'fecha'};
+  const count=cfg.data.filter(o=>(o[cfg.dateField]||'')>=desde&&(o[cfg.dateField]||'')<=hasta).length;
+  prev.textContent=`Se eliminarán ${count} registros en este rango.`;
 }
 
 window.previewDeleteSearch=function(){
@@ -1305,7 +1363,7 @@ window.confirmDeleteAll=async function(){
   const confirm=document.getElementById('del-confirm-text')?.value;
   if(confirm!=='BORRAR TODO'){toast('Escribe exactamente "BORRAR TODO"','error');return;}
   const {type}=deleteContext;
-  const colMap={ot:'ot',sum:'suministros',mat:'materiales'};
+  const colMap={ot:'ot',log:'logistica',sum:'suministros',mat:'materiales'};
   const colName=colMap[type];if(!colName)return;
   try{
     const snap=await getDocs(collection(db,colName));
@@ -1321,14 +1379,17 @@ window.confirmDeleteByDates=async function(){
   const desde=document.getElementById('del-fecha-desde')?.value||'';
   const hasta=document.getElementById('del-fecha-hasta')?.value||'';
   if(!desde||!hasta){toast('Selecciona rango de fechas','error');return;}
-  const toDelete=otData.filter(o=>o.fecha>=desde&&o.fecha<=hasta);
-  if(!toDelete.length){toast('No hay OT en ese rango','info');return;}
-  if(!confirm(`¿Eliminar ${toDelete.length} OT del ${desde} al ${hasta}?`))return;
+  const {type}=deleteContext;
+  const srcMap={ot:{data:otData,col:'ot',dateField:'fecha'},log:{data:logData,col:'logistica',dateField:'fesol'}};
+  const cfg=srcMap[type]||{data:otData,col:'ot',dateField:'fecha'};
+  const toDelete=cfg.data.filter(o=>(o[cfg.dateField]||'')>=desde&&(o[cfg.dateField]||'')<=hasta);
+  if(!toDelete.length){toast('No hay registros en ese rango','info');return;}
+  if(!confirm(`¿Eliminar ${toDelete.length} registros del ${desde} al ${hasta}?`))return;
   const batch=writeBatch(db);
-  toDelete.forEach(o=>batch.delete(doc(db,'ot',o.id)));
+  toDelete.forEach(o=>batch.delete(doc(db,cfg.col,o.id)));
   await batch.commit();
   closeModal('modal-delete');
-  toast(`${toDelete.length} OT eliminadas`,'success');
+  toast(`${toDelete.length} registros eliminados`,'success');
 };
 
 window.confirmDeleteSelected=async function(){
@@ -1356,6 +1417,7 @@ function renderOT(){
     const m=!search||(o.num||'').toLowerCase().includes(search)||(o.desc||'').toLowerCase().includes(search)||(o.equipo||'').toLowerCase().includes(search)||(o.tecnico||'').toLowerCase().includes(search);
     return m&&(!fE||o.estado===fE)&&(!fT||o.tipo===fT);
   });
+  lastFilteredOT=[...list];
   const stats={Abierta:0,'En proceso':0,Pausada:0,Cerrada:0};
   filterOTByUser().forEach(o=>stats[o.estado]=(stats[o.estado]||0)+1);
   document.getElementById('ot-stats').innerHTML=Object.entries(stats).map(([k,v])=>`<div class="stat-box"><div class="val">${v}</div><div class="lbl">${k}</div></div>`).join('');
@@ -1381,9 +1443,36 @@ function renderOT(){
     <td style="font-family:var(--mono);font-size:11px">${o.costoMat||'—'}</td>
     <td style="display:flex;gap:3px;flex-wrap:nowrap">
       <button class="btn btn-ghost btn-sm" onclick="verOT('${o.id}')">👁</button>
-      ${canWrite?`<button class="btn btn-ghost btn-sm" onclick="openCambioEstadoOT('${o.id}','${o.num}','${o.estado}','${o.avance||0}')">Estado</button><button class="btn btn-danger btn-sm" onclick="deleteOT('${o.id}')">✕</button>`:''}
+      ${canWrite?`<button class="btn btn-ghost btn-sm" title="Editar OT" onclick="openEditOT('${o.id}')">✏️</button><button class="btn btn-ghost btn-sm" onclick="openCambioEstadoOT('${o.id}','${o.num}','${o.estado}','${o.avance||0}')">Estado</button><button class="btn btn-danger btn-sm" onclick="deleteOT('${o.id}')">✕</button>`:''}
     </td></tr>`).join(''):`<tr><td colspan="18">${emptyMsg('Sin órdenes de trabajo')}</td></tr>`;
 }
+window.openEditOT=function(id){
+  const o=otData.find(x=>x.id===id);if(!o)return;
+  editingOTId=id;
+  // Abrir modal y esperar a que los selects se pueblen
+  document.getElementById('ot-modal-title').textContent='EDITAR ORDEN DE TRABAJO';
+  document.getElementById('btn-save-ot').textContent='Guardar cambios';
+  document.getElementById('modal-ot').classList.add('open');
+  // Pre-fill después de un tick para que los selects estén listos
+  setTimeout(()=>{
+    const f={
+      'ot-temporada':'temporada','ot-area-sol':'areaSol','ot-sistema':'sistema',
+      'ot-subsistema':'subsistema','ot-ubicacion':'ubicacion','ot-equipo':'equipo',
+      'ot-tipo':'tipo','ot-tecnico':'tecnico','ot-estado':'estado'
+    };
+    Object.entries(f).forEach(([elId,field])=>{const el=document.getElementById(elId);if(el)el.value=o[field]||'';});
+    document.getElementById('ot-desc').value=o.desc||'';
+    document.getElementById('ot-fecha').value=o.fecha||hoy();
+    document.getElementById('ot-hora-ini').value=o.horaIni||'';
+    document.getElementById('ot-hora-fin').value=o.horaFin||'';
+    document.getElementById('ot-avance').value=o.avance||0;
+    document.getElementById('ot-avance-val').textContent=(o.avance||0)+'%';
+    document.getElementById('ot-duracion').textContent=o.duracion||'—';
+    document.getElementById('ot-obs').value=o.obs||'';
+    if(o.materiales){otMatsSelected=[...o.materiales];renderOTMats();}
+    if(o.fotoUrl){const img=document.getElementById('ot-foto-preview');img.src=o.fotoUrl;img.style.display='block';}
+  },60);
+};
 window.verOT=function(id){
   const o=otData.find(x=>x.id===id);if(!o)return;
   document.getElementById('ver-ot-titulo').textContent=`${o.num} — ${o.equipo||''}`;
@@ -1424,13 +1513,28 @@ window.saveOT=async function(){
   if(ini&&fin){const [ih,im]=ini.split(':').map(Number),[fh,fm]=fin.split(':').map(Number);let m=(fh*60+fm)-(ih*60+im);if(m<0)m+=1440;duracion=`${Math.floor(m/60)}h ${m%60}m`;}
   const avance=parseInt(document.getElementById('ot-avance').value)||0;
   const costo=otMatsSelected.reduce((a,m)=>a+(parseFloat(m.precio)||0),0);
-  const num=`OT-${String(otCounter).padStart(4,'0')}`;
   let fotoUrl='';
   const fi=document.getElementById('ot-foto');
   if(fi.files[0]){await new Promise(res=>{const r=new FileReader();r.onload=e=>{fotoUrl=e.target.result;res();};r.readAsDataURL(fi.files[0]);});}
-  await addDoc(collection(db,'ot'),{num,desc,equipo,tecnico,temporada:document.getElementById('ot-temporada').value,areaSol:document.getElementById('ot-area-sol').value,sistema:document.getElementById('ot-sistema').value,subsistema:document.getElementById('ot-subsistema').value,ubicacion:document.getElementById('ot-ubicacion').value,tipo:document.getElementById('ot-tipo').value,estado:document.getElementById('ot-estado').value,fecha:document.getElementById('ot-fecha').value||hoy(),horaIni:ini,horaFin:fin,duracion,avance,materiales:otMatsSelected.map(m=>({id:m.id,cod:m.cod||'',texto:m.texto,um:m.um,precio:m.precio,moneda:m.moneda})),costoMat:`S/ ${costo.toFixed(2)}`,obs:document.getElementById('ot-obs').value,fotoUrl,creadoPor:currentUser.name,createdAt:serverTimestamp()});
-  await addActivity(`${num} creada por ${currentUser.name} — ${equipo}`,'ot');
-  closeModal('modal-ot');toast(`${num} creada`,'success');
+  const payload={desc,equipo,tecnico,temporada:document.getElementById('ot-temporada').value,areaSol:document.getElementById('ot-area-sol').value,sistema:document.getElementById('ot-sistema').value,subsistema:document.getElementById('ot-subsistema').value,ubicacion:document.getElementById('ot-ubicacion').value,tipo:document.getElementById('ot-tipo').value,estado:document.getElementById('ot-estado').value,fecha:document.getElementById('ot-fecha').value||hoy(),horaIni:ini,horaFin:fin,duracion,avance,materiales:otMatsSelected.map(m=>({id:m.id,cod:m.cod||'',texto:m.texto,um:m.um,precio:m.precio,moneda:m.moneda})),costoMat:`S/ ${costo.toFixed(2)}`,obs:document.getElementById('ot-obs').value};
+  if(editingOTId){
+    // MODO EDICIÓN
+    if(fotoUrl)payload.fotoUrl=fotoUrl;
+    await updateDoc(doc(db,'ot',editingOTId),payload);
+    const ot=otData.find(o=>o.id===editingOTId);
+    await addActivity(`${ot?.num||'OT'} editada por ${currentUser.name}`,'ot');
+    toast('OT actualizada','success');
+  } else {
+    // MODO CREAR
+    const num=`OT-${String(otCounter).padStart(4,'0')}`;
+    await addDoc(collection(db,'ot'),{num,...payload,fotoUrl,creadoPor:currentUser.name,createdAt:serverTimestamp()});
+    await addActivity(`${num} creada por ${currentUser.name} — ${equipo}`,'ot');
+    toast(`${num} creada`,'success');
+  }
+  editingOTId=null;
+  document.getElementById('ot-modal-title').textContent='NUEVA ORDEN DE TRABAJO';
+  document.getElementById('btn-save-ot').textContent='Crear OT';
+  closeModal('modal-ot');
   otMatsSelected=[];['ot-desc','ot-obs'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('ot-hora-ini').value='';document.getElementById('ot-hora-fin').value='';
   document.getElementById('ot-avance').value=0;document.getElementById('ot-avance-val').textContent='0%';
@@ -1524,7 +1628,8 @@ window.confirmImport=async function(type){
 
 window.exportData=function(type,format){
   document.querySelectorAll('.dropdown-menu').forEach(m=>m.classList.remove('open'));
-  const src={ot:filterOTByUser(),logistica:logData,suministros:sumData,materiales:matData,epp:eppData};
+  // Para OT: usar el orden visual actual (filtrado y ordenado como en pantalla)
+  const src={ot:lastFilteredOT.length?lastFilteredOT:filterOTByUser(),logistica:logData,suministros:sumData,materiales:matData,epp:eppData};
   const realData=src[type]||src['ot'];
   if(!realData?.length){toast('Sin datos para exportar','error');return;}
   const skip=['id','createdAt','fotoUrl','importado'];
@@ -1548,10 +1653,10 @@ function exportPDF(title,data,keys){
 }
 
 /* ── LOGÍSTICA ── */
-window.setLogFilter=function(val,el){logFilterVal=val;document.querySelectorAll('#page-logistica .filter-chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');renderLogistica();};
 function renderLogistica(){
   const search=document.getElementById('log-search')?.value?.toLowerCase()||'';
-  const list=logData.filter(s=>{const m=!search||(s.solped||'').toLowerCase().includes(search)||(s.texto||'').toLowerCase().includes(search)||(s.proveedor||'').toLowerCase().includes(search);return m&&(logFilterVal==='Todos'||s.estado===logFilterVal);});
+  const fEstado=document.getElementById('log-f-estado')?.value||'';
+  const list=logData.filter(s=>{const m=!search||(s.solped||'').toLowerCase().includes(search)||(s.texto||'').toLowerCase().includes(search)||(s.proveedor||'').toLowerCase().includes(search)||(s.pedido||'').toLowerCase().includes(search);return m&&(!fEstado||s.estado===fEstado);});
   const canWrite=ROLE_WRITE[currentUser.role];
   document.getElementById('log-tbody').innerHTML=list.length?list.map(s=>`<tr>
     <td style="font-family:var(--mono);font-size:11px">${s.fesol||'—'}</td>
@@ -1732,8 +1837,57 @@ window.deleteEquipo=async function(id){if(!confirm('¿Eliminar?'))return;await d
 window.saveEquipo=async function(){const nombre=document.getElementById('eq-nombre').value.trim(),tag=document.getElementById('eq-tag').value.trim();if(!nombre||!tag){toast('Nombre y TAG requeridos','error');return;}await addDoc(collection(db,'equipos'),{nombre,tag,area:document.getElementById('eq-area').value,tipo:document.getElementById('eq-tipo').value,marca:document.getElementById('eq-marca').value,crit:document.getElementById('eq-crit').value,estado:'Operativo',createdAt:serverTimestamp()});closeModal('modal-eq');toast(`Equipo ${tag} registrado`,'success');['eq-nombre','eq-tag','eq-area','eq-marca'].forEach(id=>document.getElementById(id).value='');};
 
 /* ── COMBOS ── */
-window.addComboOption=function(selectId,colName,label){comboTarget={selectId,collection:colName};document.getElementById('combo-modal-title').textContent=`AGREGAR ${label.toUpperCase()}`;document.getElementById('combo-modal-label').textContent=`Nueva ${label}`;document.getElementById('combo-new-val').value='';document.getElementById('modal-combo-add').classList.add('open');};
-window.saveComboOption=async function(){const val=document.getElementById('combo-new-val').value.trim();if(!val){toast('Escribe un valor','error');return;}await addDoc(collection(db,comboTarget.collection),{valor:val,createdAt:serverTimestamp()});closeModal('modal-combo-add');toast('Opción agregada','success');};
+/* ── COMBO MANAGER (agregar + editar + eliminar) ── */
+window.openComboMgr=function(selectId,colName,label){
+  comboTarget={selectId,collection:colName};
+  document.getElementById('combo-mgr-title').textContent=`GESTIONAR — ${label.toUpperCase()}`;
+  document.getElementById('combo-mgr-new-val').value='';
+  renderComboMgrList();
+  document.getElementById('modal-combo-mgr').classList.add('open');
+};
+function renderComboMgrList(){
+  const items=listasData[comboTarget.collection]||[];
+  const el=document.getElementById('combo-mgr-list');if(!el)return;
+  if(!items.length){el.innerHTML='<div style="padding:18px;text-align:center;color:var(--muted);font-size:13px">Sin opciones. Agrega la primera arriba.</div>';return;}
+  // items son strings (valores)
+  const colData=window._comboFullData?.[comboTarget.collection]||[];
+  el.innerHTML=colData.map(item=>`<div class="combo-mgr-item" id="cmi-${item.id}">
+    <span class="combo-mgr-lbl" id="cml-${item.id}">${item.valor}</span>
+    <input class="combo-mgr-edit-inp" id="cme-${item.id}" value="${item.valor.replace(/"/g,'&quot;')}" style="display:none" onkeydown="if(event.key==='Enter')comboMgrSaveEdit('${item.id}');if(event.key==='Escape')comboMgrCancelEdit('${item.id}')">
+    <button class="kpi-icon-btn" title="Editar" onclick="comboMgrStartEdit('${item.id}')">✏️</button>
+    <button class="kpi-icon-btn del" title="Eliminar" onclick="comboMgrDelete('${item.id}')">🗑</button>
+  </div>`).join('');
+}
+window.comboMgrSaveNew=async function(){
+  const val=document.getElementById('combo-mgr-new-val').value.trim();
+  if(!val){toast('Escribe un valor','error');return;}
+  if((listasData[comboTarget.collection]||[]).includes(val)){toast('Ya existe esa opción','info');return;}
+  await addDoc(collection(db,comboTarget.collection),{valor:val,createdAt:serverTimestamp()});
+  document.getElementById('combo-mgr-new-val').value='';
+  toast(`"${val}" agregado`,'success');
+};
+window.comboMgrStartEdit=function(id){
+  const lbl=document.getElementById('cml-'+id),inp=document.getElementById('cme-'+id);
+  if(!lbl||!inp)return;
+  lbl.style.display='none';inp.style.display='';inp.focus();inp.select();
+};
+window.comboMgrCancelEdit=function(id){
+  const lbl=document.getElementById('cml-'+id),inp=document.getElementById('cme-'+id);
+  if(lbl)lbl.style.display='';if(inp)inp.style.display='none';
+};
+window.comboMgrSaveEdit=async function(id){
+  const inp=document.getElementById('cme-'+id);if(!inp)return;
+  const nv=inp.value.trim();if(!nv){toast('El valor no puede estar vacío','error');return;}
+  await updateDoc(doc(db,comboTarget.collection,id),{valor:nv});
+  toast('Opción actualizada','success');
+};
+window.comboMgrDelete=async function(id){
+  if(!confirm('¿Eliminar esta opción?'))return;
+  await deleteDoc(doc(db,comboTarget.collection,id));
+  toast('Opción eliminada','success');
+};
+// Almacén de datos completos (con id) por colección de combos
+window._comboFullData={};
 function populateCombos(){const maps={'ot-temporada':'temporadas','ot-area-sol':'areas','ot-sistema':'sistemas','ot-subsistema':'subsistemas','ot-ubicacion':'ubicaciones'};Object.entries(maps).forEach(([selId,colName])=>{const sel=document.getElementById(selId);if(!sel)return;const vals=listasData[colName]||[];const cur=sel.value;sel.innerHTML='<option value="">— Seleccionar —</option>'+vals.map(v=>`<option value="${v}">${v}</option>`).join('');if(cur)sel.value=cur;});}
 
 /* ── TÉCNICOS ── */
@@ -1753,8 +1907,14 @@ function renderUsuarios(){
   document.getElementById('usr-tbody').innerHTML=list.length?list.map(u=>`<tr><td style="font-family:var(--mono);font-size:12px;color:var(--accent)">${u.username||u.id}</td><td><strong>${u.nombre||'—'}</strong></td><td><span class="badge role-badge-${u.rol||'jefatura'}">${ROLE_LABELS[u.rol]||u.rol}</span></td><td style="font-size:12px;color:var(--muted)">${u.tecnicoAsoc||'—'}</td><td style="display:flex;gap:4px"><button class="btn btn-ghost btn-sm" onclick="editUsuario('${u.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteUsuario('${u.id}')">✕</button></td></tr>`).join(''):`<tr><td colspan="5">${emptyMsg('Sin usuarios. Acceso default: planner/planner2024')}</td></tr>`;
 }
 window.toggleTecnicoSelect=function(){const rol=document.getElementById('usr-rol').value;document.getElementById('usr-tec-group').style.display=rol==='tecnico'?'block':'none';};
-window.editUsuario=function(id){const u=usrData.find(x=>x.id===id);if(!u)return;editingUsrId=id;document.getElementById('usr-modal-title').textContent='EDITAR USUARIO';document.getElementById('usr-username').value=u.username||u.id;document.getElementById('usr-password').value=u.password||'';document.getElementById('usr-nombre').value=u.nombre||'';document.getElementById('usr-rol').value=u.rol||'jefatura';document.getElementById('usr-tec-asoc').innerHTML='<option value="">— Sin asociar —</option>'+tecData.map(t=>`<option value="${t.nombre}">${t.nombre}</option>`).join('');if(u.tecnicoAsoc)document.getElementById('usr-tec-asoc').value=u.tecnicoAsoc;window.toggleTecnicoSelect();document.getElementById('modal-usr').classList.add('open');};
-window.saveUsuario=async function(){const username=document.getElementById('usr-username').value.trim().toLowerCase();const password=document.getElementById('usr-password').value.trim();const nombre=document.getElementById('usr-nombre').value.trim();const rol=document.getElementById('usr-rol').value;const tecnicoAsoc=rol==='tecnico'?document.getElementById('usr-tec-asoc').value:'';if(!username||!password||!nombre){toast('Completa todos los campos','error');return;}await setDoc(doc(db,'usuarios',username),{username,password,nombre,rol,tecnicoAsoc,createdAt:serverTimestamp()});closeModal('modal-usr');toast(`Usuario ${username} guardado`,'success');editingUsrId=null;document.getElementById('usr-modal-title').textContent='NUEVO USUARIO';['usr-username','usr-password','usr-nombre'].forEach(id=>document.getElementById(id).value='');};
+window.editUsuario=function(id){const u=usrData.find(x=>x.id===id);if(!u)return;editingUsrId=id;document.getElementById('usr-modal-title').textContent='EDITAR USUARIO';const unInp=document.getElementById('usr-username');unInp.value=u.username||u.id;unInp.readOnly=true;unInp.style.opacity='0.6';document.getElementById('usr-password').value=u.password||'';document.getElementById('usr-nombre').value=u.nombre||'';document.getElementById('usr-rol').value=u.rol||'jefatura';document.getElementById('usr-tec-asoc').innerHTML='<option value="">— Sin asociar —</option>'+tecData.map(t=>`<option value="${t.nombre}">${t.nombre}</option>`).join('');if(u.tecnicoAsoc)document.getElementById('usr-tec-asoc').value=u.tecnicoAsoc;window.toggleTecnicoSelect();document.getElementById('modal-usr').classList.add('open');};
+window.saveUsuario=async function(){const username=document.getElementById('usr-username').value.trim().toLowerCase();const password=document.getElementById('usr-password').value.trim();const nombre=document.getElementById('usr-nombre').value.trim();const rol=document.getElementById('usr-rol').value;const tecnicoAsoc=rol==='tecnico'?document.getElementById('usr-tec-asoc').value:'';if(!username||!password||!nombre){toast('Completa todos los campos','error');return;}
+  // Al editar, usar el ID existente como clave del doc (no el username del input que está readonly)
+  const docId=editingUsrId||username;
+  await setDoc(doc(db,'usuarios',docId),{username:docId,password,nombre,rol,tecnicoAsoc,updatedAt:serverTimestamp()},{merge:true});
+  closeModal('modal-usr');toast(`Usuario "${nombre}" guardado`,'success');editingUsrId=null;
+  const unInp=document.getElementById('usr-username');unInp.readOnly=false;unInp.style.opacity='';
+  document.getElementById('usr-modal-title').textContent='NUEVO USUARIO';['usr-username','usr-password','usr-nombre'].forEach(id=>document.getElementById(id).value='');};
 window.deleteUsuario=async function(id){if(!confirm(`¿Eliminar usuario ${id}?`))return;await deleteDoc(doc(db,'usuarios',id));};
 
 /* ── REPORTES ── */
@@ -1792,6 +1952,16 @@ function tipoBadge(t){return`<span class="badge ${{Correctivo:'badge-red',Preven
 function criticidadBadge(c){return`<span class="badge ${{Alta:'badge-red',Media:'badge-yellow',Baja:'badge-green'}[c]||'badge-gray'}">${c||'—'}</span>`;}
 
 /* ── MODAL / DROPDOWN ── */
+
+/* ── EXPONER FUNCIONES DE RENDER AL SCOPE GLOBAL (fix oninput) ── */
+window.renderOT=renderOT;
+window.renderLogistica=renderLogistica;
+window.renderSuministros=renderSuministros;
+window.renderMateriales=renderMateriales;
+window.renderHerramientas=renderHerramientas;
+window.renderEPP=renderEPP;
+window.renderTecnicos=renderTecnicos;
+window.renderUsuarios=renderUsuarios;
 window.closeModal=function(id){document.getElementById(id)?.classList.remove('open');if(id==='modal-epp'&&editingEPPId){editingEPPId=null;document.getElementById('epp-modal-title').textContent='📋 REGISTRO DE ENTREGA EPP';document.getElementById('btn-save-epp').textContent='Registrar';}};
 document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
 window.toggleDD=function(wrapId){const menu=document.getElementById(wrapId)?.querySelector('.dropdown-menu');document.querySelectorAll('.dropdown-menu').forEach(m=>{if(m!==menu)m.classList.remove('open');});menu?.classList.toggle('open');};
