@@ -71,7 +71,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 
 /* ── DASHBOARD ── */
 .dash-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-.dash-title{font-family:var(--display);font-size:20px;letter-spacing:2px}
+.dash-title{font-family:var(--display);font-size:28px;letter-spacing:3px;font-weight:700}
 .dash-gear{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;cursor:pointer;color:var(--muted);display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:12px;transition:all .15s}
 .dash-gear:hover{border-color:var(--accent);color:var(--accent)}
 
@@ -90,7 +90,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .kpi-trend{position:absolute;top:14px;right:36px;font-size:18px}
 .kpi-ver-btn{position:absolute;bottom:12px;right:12px;background:rgba(240,165,0,.12);color:var(--accent);border:1px solid rgba(240,165,0,.25);border-radius:4px;padding:2px 8px;font-size:10px;font-family:var(--mono);cursor:pointer;transition:all .15s}
 .kpi-ver-btn:hover{background:rgba(240,165,0,.22)}
-.kpi-edit-btns{position:absolute;top:8px;right:8px;display:none;gap:4px}
+.kpi-edit-btns{position:absolute;top:8px;right:8px;display:none;gap:4px;flex-direction:column}
 .kpi-card.edit-mode .kpi-edit-btns{display:flex}
 .kpi-icon-btn{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:2px 5px;font-size:11px;cursor:pointer;color:var(--muted)}
 .kpi-icon-btn:hover{color:var(--accent);border-color:var(--accent)}
@@ -192,10 +192,12 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
 .date-range-row input[type=date]:focus{border-color:var(--accent)}
 .date-filter-active{border-color:var(--accent)!important;color:var(--accent)!important}
 /* ─── Pie chart donut ─── */
-.donut-wrap{display:flex;align-items:center;gap:16px;padding:14px 16px}
-.donut-legend-item{margin-bottom:10px}
-.donut-legend-val{font-family:var(--mono);font-size:22px;font-weight:700;line-height:1}
-.donut-legend-lbl{font-size:11px;color:var(--muted);margin-top:2px}
+.donut-wrap{display:flex;align-items:center;gap:20px;padding:14px 16px}
+.donut-legend-item{margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.donut-legend-num{font-family:var(--mono);font-size:36px;font-weight:800;line-height:1;min-width:52px}
+.donut-legend-right{display:flex;flex-direction:column;gap:2px}
+.donut-legend-pct{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--muted)}
+.donut-legend-lbl{font-size:11px;color:var(--muted);letter-spacing:.5px}
 /* ─── Bar chart in costo areas ─── */
 .bar-chart-wrap{padding:10px 14px 14px}
 .bar-chart-title{font-family:var(--mono);font-size:10px;letter-spacing:1.5px;color:var(--muted);margin-bottom:10px}
@@ -399,13 +401,13 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
       <div class="section-sub">Seguimiento de solicitudes, pedidos y servicios</div>
       <div class="search-bar">
         <input class="search-input" id="log-search" placeholder="🔍 Buscar sol. pedido, texto, proveedor..." oninput="renderLogistica()">
-        <select class="form-control" style="width:160px" id="log-f-estado" onchange="renderLogistica()">
+        <select class="form-control" style="width:165px" id="log-f-estadoMP" onchange="renderLogistica()">
           <option value="">Todos estados MP</option>
           <option>APROBADO</option><option>RECHAZADO</option>
         </select>
-        <select class="form-control" style="width:130px" id="log-f-sort" onchange="renderLogistica()">
-          <option value="desc">↓ Más reciente</option>
-          <option value="asc">↑ Más antiguo</option>
+        <select class="form-control" style="width:150px" id="log-f-estadoOP" onchange="renderLogistica()">
+          <option value="">Todos los estados</option>
+          <option>PENDIENTE</option><option>FINALIZADO</option><option>CANCELADO</option>
         </select>
         <div class="date-range-wrap">
           <button class="btn btn-ghost" id="dr-btn-log" onclick="toggleDateRange('log',event)" title="Filtrar por fecha">📅 Fecha</button>
@@ -433,7 +435,7 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
         <button class="btn btn-ghost btn-sm" onclick="toggleDeleteMode('log')">✕ Cancelar</button>
       </div>
       <div class="card"><div class="table-wrap"><table id="log-table"><thead><tr id="log-th-row">
-        <th>Fe.Sol.</th><th>Sol.Pedido</th><th>Pedido</th><th>Texto Breve</th><th>Proveedor</th>
+        <th title="Ordenado: más reciente primero" style="cursor:default">Fe.Sol. ↓</th><th>Sol.Pedido</th><th>Pedido</th><th>Texto Breve</th><th>Proveedor</th>
         <th>Valor</th><th>Moneda</th><th>Estado</th><th>N°Factura</th><th>Ingreso MP</th><th>Estado MP</th><th>Comentario</th><th>Acc.</th>
       </tr></thead><tbody id="log-tbody"></tbody></table></div></div>
     </div>
@@ -635,15 +637,15 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
     <div class="modal-body">
       <div class="section-divider">IDENTIFICACIÓN</div>
       <div class="form-grid3">
-        <div class="form-group"><label>Temporada</label><div class="combo-wrap"><select class="form-control" id="ot-temporada"></select><button class="combo-add-btn" onclick="addComboOption('ot-temporada','temporadas','Temporada')">✏️</button></div></div>
-        <div class="form-group"><label>Área Solicitante</label><div class="combo-wrap"><select class="form-control" id="ot-area-sol"></select><button class="combo-add-btn" onclick="addComboOption('ot-area-sol','areas','Área')">✏️</button></div></div>
+        <div class="form-group"><label>Temporada</label><div class="combo-wrap"><select class="form-control" id="ot-temporada"></select><button class="combo-add-btn" onclick="openComboMgr('ot-temporada','temporadas','Temporada')">✏️</button></div></div>
+        <div class="form-group"><label>Área Solicitante</label><div class="combo-wrap"><select class="form-control" id="ot-area-sol"></select><button class="combo-add-btn" onclick="openComboMgr('ot-area-sol','areas','Área Solicitante')">✏️</button></div></div>
         <div class="form-group"><label>Tipo de Mantenimiento</label><select class="form-control" id="ot-tipo"><option>Correctivo</option><option>Preventivo</option><option>Predictivo</option><option>Mejora</option></select></div>
       </div>
       <div class="section-divider" style="margin-top:14px">UBICACIÓN Y EQUIPO</div>
       <div class="form-grid">
-        <div class="form-group"><label>Sistema</label><div class="combo-wrap"><select class="form-control" id="ot-sistema"></select><button class="combo-add-btn" onclick="addComboOption('ot-sistema','sistemas','Sistema')">✏️</button></div></div>
-        <div class="form-group"><label>Subsistema</label><div class="combo-wrap"><select class="form-control" id="ot-subsistema"></select><button class="combo-add-btn" onclick="addComboOption('ot-subsistema','subsistemas','Subsistema')">✏️</button></div></div>
-        <div class="form-group"><label>Ubicación</label><div class="combo-wrap"><select class="form-control" id="ot-ubicacion"></select><button class="combo-add-btn" onclick="addComboOption('ot-ubicacion','ubicaciones','Ubicación')">✏️</button></div></div>
+        <div class="form-group"><label>Sistema</label><div class="combo-wrap"><select class="form-control" id="ot-sistema"></select><button class="combo-add-btn" onclick="openComboMgr('ot-sistema','sistemas','Sistema')">✏️</button></div></div>
+        <div class="form-group"><label>Subsistema</label><div class="combo-wrap"><select class="form-control" id="ot-subsistema"></select><button class="combo-add-btn" onclick="openComboMgr('ot-subsistema','subsistemas','Subsistema')">✏️</button></div></div>
+        <div class="form-group"><label>Ubicación</label><div class="combo-wrap"><select class="form-control" id="ot-ubicacion"></select><button class="combo-add-btn" onclick="openComboMgr('ot-ubicacion','ubicaciones','Ubicación')">✏️</button></div></div>
         <div class="form-group"><label>Equipo / TAG *</label><div class="combo-wrap"><select class="form-control" id="ot-equipo"></select><button class="combo-add-btn" onclick="openModal('modal-eq')">✏️</button></div></div>
       </div>
       <div class="section-divider" style="margin-top:14px">ACTIVIDAD</div>
@@ -1084,7 +1086,7 @@ let renamingKPIId=null;
 let deleteContext={type:'',mode:''};
 let dashAreaFilter=new Set(['__ALL__']); // __ALL__ = todas las áreas
 
-const SUM_COLS=[{key:'status',label:'Status'},{key:'posSol',label:'Pos.Sol.Pedido'},{key:'tipoImp',label:'Tipo Imputación'},{key:'tipoPos',label:'Tipo Posición'},{key:'material',label:'Material'},{key:'texto',label:'Texto Breve'},{key:'cant',label:'Cantidad'},{key:'um',label:'UM'},{key:'precio',label:'Precio Val.'},{key:'moneda',label:'Moneda'},{key:'centro',label:'Centro'},{key:'pedido',label:'Pedido'},{key:'grupoArt',label:'Grupo Art.'},{key:'valorTotal',label:'Valor Total'},{key:'posEd',label:'Pos.Pedido'},{key:'fechaOC',label:'Fe.Orden Compra'},{key:'grupoComp',label:'Grupo Compras'},{key:'solicitante',label:'Solicitante'},{key:'creadoPorSAP',label:'Creado Por'},{key:'tipoFe',label:'Tipo Fe.Entrega'},{key:'fechaEnt',label:'Fe.Entrega'},{key:'almacen',label:'Almacén'},{key:'urgencia',label:'Urgencia'},{key:'numNec',label:'N° Necesidad'},{key:'statusTrat',label:'Status Trat.'},{key:'statusTratSol',label:'Status Trat.Sol.'}];
+const SUM_COLS=[{key:'solped',label:'Sol.Pedido'},{key:'status',label:'Status'},{key:'posSol',label:'Pos.Sol.Pedido'},{key:'tipoImp',label:'Tipo Imputación'},{key:'tipoPos',label:'Tipo Posición'},{key:'material',label:'Material'},{key:'texto',label:'Texto Breve'},{key:'cant',label:'Cantidad'},{key:'um',label:'UM'},{key:'precio',label:'Precio Val.'},{key:'moneda',label:'Moneda'},{key:'centro',label:'Centro'},{key:'pedido',label:'Pedido'},{key:'grupoArt',label:'Grupo Art.'},{key:'valorTotal',label:'Valor Total'},{key:'posEd',label:'Pos.Pedido'},{key:'fechaOC',label:'Fe.Orden Compra'},{key:'grupoComp',label:'Grupo Compras'},{key:'solicitante',label:'Solicitante'},{key:'creadoPorSAP',label:'Creado Por'},{key:'tipoFe',label:'Tipo Fe.Entrega'},{key:'fechaEnt',label:'Fe.Entrega'},{key:'almacen',label:'Almacén'},{key:'urgencia',label:'Urgencia'},{key:'numNec',label:'N° Necesidad'},{key:'statusTrat',label:'Status Trat.'},{key:'statusTratSol',label:'Status Trat.Sol.'}];
 let visibleSumCols=SUM_COLS.map(c=>c.key);
 
 /* ── DASHBOARD LAYOUT ── */
@@ -1136,6 +1138,8 @@ window.doLogout=function(){unsubscribers.forEach(u=>u());sessionStorage.removeIt
 
 /* ── BOOT ── */
 function bootApp(){
+  // Limpiar modo borrado al iniciar
+  Object.keys(deleteMode).forEach(k=>{deleteMode[k]=false;});
   document.getElementById('app').style.display='block';
   document.getElementById('user-display-name').textContent=currentUser.name;
   document.getElementById('user-role-label').textContent=ROLE_LABELS[currentUser.role]||currentUser.role;
@@ -1177,6 +1181,8 @@ function computeOTCounter(){
 
 /* ── NAV ── */
 window.navigate=function(page,el){
+  // Reset delete mode al navegar (nunca quede activo en otra página)
+  Object.keys(deleteMode).forEach(k=>{deleteMode[k]=false;});
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   const pg=document.getElementById('page-'+page);if(!pg)return;
@@ -1592,9 +1598,9 @@ function renderOT(){
   const stats={Abierta:0,'En proceso':0,Pausada:0,Cerrada:0};
   filterOTByUser().forEach(o=>stats[o.estado]=(stats[o.estado]||0)+1);
   document.getElementById('ot-stats').innerHTML=Object.entries(stats).map(([k,v])=>`<div class="stat-box"><div class="val">${v}</div><div class="lbl">${k}</div></div>`).join('');
-  // Update del-col header
+  // Update del-col header — solo muestra columna vacía sin checkbox (ya está en del-bar)
   const thRow=document.getElementById('ot-th-row');
-  if(thRow){const existing=thRow.querySelector('th.del-col');if(isDelMode&&!existing){const th=document.createElement('th');th.className='del-col';th.innerHTML=`<input type="checkbox" class="del-all-chk" onchange="selectAllRows('ot',this)">`;thRow.insertBefore(th,thRow.firstChild);}else if(!isDelMode&&existing){existing.remove();}}
+  if(thRow){const existing=thRow.querySelector('th.del-col');if(isDelMode&&!existing){const th=document.createElement('th');th.className='del-col';th.style.cssText='width:28px';th.innerHTML='';thRow.insertBefore(th,thRow.firstChild);}else if(!isDelMode&&existing){existing.remove();}}
   const canWrite=ROLE_WRITE[currentUser.role];
   document.getElementById('btn-nueva-ot').style.display=canWrite&&!isDelMode?'':'none';
   document.getElementById('ot-tbody').innerHTML=list.length?list.map(o=>`<tr>
@@ -1617,8 +1623,7 @@ function renderOT(){
     <td>${estadoBadge(o.estado)}</td>
     <td style="font-family:var(--mono);font-size:11px">${o.costoMat||'—'}</td>
     <td style="display:flex;gap:3px;flex-wrap:nowrap">
-      <button class="btn btn-ghost btn-sm" onclick="verOT('${o.id}')">👁</button>
-      ${canWrite&&!isDelMode?`<button class="btn btn-ghost btn-sm" title="Editar OT" onclick="openEditOT('${o.id}')">✏️</button><button class="btn btn-ghost btn-sm" onclick="openCambioEstadoOT('${o.id}','${o.num}','${o.estado}','${o.avance||0}')">Estado</button>`:isDelMode?'':''}
+      ${canWrite&&!isDelMode?`<button class="btn btn-ghost btn-sm" onclick="openCambioEstadoOT('${o.id}','${o.num}','${o.estado}','${o.avance||0}')">Estado</button><button class="btn btn-ghost btn-sm" onclick="verOT('${o.id}')">👁</button><button class="btn btn-ghost btn-sm" title="Editar OT" onclick="openEditOT('${o.id}')">✏️</button>`:isDelMode?'':''}
     </td></tr>`).join(''):`<tr><td colspan="${isDelMode?19:18}">${emptyMsg('Sin órdenes de trabajo')}</td></tr>`;
 }
 window.openEditOT=function(id){
@@ -1830,19 +1835,20 @@ function exportPDF(title,data,keys){
 /* ── LOGÍSTICA ── */
 function renderLogistica(){
   const search=document.getElementById('log-search')?.value?.toLowerCase()||'';
-  const fEstado=document.getElementById('log-f-estado')?.value||'';
-  const sortDir=document.getElementById('log-f-sort')?.value||'desc';
+  const fEstadoMP=document.getElementById('log-f-estadoMP')?.value||'';
+  const fEstadoOP=document.getElementById('log-f-estadoOP')?.value||'';
+  const sortDir='desc';
   const isDelMode=deleteMode['log'];
   const bar=document.getElementById('del-bar-log');if(bar)bar.classList.toggle('active',isDelMode);
   const btnDel=document.getElementById('btn-del-log');if(btnDel)btnDel.textContent=isDelMode?'✕ Salir':'🗑 Borrar';
   let list=logData.filter(s=>{
-    const m=!search||(s.solped||'').toLowerCase().includes(search)||(s.texto||'').toLowerCase().includes(search)||(s.proveedor||'').toLowerCase().includes(search)||(s.pedido||'').toLowerCase().includes(search);
-    return m&&(!fEstado||s.estadoMP===fEstado)&&inDateRange(s.fesol||'','log');
+    const m=!search||(s.solped||'').toLowerCase().includes(search)||(s.texto||'').toLowerCase().includes(search)||(s.proveedor||'').toLowerCase().includes(search)||(s.pedido||'').toLowerCase().includes(search)||(s.factura||'').toLowerCase().includes(search);
+    return m&&(!fEstadoMP||s.estadoMP===fEstadoMP)&&(!fEstadoOP||s.estadoOP===fEstadoOP)&&inDateRange(s.fesol||'','log');
   });
   list=list.sort((a,b)=>{const da=a.fesol||'',db=b.fesol||'';return sortDir==='asc'?da.localeCompare(db):db.localeCompare(da);});
   const canWrite=ROLE_WRITE[currentUser.role];
   const thRow=document.getElementById('log-th-row');
-  if(thRow){const ec=thRow.querySelector('th.del-col');if(isDelMode&&!ec){const th=document.createElement('th');th.className='del-col';th.innerHTML=`<input type="checkbox" class="del-all-chk" onchange="selectAllRows('log',this)">`;thRow.insertBefore(th,thRow.firstChild);}else if(!isDelMode&&ec)ec.remove();}
+  if(thRow){const ec=thRow.querySelector('th.del-col');if(isDelMode&&!ec){const th=document.createElement('th');th.className='del-col';th.style.cssText='width:28px';th.innerHTML='';thRow.insertBefore(th,thRow.firstChild);}else if(!isDelMode&&ec)ec.remove();}
   document.getElementById('log-tbody').innerHTML=list.length?list.map(s=>`<tr>
     ${isDelMode?`<td class="del-col"><input type="checkbox" class="del-row-chk del-row-chk-log" value="${s.id}" onchange="updDelCount('log')"></td>`:''}
     <td style="font-family:var(--mono);font-size:11px">${s.fesol||'—'}</td>
@@ -1874,7 +1880,7 @@ function renderSuministros(){
   const list=sumData.filter(s=>(!search||Object.values(s).some(v=>String(v).toLowerCase().includes(search)))&&inDateRange(s.fechaOC||s.fechaEnt||'','sum'));
   const cols=SUM_COLS.filter(c=>visibleSumCols.includes(c.key));
   const canWrite=ROLE_WRITE[currentUser.role];
-  const delTh=isDelMode?'<th class="del-col"><input type="checkbox" class="del-all-chk" onchange="selectAllRows(&#39;sum&#39;,this)"></th>':'';
+  const delTh=isDelMode?'<th class="del-col" style="width:28px"></th>':'';
   document.getElementById('sum-table-card').innerHTML=`<div class="table-wrap"><table><thead><tr>${delTh}${cols.map(c=>`<th>${c.label}</th>`).join('')}</tr></thead><tbody>${list.length?list.map(s=>`<tr>${isDelMode?`<td class="del-col"><input type="checkbox" class="del-row-chk del-row-chk-sum" value="${s.id}" onchange="updDelCount('sum')"></td>`:''}${cols.map(c=>`<td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px">${s[c.key]||'—'}</td>`).join('')}</tr>`).join(''):`<tr><td colspan="${cols.length+(isDelMode?1:0)}">${emptyMsg('Sin suministros')}</td></tr>`}</tbody></table></div>`;
 }
 window.saveSum=async function(){const fields={status:'sum-status',posSol:'sum-pos-sol',tipoImp:'sum-tipo-imp',tipoPos:'sum-tipo-pos',material:'sum-material',texto:'sum-texto',cant:'sum-cant',um:'sum-um',precio:'sum-precio',moneda:'sum-moneda',centro:'sum-centro',pedido:'sum-pedido',grupoArt:'sum-grupo-art',valorTotal:'sum-valor-total',posEd:'sum-pos-ped',fechaOC:'sum-fecha-oc',grupoComp:'sum-grupo-comp',solicitante:'sum-solicitante',creadoPorSAP:'sum-creado-por',tipoFe:'sum-tipo-fe',fechaEnt:'sum-fecha-ent',almacen:'sum-almacen',urgencia:'sum-urgencia',numNec:'sum-num-nec',statusTrat:'sum-status-trat',statusTratSol:'sum-status-trat-sol'};const data={createdAt:serverTimestamp(),creadoPor:currentUser.name};Object.entries(fields).forEach(([k,id])=>{const el=document.getElementById(id);if(el)data[k]=el.value;});await addDoc(collection(db,'suministros'),data);closeModal('modal-sum');toast('Suministro registrado','success');};
@@ -2238,7 +2244,7 @@ function svgDonut(slices){
     angle+=sweep;
     return{d,color:s.color,label:s.label,value:s.value,pct:Math.round(s.value/total*100)};
   }).filter(Boolean);
-  return`<div class="donut-wrap"><svg width="150" height="150" viewBox="0 0 150 150">${paths.map(p=>`<path d="${p.d}" fill="${p.color}" stroke="var(--surface)" stroke-width="3"><title>${p.label}: ${p.value}</title></path>`).join('')}</svg><div>${paths.map(p=>`<div class="donut-legend-item"><div style="display:flex;align-items:center;gap:6px;margin-bottom:3px"><div style="width:10px;height:10px;border-radius:2px;background:${p.color}"></div><span style="font-size:12px;color:var(--muted)">${p.label}</span></div><div class="donut-legend-val" style="color:${p.color}">${p.value}</div><div class="donut-legend-lbl">${p.pct}% del total</div></div>`).join('')}</div></div>`;
+  return`<div class="donut-wrap"><svg width="140" height="140" viewBox="0 0 150 150">${paths.map(p=>`<path d="${p.d}" fill="${p.color}" stroke="var(--surface)" stroke-width="3"><title>${p.label}: ${p.value}</title></path>`).join('')}</svg><div style="display:flex;flex-direction:column;gap:14px;justify-content:center">${paths.map(p=>`<div class="donut-legend-item"><div style="width:12px;height:12px;border-radius:3px;background:${p.color};flex-shrink:0;margin-top:6px"></div><div class="donut-legend-num" style="color:${p.color}">${p.value}</div><div class="donut-legend-right"><div class="donut-legend-pct" style="color:${p.color}">${p.pct}%</div><div class="donut-legend-lbl">${p.label.toUpperCase()}</div></div></div>`).join('')}</div></div>`;
 }
 
 /* ── RENAME WIDGET ── */
