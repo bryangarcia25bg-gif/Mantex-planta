@@ -6,7 +6,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MANTEX — Gestión de Mantenimiento</title>
+<title>MANTEX v16 — Gestión de Mantenimiento</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
@@ -345,6 +345,39 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
 .kb2-fv{color:var(--text)}
 @media(max-width:900px){.kb2-board{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:480px){.kb2-board{grid-template-columns:1fr}}
+
+/* ── Programación Actividades ── */
+.prog-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:16px;overflow-x:auto}
+.prog-tab{padding:9px 18px;font-family:var(--mono);font-size:11px;letter-spacing:1.5px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s,border-color .15s}
+.prog-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.prog-tab:hover{color:var(--text)}
+.prog-panel{display:none}.prog-panel.active{display:block}
+/* Cronograma */
+.crono-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.crono-table{border-collapse:collapse;width:100%;min-width:700px}
+.crono-table th,.crono-table td{border:1px solid var(--border);padding:7px 10px;font-size:12px}
+.crono-table th{background:var(--surface2);font-family:var(--mono);font-size:10px;letter-spacing:1px;text-align:center;color:var(--muted)}
+.crono-table th.crono-day{min-width:90px}
+.crono-table th.crono-day.today-col{background:rgba(240,165,0,.15);color:var(--accent)}
+.crono-table td.crono-act{font-size:11px;color:var(--text)}
+.crono-cell{padding:2px 0;display:flex;align-items:center;gap:4px}
+.crono-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.crono-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:140px}
+.prog-kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:4px}
+.prog-kb-col{background:var(--surface2);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.prog-kb-hdr{padding:11px 13px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;border-top:3px solid transparent}
+.prog-kb-lbl{font-family:var(--mono);font-size:11px;letter-spacing:2px;font-weight:700}
+.prog-kb-cnt{font-family:var(--mono);font-size:13px;font-weight:700;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:1px 9px}
+.prog-kb-cards{padding:8px;display:flex;flex-direction:column;gap:8px;min-height:60px}
+.prog-kb-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 12px}
+.prog-kb-num{font-family:var(--mono);font-size:10px;color:var(--accent);font-weight:700;margin-bottom:4px}
+.prog-kb-desc{font-size:12px;font-weight:500;line-height:1.4;margin-bottom:5px}
+.prog-kb-meta{font-size:11px;color:var(--muted)}
+.prog-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-family:var(--mono);font-weight:700}
+.pbg-preventivo{background:rgba(0,212,170,.15);color:#00d4aa;border:1px solid rgba(0,212,170,.3)}
+.pbg-diario{background:rgba(30,144,255,.15);color:#1e90ff;border:1px solid rgba(30,144,255,.3)}
+@media(max-width:900px){.prog-kanban{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.prog-kanban{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -572,6 +605,74 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
         <button class="btn btn-ghost btn-sm" onclick="toggleDeleteMode('sum')">✕ Cancelar</button>
       </div>
       <div class="card" id="sum-table-card"></div>
+    </div>
+
+
+    <!-- PROGRAMACIÓN ACTIVIDADES -->
+    <div class="page" id="page-prog">
+      <div class="section-title">PROGRAMACIÓN DE ACTIVIDADES</div>
+      <div class="section-sub">Plan de mantenimiento preventivo, actividades diarias y cronograma semanal</div>
+
+      <!-- Sub-tabs -->
+      <div class="prog-tabs">
+        <div class="prog-tab active" id="ptab-preventivo" onclick="switchProgTab('preventivo')">&#128200; PREVENTIVO</div>
+        <div class="prog-tab" id="ptab-diario" onclick="switchProgTab('diario')">&#128197; DIARIO</div>
+        <div class="prog-tab" id="ptab-cronograma" onclick="switchProgTab('cronograma')">&#128198; CRONOGRAMA</div>
+        <div class="prog-tab" id="ptab-kanban" onclick="switchProgTab('kanban')">&#128204; KANBAN</div>
+      </div>
+
+      <!-- Panel: Preventivo -->
+      <div class="prog-panel active" id="ppanel-preventivo">
+        <div class="search-bar">
+          <input class="search-input" id="prog-search-prev" placeholder="&#128269; Buscar actividad, equipo, responsable..." oninput="renderProgTable('preventivo')">
+          <button class="btn btn-ghost" id="btn-del-prog-prev" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDeleteMode('prog-prev')">&#128465; Borrar</button>
+          <button class="btn btn-primary" onclick="openProgModal('Preventivo')">+ Nueva Actividad</button>
+        </div>
+        <div class="del-mode-bar" id="del-bar-prog-prev">
+          <input type="checkbox" class="del-all-chk" onchange="selectAllRows('prog-prev',this)"> <span>Seleccionar todo</span>
+          <span style="margin-left:8px;color:var(--muted)">|</span>
+          <span><b class="del-count-sp">0</b> seleccionado(s)</span>
+          <button class="btn btn-danger btn-sm" onclick="execBulkDelete('prog-prev')">&#128465; Eliminar</button>
+          <button class="btn btn-ghost btn-sm" onclick="toggleDeleteMode('prog-prev')">&#10005; Cancelar</button>
+        </div>
+        <div class="card">
+          <div class="table-wrap" id="prog-prev-tbl"></div>
+        </div>
+      </div>
+
+      <!-- Panel: Diario -->
+      <div class="prog-panel" id="ppanel-diario">
+        <div class="search-bar">
+          <input class="search-input" id="prog-search-diario" placeholder="&#128269; Buscar actividad..." oninput="renderProgTable('diario')">
+          <button class="btn btn-ghost" id="btn-del-prog-diario" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDeleteMode('prog-diario')">&#128465; Borrar</button>
+          <button class="btn btn-primary" onclick="openProgModal('Diario')">+ Nueva Actividad</button>
+        </div>
+        <div class="del-mode-bar" id="del-bar-prog-diario">
+          <input type="checkbox" class="del-all-chk" onchange="selectAllRows('prog-diario',this)"> <span>Seleccionar todo</span>
+          <span style="margin-left:8px;color:var(--muted)">|</span>
+          <span><b class="del-count-sp">0</b> seleccionado(s)</span>
+          <button class="btn btn-danger btn-sm" onclick="execBulkDelete('prog-diario')">&#128465; Eliminar</button>
+          <button class="btn btn-ghost btn-sm" onclick="toggleDeleteMode('prog-diario')">&#10005; Cancelar</button>
+        </div>
+        <div class="card">
+          <div class="table-wrap" id="prog-diario-tbl"></div>
+        </div>
+      </div>
+
+      <!-- Panel: Cronograma -->
+      <div class="prog-panel" id="ppanel-cronograma">
+        <div class="search-bar" style="align-items:center">
+          <span style="font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:1px">SEMANA:</span>
+          <input type="week" class="form-control" id="crono-week-sel" style="max-width:180px" onchange="renderCronograma()">
+          <button class="btn btn-ghost btn-sm" onclick="crono_thisWeek()">Esta semana</button>
+        </div>
+        <div class="crono-wrap" id="crono-container" style="margin-top:12px"></div>
+      </div>
+
+      <!-- Panel: Kanban -->
+      <div class="prog-panel" id="ppanel-kanban">
+        <div id="prog-kb-wrap" style="margin-top:4px"></div>
+      </div>
     </div>
 
     <!-- EQUIPOS -->
@@ -858,6 +959,70 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
     <div class="modal-header"><h2 id="del-title">BORRAR DATOS</h2><button class="modal-close" onclick="closeModal('modal-delete')">✕</button></div>
     <div class="modal-body" id="del-body"></div>
     <div class="modal-footer" id="del-footer"></div>
+  </div>
+</div>
+
+<!-- MODAL PROG ACTIVIDAD -->
+<div class="modal-overlay" id="modal-prog">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-header">
+      <h2 id="prog-modal-title">NUEVA ACTIVIDAD</h2>
+      <button class="modal-close" onclick="closeModal('modal-prog')">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label>Tipo *</label>
+          <select class="form-control" id="prog-tipo">
+            <option value="Preventivo">Preventivo</option>
+            <option value="Correctivo">Correctivo</option>
+            <option value="Predictivo">Predictivo</option>
+            <option value="Diario">Diario</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Estado</label>
+          <select class="form-control" id="prog-estado">
+            <option value="Pendiente">Pendiente</option>
+            <option value="En proceso">En proceso</option>
+            <option value="Completada">Completada</option>
+            <option value="Cancelada">Cancelada</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label>Descripci&#243;n / Actividad *</label>
+        <input class="form-control" id="prog-desc" placeholder="Descripci&#243;n de la actividad...">
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>Equipo</label>
+          <input class="form-control" id="prog-equipo" placeholder="Equipo o sistema">
+        </div>
+        <div class="form-group"><label>Responsable</label>
+          <input class="form-control" id="prog-resp" placeholder="T&#233;cnico responsable">
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>Fecha Inicio *</label>
+          <input type="date" class="form-control" id="prog-fecha-ini">
+        </div>
+        <div class="form-group"><label>Fecha Final</label>
+          <input type="date" class="form-control" id="prog-fecha-fin">
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>A&#241;o</label>
+          <input type="number" class="form-control" id="prog-anio" min="2020" max="2035">
+        </div>
+        <div class="form-group"><label>Semana Inicio</label>
+          <input type="week" class="form-control" id="prog-semana">
+        </div>
+      </div>
+      <div class="form-group"><label>Observaciones</label>
+        <textarea class="form-control" id="prog-obs" rows="2" placeholder="Notas adicionales..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-prog')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveProg()">Guardar</button>
+    </div>
   </div>
 </div>
 
@@ -1221,19 +1386,19 @@ const firebaseConfig = {
 const ROLE_LABELS={planner:"Planner",supervisor:"Supervisor",tecnico:"Técnico",jefatura:"Jefatura"};
 const ROLE_WRITE={planner:true,supervisor:true,tecnico:false,jefatura:false};
 const NAV_CONFIG={
-  planner:['dashboard','kanban','ot','logistica','suministros','equipos','materiales','herramientas','epp','tecnicos','usuarios','reportes'],
-  supervisor:['dashboard','kanban','ot','logistica','suministros','equipos','materiales','herramientas','epp','tecnicos','reportes'],
+  planner:['dashboard','kanban','ot','logistica','suministros','prog','equipos','materiales','herramientas','epp','tecnicos','usuarios','reportes'],
+  supervisor:['dashboard','kanban','ot','logistica','suministros','prog','equipos','materiales','herramientas','epp','tecnicos','reportes'],
   tecnico:['ot'],
-  jefatura:['dashboard','kanban','ot','logistica','suministros','reportes']
+  jefatura:['dashboard','kanban','ot','logistica','suministros','prog','reportes']
 };
-const NAV_LABELS={dashboard:'Dashboard',kanban:'Kanban OT',ot:'Órdenes de Trabajo',logistica:'SAP — Servicios',suministros:'SAP — Suministros',equipos:'Equipos',materiales:'Materiales',herramientas:'Herramientas',epp:'Entrega EPPs',tecnicos:'Técnicos',usuarios:'Gestión de Usuarios',reportes:'Indicadores'};
-const NAV_ICONS={dashboard:'📊',kanban:'📌',ot:'🛠️',logistica:'📋',suministros:'🛒',equipos:'⚙️',materiales:'📦',herramientas:'🔨',epp:'🦺',tecnicos:'👷',usuarios:'👥',reportes:'📈'};
-const NAV_SECTIONS={dashboard:'Principal',kanban:'Operaciones',ot:'Operaciones',logistica:'Operaciones',suministros:'Operaciones',equipos:'Recursos',materiales:'Recursos',herramientas:'Recursos',epp:'Recursos',tecnicos:'Recursos',usuarios:'Administración',reportes:'Análisis'};
-const PAGE_TITLES={dashboard:'DASHBOARD',kanban:'KANBAN — ÓRDENES DE TRABAJO',ot:'ÓRDENES DE TRABAJO',logistica:'SAP — SERVICIOS',suministros:'SAP — SUMINISTROS',equipos:'EQUIPOS',materiales:'MATERIALES',herramientas:'HERRAMIENTAS',epp:'ENTREGA DE EPPs',tecnicos:'TÉCNICOS',usuarios:'GESTIÓN DE USUARIOS',reportes:'INDICADORES'};
+const NAV_LABELS={dashboard:'Dashboard',kanban:'Kanban OT',prog:'Programación',ot:'Órdenes de Trabajo',logistica:'SAP — Servicios',suministros:'SAP — Suministros',equipos:'Equipos',materiales:'Materiales',herramientas:'Herramientas',epp:'Entrega EPPs',tecnicos:'Técnicos',usuarios:'Gestión de Usuarios',reportes:'Indicadores'};
+const NAV_ICONS={dashboard:'📊',kanban:'📌',prog:'📅',ot:'🛠️',logistica:'📋',suministros:'🛒',equipos:'⚙️',materiales:'📦',herramientas:'🔨',epp:'🦺',tecnicos:'👷',usuarios:'👥',reportes:'📈'};
+const NAV_SECTIONS={dashboard:'Principal',kanban:'Operaciones',prog:'Operaciones',ot:'Operaciones',logistica:'Operaciones',suministros:'Operaciones',equipos:'Recursos',materiales:'Recursos',herramientas:'Recursos',epp:'Recursos',tecnicos:'Recursos',usuarios:'Administración',reportes:'Análisis'};
+const PAGE_TITLES={dashboard:'DASHBOARD',kanban:'KANBAN — ÓRDENES DE TRABAJO',prog:'PROGRAMACIÓN DE ACTIVIDADES',ot:'ÓRDENES DE TRABAJO',logistica:'SAP — SERVICIOS',suministros:'SAP — SUMINISTROS',equipos:'EQUIPOS',materiales:'MATERIALES',herramientas:'HERRAMIENTAS',epp:'ENTREGA DE EPPs',tecnicos:'TÉCNICOS',usuarios:'GESTIÓN DE USUARIOS',reportes:'INDICADORES'};
 
 let app,db;
 let currentUser=null;
-let otData=[],logData=[],sumData=[],eqData=[],tecData=[],eppData=[],herData=[],matData=[],actData=[],usrData=[],listasData={},eppCatData=[];
+let otData=[],logData=[],sumData=[],eqData=[],tecData=[],eppData=[],herData=[],matData=[],actData=[],usrData=[],progData=[],listasData={},eppCatData=[];
 let deleteMode={};
 let editingOTId=null,editingLogId=null,editingUsrId=null,editingEPPId=null;
 let otCounter=1;
@@ -1308,7 +1473,7 @@ function bootApp(){
   (function startClock(){const tick=()=>{const n=new Date();const hh=String(n.getHours()).padStart(2,'0');const mm=String(n.getMinutes()).padStart(2,'0');const ss=String(n.getSeconds()).padStart(2,'0');const el=document.getElementById('topbar-clock');if(el)el.textContent=hh+':'+mm+':'+ss;};tick();setInterval(tick,1000);})();
   buildNav();subscribeAll();setDefaultDates();
   const _startPage=(currentUser.role==='tecnico')?'ot':NAV_CONFIG[currentUser.role][0];
-  navigate(_startPage,null);
+  window.navigate(_startPage,null);
 }
 function buildNav(){
   const pages=NAV_CONFIG[currentUser.role]||['dashboard'];
@@ -1320,6 +1485,7 @@ function buildNav(){
 /* ── SUBS ── */
 function subscribeAll(){
   unsubscribers.push(onSnapshot(collection(db,'ot'),snap=>{otData=snap.docs.map(d=>({id:d.id,...d.data()}));computeOTCounter();updateBadges();populateOTSelect();if(isActive('page-ot'))renderOT();if(isActive('page-kanban'))renderKanbanBoard();if(isActive('page-dashboard'))renderDashboard();if(isActive('page-reportes'))renderReportes();}));
+  unsubscribers.push(onSnapshot(query(collection(db,'prog_actividades'),orderBy('fechaCreacion','desc')),snap=>{progData=snap.docs.map(d=>({id:d.id,...d.data()}));if(isActive('page-prog'))renderProg();}));
   unsubscribers.push(onSnapshot(collection(db,'logistica'),snap=>{logData=snap.docs.map(d=>({id:d.id,...d.data()}));updateBadges();if(isActive('page-logistica'))renderLogistica();if(isActive('page-dashboard'))renderDashboard();}));
   unsubscribers.push(onSnapshot(collection(db,'suministros'),snap=>{sumData=snap.docs.map(d=>({id:d.id,...d.data()}));if(isActive('page-suministros'))renderSuministros();}));
   unsubscribers.push(onSnapshot(collection(db,'equipos'),snap=>{eqData=snap.docs.map(d=>({id:d.id,...d.data()}));populateSelects();if(isActive('page-equipos'))renderEquipos();}));
@@ -1350,7 +1516,7 @@ window.navigate=function(page,el){
   pg.classList.add('active');
   document.getElementById('page-title').textContent=PAGE_TITLES[page]||page.toUpperCase();
   if(el)el.classList.add('active');else{const n=document.getElementById('nav-'+page);if(n)n.classList.add('active');}
-  const r={dashboard:renderDashboard,kanban:renderKanbanBoard,ot:renderOT,logistica:renderLogistica,suministros:renderSuministros,equipos:renderEquipos,materiales:renderMateriales,herramientas:renderHerramientas,epp:renderEPP,tecnicos:renderTecnicos,usuarios:renderUsuarios,reportes:renderReportes};
+  const r={dashboard:renderDashboard,kanban:renderKanbanBoard,prog:renderProg,ot:renderOT,logistica:renderLogistica,suministros:renderSuministros,equipos:renderEquipos,materiales:renderMateriales,herramientas:renderHerramientas,epp:renderEPP,tecnicos:renderTecnicos,usuarios:renderUsuarios,reportes:renderReportes};
   if(r[page])r[page]();
   document.querySelectorAll('.dropdown-menu').forEach(m=>m.classList.remove('open'));
 };
@@ -1742,6 +1908,269 @@ window.confirmDeleteSelected=async function(){
 /* ═══════════════════════════════════════════
    OT
 ═══════════════════════════════════════════ */
+
+
+/* ═══════════════════════════════════════════════════════
+   PROGRAMACIÓN ACTIVIDADES MODULE
+   ═══════════════════════════════════════════════════════ */
+var _activeProgTab='preventivo';
+var _editingProgId=null;
+var _savingProg=false;
+
+/* Estado colors */
+const PROG_ESTADO_COLOR={
+  'Pendiente':   {bg:'rgba(90,100,128,.2)', c:'#8892aa', b:'rgba(90,100,128,.4)'},
+  'En proceso':  {bg:'rgba(255,165,2,.15)', c:'#ffa502', b:'rgba(255,165,2,.35)'},
+  'Completada':  {bg:'rgba(0,212,170,.15)', c:'#00d4aa', b:'rgba(0,212,170,.35)'},
+  'Cancelada':   {bg:'rgba(255,71,87,.15)', c:'var(--danger)', b:'rgba(255,71,87,.35)'}
+};
+const PROG_TIPO_COLOR={
+  'Preventivo':  '#00d4aa',
+  'Correctivo':  '#ff4757',
+  'Predictivo':  '#a29bfe',
+  'Diario':      '#1e90ff'
+};
+function progEstadoBadge(e){
+  const s=PROG_ESTADO_COLOR[e]||{bg:'rgba(90,100,128,.2)',c:'#8892aa',b:'rgba(90,100,128,.4)'};
+  return `<span style="background:${s.bg};color:${s.c};border:1px solid ${s.b};border-radius:4px;padding:2px 8px;font-size:10px;font-family:var(--mono);font-weight:700">${e||'Pendiente'}</span>`;
+}
+function progTipoBadge(t){
+  const c=PROG_TIPO_COLOR[t]||'#8892aa';
+  return `<span style="background:${c}22;color:${c};border:1px solid ${c}44;border-radius:4px;padding:2px 8px;font-size:10px;font-family:var(--mono);font-weight:700">${t||'—'}</span>`;
+}
+
+window.switchProgTab=function(tab){
+  _activeProgTab=tab;
+  document.querySelectorAll('.prog-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.prog-panel').forEach(p=>p.classList.remove('active'));
+  const tabEl=document.getElementById('ptab-'+tab);
+  const panelEl=document.getElementById('ppanel-'+tab);
+  if(tabEl)tabEl.classList.add('active');
+  if(panelEl)panelEl.classList.add('active');
+  if(tab==='preventivo'||tab==='diario')renderProgTable(tab);
+  else if(tab==='cronograma')renderCronograma();
+  else if(tab==='kanban')renderProgKanban();
+};
+
+function renderProg(){
+  if(_activeProgTab==='preventivo'||_activeProgTab==='diario')renderProgTable(_activeProgTab);
+  else if(_activeProgTab==='cronograma')renderCronograma();
+  else if(_activeProgTab==='kanban')renderProgKanban();
+}
+
+function renderProgTable(subtype){
+  const isPrev=subtype==='preventivo';
+  const tipos=isPrev?['Preventivo','Correctivo','Predictivo']:['Diario'];
+  const search=(document.getElementById('prog-search-'+(isPrev?'prev':'diario'))||{value:''}).value.toLowerCase();
+  const list=progData.filter(a=>{
+    if(!tipos.includes(a.tipo))return false;
+    if(search&&!Object.values(a).join(' ').toLowerCase().includes(search))return false;
+    return true;
+  }).sort((a,b)=>(a.fechaIni||'').localeCompare(b.fechaIni||''));
+  const delKey='prog-'+(isPrev?'prev':'diario');
+  const isDelMode=deleteMode[delKey];
+  const delTh=isDelMode?'<th class="del-col"></th>':'';
+  const rows=list.map(a=>{
+    const delCell=isDelMode?`<td class="del-col"><input type="checkbox" class="del-row-chk" value="${a.id}" onchange="updateDelCount('${delKey}',this)"></td>`:'';
+    return `<tr>
+      ${delCell}
+      <td>${progTipoBadge(a.tipo)}</td>
+      <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.desc||''}</td>
+      <td>${a.fechaIni||''}</td>
+      <td>${a.semana||''}</td>
+      <td>${a.anio||''}</td>
+      <td>${a.responsable||''}</td>
+      <td>${a.fechaFin||''}</td>
+      ${progEstadoBadge(a.estado) ? `<td>${progEstadoBadge(a.estado)}</td>` : '<td></td>'}
+      <td><button class="btn btn-ghost btn-sm" onclick="editProg('${a.id}')">&#9998;</button></td>
+    </tr>`;
+  }).join('');
+  const empty=`<tr><td colspan="${isDelMode?10:9}" style="text-align:center;padding:28px;color:var(--muted)">Sin actividades registradas</td></tr>`;
+  const tblId=isPrev?'prog-prev-tbl':'prog-diario-tbl';
+  const el=document.getElementById(tblId);
+  if(!el)return;
+  el.innerHTML=`<table><thead><tr>${delTh}<th>Tipo</th><th>Descripci&#243;n / Actividad</th><th>Fecha</th><th>Semana</th><th>A&#241;o</th><th>Responsable</th><th>Fecha Final</th><th>Estado</th><th></th></tr></thead><tbody>${rows||empty}</tbody></table>`;
+}
+
+/* ── CRONOGRAMA ── */
+window.crono_thisWeek=function(){
+  const d=new Date();
+  const dow=d.getDay()||7;
+  const mon=new Date(d.getTime()-(dow-1)*86400000);
+  const y=mon.getFullYear();
+  const jan4=new Date(y,0,4);
+  const dayOfYear=(mon-new Date(y,0,0))/86400000;
+  const weekNum=Math.ceil((dayOfYear+(jan4.getDay()||7)-1)/7);
+  const w=String(weekNum).padStart(2,'0');
+  const sel=document.getElementById('crono-week-sel');
+  if(sel){sel.value=`${y}-W${w}`;}
+  renderCronograma();
+};
+
+function getWeekDays(weekVal){
+  /* weekVal = "YYYY-Www" */
+  if(!weekVal)return[];
+  const [y,wPart]=weekVal.split('-W');
+  const wn=parseInt(wPart);
+  const jan4=new Date(parseInt(y),0,4);
+  const dow=(jan4.getDay()||7)-1;
+  const weekStart=new Date(jan4.getTime()+(wn-1)*7*86400000-dow*86400000);
+  const days=[];
+  for(let i=0;i<7;i++){
+    const d=new Date(weekStart.getTime()+i*86400000);
+    days.push(d);
+  }
+  return days;
+}
+
+function renderCronograma(){
+  const container=document.getElementById('crono-container');
+  if(!container)return;
+  const sel=document.getElementById('crono-week-sel');
+  const weekVal=sel?sel.value:'';
+  if(!weekVal){container.innerHTML='<div style="color:var(--muted);padding:20px;text-align:center;font-family:var(--mono);font-size:12px">Selecciona una semana</div>';return;}
+  const days=getWeekDays(weekVal);
+  const [y,wPart]=weekVal.split('-W');
+  const today=new Date();
+  today.setHours(0,0,0,0);
+  /* Day headers */
+  const DAY_NAMES=['L','M','X','J','V','S','D'];
+  let hdrs='<th style="text-align:left;min-width:180px">EQUIPO / ACTIVIDAD</th><th style="min-width:100px">TIPO</th><th style="min-width:110px">RESPONSABLE</th>';
+  days.forEach((d,i)=>{
+    const isToday=d.getTime()===today.getTime();
+    const dateStr=d.getDate()+'/'+(d.getMonth()+1 < 10 ? '0' : '')+(d.getMonth()+1);
+    hdrs+=`<th class="crono-day${isToday?' today-col':''}">${DAY_NAMES[i]}<br>${dateStr}</th>`;
+  });
+  /* Activities for this week */
+  const weekStart=days[0];weekStart.setHours(0,0,0,0);
+  const weekEnd=days[6];weekEnd.setHours(23,59,59,999);
+  const acts=progData.filter(a=>{
+    if(!a.fechaIni)return false;
+    const fi=new Date(a.fechaIni+'T00:00:00');
+    const ff=a.fechaFin?new Date(a.fechaFin+'T23:59:59'):fi;
+    return fi<=weekEnd&&ff>=weekStart;
+  }).sort((a,b)=>(a.fechaIni||'').localeCompare(b.fechaIni||''));
+  if(!acts.length){
+    container.innerHTML='<div style="color:var(--muted);padding:28px;text-align:center;font-family:var(--mono);font-size:12px;background:var(--surface2);border-radius:10px;border:1px solid var(--border)">No hay actividades programadas para esta semana</div>';
+    return;
+  }
+  const rows=acts.map(a=>{
+    const color=PROG_TIPO_COLOR[a.tipo]||'#8892aa';
+    const fi=new Date(a.fechaIni+'T00:00:00');
+    const ff=a.fechaFin?new Date(a.fechaFin+'T23:59:59'):fi;
+    let cells='';
+    days.forEach(d=>{
+      const dt=new Date(d);dt.setHours(12,0,0,0);
+      const active=dt>=fi&&dt<=ff;
+      cells+=`<td style="${active?`background:${color}22;border-color:${color}55`:''}">${active?`<div style="width:100%;height:6px;border-radius:3px;background:${color}"></div>`:'&nbsp;'}</td>`;
+    });
+    return `<tr>
+      <td class="crono-act">${a.desc||''}</td>
+      <td>${progTipoBadge(a.tipo)}</td>
+      <td style="font-size:11px;color:var(--muted)">${a.responsable||''}</td>
+      ${cells}
+    </tr>`;
+  }).join('');
+  container.innerHTML=`<div style="font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:2px;margin-bottom:8px">SEMANA ${wPart} — ${y}</div><div class="crono-wrap"><table class="crono-table"><thead><tr>${hdrs}</tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+/* ── KANBAN ACTIVIDADES ── */
+const PROG_KB_COLS=[
+  {id:'Pendiente',  color:'#5a6480'},
+  {id:'En proceso', color:'#ffa502'},
+  {id:'Completada', color:'#00d4aa'},
+  {id:'Cancelada',  color:'#ff4757'}
+];
+function renderProgKanban(){
+  const area=document.getElementById('prog-kb-wrap');
+  if(!area)return;
+  let html='<div class="prog-kanban">';
+  PROG_KB_COLS.forEach(col=>{
+    const cards=progData.filter(a=>a.estado===col.id);
+    html+=`<div class="prog-kb-col">
+      <div class="prog-kb-hdr" style="border-top-color:${col.color}">
+        <span class="prog-kb-lbl" style="color:${col.color}">${col.id.toUpperCase()}</span>
+        <span class="prog-kb-cnt" style="color:${col.color}">${cards.length}</span>
+      </div>
+      <div class="prog-kb-cards">`;
+    if(!cards.length){html+=`<div style="text-align:center;color:var(--muted);padding:20px;font-size:12px">Sin actividades</div>`;}
+    else cards.forEach(a=>{
+      html+=`<div class="prog-kb-card">
+        <div class="prog-kb-num">${progTipoBadge(a.tipo)}</div>
+        <div class="prog-kb-desc">${a.desc||''}</div>
+        <div class="prog-kb-meta">&#128209; ${a.fechaIni||''} &nbsp;&#128101; ${a.responsable||''}</div>
+      </div>`;
+    });
+    html+=`</div></div>`;
+  });
+  html+='</div>';
+  area.innerHTML=html;
+}
+
+/* ── CRUD ── */
+window.openProgModal=function(tipo){
+  _editingProgId=null;
+  document.getElementById('prog-modal-title').textContent='NUEVA ACTIVIDAD';
+  document.getElementById('prog-tipo').value=tipo||'Preventivo';
+  document.getElementById('prog-estado').value='Pendiente';
+  document.getElementById('prog-desc').value='';
+  document.getElementById('prog-equipo').value='';
+  document.getElementById('prog-resp').value='';
+  document.getElementById('prog-fecha-ini').value=new Date().toISOString().slice(0,10);
+  document.getElementById('prog-fecha-fin').value='';
+  document.getElementById('prog-anio').value=new Date().getFullYear();
+  const wSel=document.getElementById('prog-semana');
+  if(wSel){const d=new Date();const dow=d.getDay()||7;const mon=new Date(d.getTime()-(dow-1)*86400000);const y2=mon.getFullYear();const jan4=new Date(y2,0,4);const doy=(mon-new Date(y2,0,0))/86400000;const wn=Math.ceil((doy+(jan4.getDay()||7)-1)/7);wSel.value=`${y2}-W${String(wn).padStart(2,'0')}`;}
+  document.getElementById('prog-obs').value='';
+  openModal('modal-prog');
+};
+window.editProg=function(id){
+  const a=progData.find(x=>x.id===id);if(!a)return;
+  _editingProgId=id;
+  document.getElementById('prog-modal-title').textContent='EDITAR ACTIVIDAD';
+  document.getElementById('prog-tipo').value=a.tipo||'Preventivo';
+  document.getElementById('prog-estado').value=a.estado||'Pendiente';
+  document.getElementById('prog-desc').value=a.desc||'';
+  document.getElementById('prog-equipo').value=a.equipo||'';
+  document.getElementById('prog-resp').value=a.responsable||'';
+  document.getElementById('prog-fecha-ini').value=a.fechaIni||'';
+  document.getElementById('prog-fecha-fin').value=a.fechaFin||'';
+  document.getElementById('prog-anio').value=a.anio||new Date().getFullYear();
+  const wSel=document.getElementById('prog-semana');if(wSel)wSel.value=a.semana||'';
+  document.getElementById('prog-obs').value=a.obs||'';
+  openModal('modal-prog');
+};
+window.saveProg=async function(){
+  if(_savingProg)return; _savingProg=true;
+  const tipo=document.getElementById('prog-tipo').value;
+  const estado=document.getElementById('prog-estado').value;
+  const desc=document.getElementById('prog-desc').value.trim();
+  if(!desc){toast('La descripción es obligatoria','error');_savingProg=false;return;}
+  const fechaIni=document.getElementById('prog-fecha-ini').value;
+  if(!fechaIni){toast('La fecha de inicio es obligatoria','error');_savingProg=false;return;}
+  const payload={
+    tipo,estado,desc,
+    equipo:document.getElementById('prog-equipo').value.trim(),
+    responsable:document.getElementById('prog-resp').value.trim(),
+    fechaIni,
+    fechaFin:document.getElementById('prog-fecha-fin').value,
+    anio:parseInt(document.getElementById('prog-anio').value)||new Date().getFullYear(),
+    semana:document.getElementById('prog-semana').value,
+    obs:document.getElementById('prog-obs').value.trim(),
+    creadoPor:currentUser.name
+  };
+  if(_editingProgId){
+    await updateDoc(doc(db,'prog_actividades',_editingProgId),payload);
+    toast('Actividad actualizada','success');
+  } else {
+    payload.fechaCreacion=serverTimestamp();
+    await addDoc(collection(db,'prog_actividades'),payload);
+    toast('Actividad registrada','success');
+  }
+  closeModal('modal-prog');
+  _savingProg=false;
+  _editingProgId=null;
+};
 
 /* ═══ KANBAN BOARD ═══ */
 var _kb2Drag={id:null,from:null};
@@ -2663,13 +3092,19 @@ window.setDashFilter=function(type,btn){
   badge.style.display='none';
   if(type==='year'){inp.type='hidden';inp.value=String(new Date().getFullYear());dashFilter.val=inp.value;
     const curY=new Date().getFullYear();
-    let ypHtml='<div id="year-picker" style="display:flex;flex-wrap:wrap;gap:4px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px;position:absolute;z-index:200;top:38px;left:0;min-width:180px">';
-    for(let y=curY+1;y>=2020;y--)ypHtml+=`<button onclick="_pickYear(${y})" class="filter-chip" id="ybtn-${y}" style="padding:4px 10px;min-width:56px">${y}</button>`;
+    let ypHtml='<div id="year-picker" style="display:flex;flex-wrap:wrap;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px;position:fixed;z-index:500;margin-top:6px;box-shadow:0 8px 24px rgba(0,0,0,.4)">';
+    for(let y=curY+1;y>=2020;y--)ypHtml+=`<button onclick="_pickYear(${y})" class="filter-chip" id="ybtn-${y}" style="padding:6px 14px;min-width:64px">${y}</button>`;
     ypHtml+='</div>';
-    wrap.style.position='relative';
     const existPicker=document.getElementById('year-picker');
     if(existPicker)existPicker.remove();
-    wrap.insertAdjacentHTML('beforeend',ypHtml);
+    /* Position picker below the Año button */
+    const yearBtn=document.getElementById('dflt-year');
+    document.body.insertAdjacentHTML('beforeend',ypHtml);
+    if(yearBtn){
+      const r=yearBtn.getBoundingClientRect();
+      const p=document.getElementById('year-picker');
+      if(p){p.style.top=(r.bottom+window.scrollY+4)+'px';p.style.left=r.left+'px';}
+    }
     _updateYearBtns();
     renderDashboard();}
   else if(type==='month'){inp.type='month';inp.placeholder='';}
