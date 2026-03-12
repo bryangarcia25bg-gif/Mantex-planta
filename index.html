@@ -261,10 +261,10 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
 
 /* ── Sidebar toggle ── */
 .sidebar-toggle{display:none!important}
-.sidebar-flap{position:fixed;top:50%;transform:translateY(-50%);left:232px;z-index:150;width:14px;height:52px;background:var(--surface2);border:1px solid var(--border);border-left:none;border-radius:0 8px 8px 0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:left .25s ease,opacity .15s,background .15s;opacity:.25;user-select:none}
-.sidebar-flap:hover{opacity:1;background:var(--accent);border-color:var(--accent)}
-.sidebar-flap:hover .flap-arr{color:#fff!important}
-.sidebar-flap .flap-arr{font-size:9px;color:var(--muted);line-height:1;transition:color .15s}
+.sb-flap{position:fixed;top:50%;transform:translateY(-50%);left:232px;z-index:150;width:14px;height:52px;background:var(--surface2);border:1px solid var(--border);border-left:none;border-radius:0 8px 8px 0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:left .25s ease,opacity .15s,background .15s;opacity:.22;user-select:none}
+.sb-flap:hover{opacity:1;background:var(--accent);border-color:var(--accent)}
+.sb-flap:hover span{color:#fff!important}
+.sb-flap span{font-size:9px;color:var(--muted);transition:color .15s}
 .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:98}
 .sidebar-overlay.visible{display:block}
 .sidebar{transition:transform .25s ease,background .25s}
@@ -299,10 +299,9 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
   .main.expanded{margin-left:0}
 }
 
-/* ─ Kanban técnico ─ */
 .kanban-board{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
 .kanban-col{background:var(--surface2);border:1px solid var(--border);border-radius:10px;overflow:hidden}
-.kanban-col-hdr{padding:10px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.kanban-col-hdr{padding:10px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;border-top-width:3px;border-top-style:solid}
 .kanban-col-hdr .kc-lbl{font-family:var(--mono);font-size:10px;letter-spacing:2px}
 .kanban-col-hdr .kc-cnt{background:var(--surface);border:1px solid var(--border);border-radius:20px;font-size:10px;padding:1px 8px;font-family:var(--mono)}
 .kanban-cards{padding:8px;display:flex;flex-direction:column;gap:8px;min-height:80px}
@@ -331,7 +330,7 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
   </div>
 </div>
 
-<div class="sidebar-flap" id="sidebar-flap" onclick="toggleSidebar()" title="Mostrar/Ocultar menú"><span class="flap-arr" id="flap-arr">&#9666;</span></div>
+<div class="sb-flap" id="sb-flap" onclick="toggleSidebar()" title="Mostrar/Ocultar menú"><span id="sb-flap-arr">&#9666;</span></div>
 <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebarOverlay()"></div>
 <div id="app" style="display:none">
 <nav class="sidebar">
@@ -341,7 +340,7 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
     <div class="user-pill">
       <div class="user-avatar" id="user-avatar">?</div>
       <div class="user-info"><strong id="user-display-name">—</strong><span id="user-role-label">—</span></div>
-      <button class="logout-btn" onclick="doLogout()" title="Cerrar sesión" style="font-size:11px;font-family:var(--mono);font-weight:700;padding:4px 8px;letter-spacing:1px;border:1px solid var(--border);border-radius:4px">OFF</button>
+      <button class="logout-btn" onclick="doLogout()" title="Cerrar sesión" style="font-size:11px;font-family:var(--mono);font-weight:700;padding:3px 7px;letter-spacing:1px;border:1px solid var(--border);border-radius:4px">OFF</button>
     </div>
   </div>
 </nav>
@@ -833,7 +832,7 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
         <div class="form-group"><label>Hora Fin</label><input type="time" class="form-control" id="tec-ot-fin"></div>
       </div>
       <div class="form-group"><label>% Avance</label><input type="range" class="form-control" id="tec-ot-avance" min="0" max="100" value="0" oninput="document.getElementById('tec-ot-avval').textContent=this.value+'%'"><div style="font-family:var(--mono);font-size:12px;color:var(--accent);margin-top:3px" id="tec-ot-avval">0%</div></div>
-      <div class="form-group"><label>Comentario</label><textarea class="form-control" id="tec-ot-comment" rows="2" placeholder="Observación opcional..."></textarea></div>
+      <div class="form-group"><label>Comentario</label><textarea class="form-control" id="tec-ot-comment" rows="2" placeholder="Observaci&#243;n opcional..."></textarea></div>
     </div>
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-tec-ot')">Cancelar</button><button class="btn btn-primary" onclick="saveTecOT()">Guardar</button></div>
   </div>
@@ -1121,6 +1120,29 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
 
 <div id="toast"></div>
 
+<script>
+// Detect file:// protocol — Firebase ES modules don't work from file://
+if(location.protocol==='file:'){
+  document.addEventListener('DOMContentLoaded',function(){
+    var ld=document.getElementById('loading');
+    if(ld){
+      ld.style.display='flex';
+      ld.innerHTML='<div style="text-align:center;padding:40px;max-width:480px">'
+        +'<div style="font-size:42px;margin-bottom:16px">⚠️</div>'
+        +'<div style="font-family:Bebas Neue,sans-serif;font-size:28px;color:#f0a500;letter-spacing:2px">ACCESO INCORRECTO</div>'
+        +'<div style="color:#e8edf5;margin-top:14px;font-size:14px;line-height:1.6">'
+        +'Este aplicativo <strong>no puede abrirse como archivo local</strong>.<br>'
+        +'Debes acceder a través del navegador usando la URL de GitHub Pages:</div>'
+        +'<div style="margin-top:16px;background:#181c22;border:1px solid #1e2530;border-radius:8px;padding:12px 18px;font-family:monospace;font-size:13px;color:#f0a500;word-break:break-all">'
+        +'https://bryangarcia25bg-gif.github.io/Mantex-planta</div>'
+        +'<button onclick="location.href='https://bryangarcia25bg-gif.github.io/Mantex-planta'" '
+        +'style="margin-top:18px;background:#f0a500;color:#000;border:none;border-radius:8px;padding:11px 28px;'
+        +'font-size:14px;font-weight:700;cursor:pointer;letter-spacing:1px">IR AL APLICATIVO</button>'
+        +'</div>';
+    }
+  });
+}
+</script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, getDoc, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -1149,8 +1171,21 @@ const PAGE_TITLES={dashboard:'DASHBOARD',ot:'ÓRDENES DE TRABAJO',logistica:'SAP
 
 let app,db;
 let currentUser=null;
+
+/* ─ Debounce search ─ */
+function _dbfn(fn,ms){var t;return function(){clearTimeout(t);t=setTimeout(fn,ms);};}
+window._dOT=_dbfn(function(){renderOT&&renderOT();},220);
+window._dLog=_dbfn(function(){renderLogistica&&renderLogistica();},220);
+window._dSum=_dbfn(function(){renderSuministros&&renderSuministros();},220);
+window._dMat=_dbfn(function(){renderMateriales&&renderMateriales();},220);
+window._dHer=_dbfn(function(){renderHerramientas&&renderHerramientas();},220);
+window._dEPP=_dbfn(function(){renderEPP&&renderEPP();},220);
+window._dTec=_dbfn(function(){renderTecnicos&&renderTecnicos();},220);
+window._dUsr=_dbfn(function(){renderUsuarios&&renderUsuarios();},220);
+
 let otData=[],logData=[],sumData=[],eqData=[],tecData=[],eppData=[],herData=[],matData=[],actData=[],usrData=[],listasData={},eppCatData=[];
 let deleteMode={};
+function priorBadge(p){const m={Alta:'badge-red',Media:'badge-yellow',Baja:'badge-green',Normal:'badge-gray'};return'<span class="badge '+(m[p]||'badge-gray')+'">'+(p||'Normal')+'</span>';}
 let editingOTId=null,editingLogId=null,editingUsrId=null,editingEPPId=null;
 let otCounter=1;
 let unsubscribers=[];
@@ -1197,10 +1232,11 @@ try{
   db=getFirestore(app);
   document.getElementById('loading').style.display='none';
   const saved=sessionStorage.getItem('mantex_user');
-  if(saved){currentUser=JSON.parse(saved);bootApp();}
+  if(saved){currentUser=JSON.parse(saved);try{bootApp();}catch(be){const ld=document.getElementById('loading');if(ld){ld.style.display='flex';ld.innerHTML=`<div style="text-align:center;padding:40px"><div style="font-size:38px;margin-bottom:16px">⚠️</div><div style="font-family:var(--display);font-size:26px;color:var(--accent)">ERROR INICIO</div><div style="color:var(--muted);margin-top:10px;font-size:13px">${be.message}</div></div>`;}}}
   else{document.getElementById('login-screen').style.display='flex';}
 }catch(e){
-  document.getElementById('loading').innerHTML=`<div style="text-align:center;padding:40px"><div style="font-size:38px;margin-bottom:16px">⚠️</div><div style="font-family:var(--display);font-size:26px;color:var(--accent)">ERROR CONEXIÓN</div><div style="color:var(--muted);margin-top:10px;font-size:13px">${e.message}</div></div>`;
+  const ld=document.getElementById('loading');
+  if(ld){ld.style.display='flex';ld.innerHTML=`<div style="text-align:center;padding:40px"><div style="font-size:38px;margin-bottom:16px">⚠️</div><div style="font-family:var(--display);font-size:26px;color:var(--accent)">ERROR CONEXIÓN</div><div style="color:var(--muted);margin-top:10px;font-size:13px">${e.message}</div></div>`;}
 }
 
 /* ── LOGIN ── */
@@ -1657,26 +1693,10 @@ window.confirmDeleteSelected=async function(){
 /* ═══════════════════════════════════════════
    OT
 ═══════════════════════════════════════════ */
-function renderKanbanTec(){
-  // Hide table-related controls
-  ['del-bar-ot','btn-del-ot','btn-nueva-ot','ot-stats'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='none';});
-  document.querySelectorAll('#page-ot .search-bar').forEach(e=>e.style.display='none');
-  const tableCard=document.getElementById('ot-table-card');if(tableCard)tableCard.style.display='none';
-  const area=document.getElementById('ot-kanban-area');if(!area)return;
-  const COLS=[
-    {id:'Abierta',color:'var(--info)'},
-    {id:'En proceso',color:'var(--warn)'},
-    {id:'Pausada',color:'var(--muted)'},
-    {id:'Cerrada',color:'var(--accent2)'}
-  ];
-  const list=filterOTByUser().slice().sort((a,b)=>{const na=parseInt((a.num||'').replace(/\D/g,''))||0,nb=parseInt((b.num||'').replace(/\D/g,''))||0;return nb-na;});
-  area.innerHTML='<div class="kanban-board">'+COLS.map(col=>{
-    const cards=list.filter(o=>o.estado===col.id);
-    return '<div class="kanban-col"><div class="kanban-col-hdr" style="border-top:3px solid '+col.color+'"><span class="kc-lbl" style="color:'+col.color+'">'+col.id.toUpperCase()+'</span><span class="kc-cnt">'+cards.length+'</span></div><div class="kanban-cards">'+(cards.length?cards.map(o=>'<div class="kb-card" onclick="openTecOT(''+o.id+'')">'+'<div class="kb-num">'+o.num+'</div>'+'<div class="kb-desc">'+(o.desc||'')+'</div>'+'<div class="kb-meta">&#9874; '+(o.equipo||'')+'</div>'+'<div class="kb-foot">'+priorBadge(o.prior)+'<span style="font-family:var(--mono);font-size:10px;color:var(--muted)">'+(o.fecha||'')+'</span></div></div>').join(''):'<div style="text-align:center;color:var(--muted);padding:20px;font-size:12px">Sin OT</div>')+'</div></div>';
-  }).join('')+'</div>';
-}
+
+/* ─ KANBAN TÉCNICO ─ */
 window.openTecOT=function(id){
-  const o=otData.find(x=>x.id===id);if(!o)return;
+  const o=otData.find(function(x){return x.id===id;});if(!o)return;
   editingOTId=id;
   document.getElementById('tec-ot-title').textContent=o.num+' — '+(o.equipo||'');
   document.getElementById('tec-ot-estado').value=o.estado||'Abierta';
@@ -1696,15 +1716,58 @@ window.saveTecOT=async function(){
   const avance=parseInt(document.getElementById('tec-ot-avance').value)||0;
   const comment=document.getElementById('tec-ot-comment').value.trim();
   let dur='—';
-  if(ini&&fin){const[ih,im]=ini.split(':').map(Number),[fh,fm]=fin.split(':').map(Number);let m=(fh*60+fm)-(ih*60+im);if(m<0)m+=1440;dur=Math.floor(m/60)+'h '+m%60+'m';}
-  await updateDoc(doc(db,'ot',editingOTId),{estado,horaIni:ini,horaFin:fin,duracion:dur,avance});
-  const ot=otData.find(o=>o.id===editingOTId);
-  await addActivity((ot?.num||'OT')+': "'+estado+'" '+avance+'%'+(comment?' — '+comment:''),'ot');
+  if(ini&&fin){const p1=ini.split(':').map(Number);const p2=fin.split(':').map(Number);let m=(p2[0]*60+p2[1])-(p1[0]*60+p1[1]);if(m<0)m+=1440;dur=Math.floor(m/60)+'h '+m%60+'m';}
+  await updateDoc(doc(db,'ot',editingOTId),{estado:estado,horaIni:ini,horaFin:fin,duracion:dur,avance:avance});
+  const ot=otData.find(function(o){return o.id===editingOTId;});
+  await addActivity((ot?ot.num:'OT')+': "'+estado+'" '+avance+'%'+(comment?' — '+comment:''),'ot');
   closeModal('modal-tec-ot');_savingTecOT=false;editingOTId=null;
   toast('OT actualizada','success');
 };
+function renderKanbanTec(){
+  var els=['del-bar-ot','btn-del-ot','btn-nueva-ot','ot-stats'];
+  els.forEach(function(id){var e=document.getElementById(id);if(e)e.style.display='none';});
+  document.querySelectorAll('#page-ot .search-bar').forEach(function(e){e.style.display='none';});
+  var tableCard=document.getElementById('ot-table-card');if(tableCard)tableCard.style.display='none';
+  var area=document.getElementById('ot-kanban-area');if(!area)return;
+  var COLS=[
+    {id:'Abierta',color:'var(--info)'},
+    {id:'En proceso',color:'var(--warn)'},
+    {id:'Pausada',color:'var(--muted)'},
+    {id:'Cerrada',color:'var(--accent2)'}
+  ];
+  var list=filterOTByUser().slice().sort(function(a,b){
+    var na=parseInt((a.num||'').replace(/\D/g,''))||0;
+    var nb=parseInt((b.num||'').replace(/\D/g,''))||0;
+    return nb-na;
+  });
+  var html='<div class="kanban-board">';
+  COLS.forEach(function(col){
+    var cards=list.filter(function(o){return o.estado===col.id;});
+    html+='<div class="kanban-col"><div class="kanban-col-hdr" style="border-top-color:'+col.color+'">'
+      +'<span class="kc-lbl" style="color:'+col.color+'">'+col.id.toUpperCase()+'</span>'
+      +'<span class="kc-cnt">'+cards.length+'</span></div>'
+      +'<div class="kanban-cards">';
+    if(cards.length){
+      cards.forEach(function(o){
+        html+='<div class="kb-card" onclick="openTecOT(''+o.id+'')">'
+          +'<div class="kb-num">'+o.num+'</div>'
+          +'<div class="kb-desc">'+(o.desc||'')+'</div>'
+          +'<div class="kb-meta">&#9874; '+(o.equipo||'')+'</div>'
+          +'<div class="kb-foot">'+priorBadge(o.prior)
+          +'<span style="font-family:var(--mono);font-size:10px;color:var(--muted)">'+(o.fecha||'')+'</span></div>'
+          +'</div>';
+      });
+    } else {
+      html+='<div style="text-align:center;color:var(--muted);padding:20px;font-size:12px">Sin OT</div>';
+    }
+    html+='</div></div>';
+  });
+  html+='</div>';
+  area.innerHTML=html;
+}
+
 function renderOT(){
-  if(currentUser?.role==='tecnico'){renderKanbanTec();return;}
+  if(currentUser&&currentUser.role==='tecnico'){renderKanbanTec();return;}
   const search=document.getElementById('ot-search')?.value?.toLowerCase()||'';
   const fE=document.getElementById('ot-f-estado')?.value||'';
   const fT=document.getElementById('ot-f-tipo')?.value||'';
@@ -1823,7 +1886,7 @@ window.saveOT=async function(){
   let fotoUrl='';
   const fi=document.getElementById('ot-foto');
   if(fi.files[0]){await new Promise(res=>{const r=new FileReader();r.onload=e=>{fotoUrl=e.target.result;res();};r.readAsDataURL(fi.files[0]);});}
-  const payload={desc,equipo,tecnico,temporada:document.getElementById('ot-temporada').value,areaSol:document.getElementById('ot-area-sol').value,sistema:document.getElementById('ot-sistema').value,subsistema:document.getElementById('ot-subsistema').value,ubicacion:document.getElementById('ot-ubicacion').value,tipo:document.getElementById('ot-tipo').value,estado:document.getElementById('ot-estado').value,prior:document.getElementById('ot-prior').value||'Normal',fecha:document.getElementById('ot-fecha').value||hoy(),horaIni:ini,horaFin:fin,duracion,avance,materiales:otMatsSelected.map(m=>({id:m.id,cod:m.cod||'',texto:m.texto,um:m.um,precio:m.precio,moneda:m.moneda})),costoMat:`S/ ${costo.toFixed(2)}`,obs:document.getElementById('ot-obs').value};
+  const payload={desc,equipo,tecnico,temporada:document.getElementById('ot-temporada').value,areaSol:document.getElementById('ot-area-sol').value,sistema:document.getElementById('ot-sistema').value,subsistema:document.getElementById('ot-subsistema').value,ubicacion:document.getElementById('ot-ubicacion').value,tipo:document.getElementById('ot-tipo').value,estado:document.getElementById('ot-estado').value,prior:document.getElementById('ot-prior')?.value||'Normal',fecha:document.getElementById('ot-fecha').value||hoy(),horaIni:ini,horaFin:fin,duracion,avance,materiales:otMatsSelected.map(m=>({id:m.id,cod:m.cod||'',texto:m.texto,um:m.um,precio:m.precio,moneda:m.moneda})),costoMat:`S/ ${costo.toFixed(2)}`,obs:document.getElementById('ot-obs').value};
   if(editingOTId){
     // MODO EDICIÓN
     if(fotoUrl)payload.fotoUrl=fotoUrl;
@@ -1860,7 +1923,7 @@ window.openNuevaOT=function(){
   ['ot-temporada','ot-area-sol','ot-sistema','ot-subsistema','ot-ubicacion'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   document.getElementById('ot-tipo').value='Correctivo';
   document.getElementById('ot-estado').value='Abierta';
-  document.getElementById('ot-prior').value='';
+  const _prEl=document.getElementById('ot-prior');if(_prEl)_prEl.value='';
   const otTec=document.getElementById('ot-tecnico');if(otTec)otTec.value='';
   const otEq=document.getElementById('ot-equipo');if(otEq)otEq.value='';
   document.getElementById('ot-avance').value=0;
@@ -2338,7 +2401,6 @@ function emptyMsg(msg){return`<div style="text-align:center;color:var(--muted);p
 function estadoBadge(e){return`<span class="badge ${{Abierta:'badge-blue','En proceso':'badge-yellow',Pausada:'badge-gray',Cerrada:'badge-green'}[e]||'badge-gray'}">${e||'—'}</span>`;}
 function logEstadoBadge(e){return`<span class="badge ${{Pendiente:'badge-yellow','En proceso':'badge-blue',Facturado:'badge-orange',Cerrado:'badge-green'}[e]||'badge-gray'}">${e||'—'}</span>`;}
 function tipoBadge(t){return`<span class="badge ${{Correctivo:'badge-red',Preventivo:'badge-green',Predictivo:'badge-blue',Mejora:'badge-orange'}[t]||'badge-gray'}">${t||'—'}</span>`;}
-function priorBadge(p){const cls={Alta:"badge-red",Media:"badge-yellow",Baja:"badge-green",Normal:"badge-gray"};return`<span class="badge ${cls[p]||"badge-gray"}">${p||"Normal"}</span>`}
 function criticidadBadge(c){return`<span class="badge ${{Alta:'badge-red',Media:'badge-yellow',Baja:'badge-green'}[c]||'badge-gray'}">${c||'—'}</span>`;}
 
 /* ── MODAL / DROPDOWN ── */
@@ -2507,39 +2569,26 @@ window.toggleDD=function(wrapId){const menu=document.getElementById(wrapId)?.que
 document.addEventListener('click',e=>{if(!e.target.closest('.dropdown'))document.querySelectorAll('.dropdown-menu').forEach(m=>m.classList.remove('open'));});
 
 /* ── SIDEBAR TOGGLE ── */
-function _updateFlap(){
-  const sb=document.querySelector('.sidebar');const fl=document.getElementById('sidebar-flap');const ar=document.getElementById('flap-arr');if(!fl)return;
-  const mob=window.innerWidth<=768;
-  const hidden=mob?!sb?.classList.contains('mobile-open'):sb?.classList.contains('collapsed');
-  fl.style.left=hidden?'0':'232px';
-  if(ar)ar.innerHTML=hidden?'&#9656;':'&#9666;';
+function _sbFlap(){
+  const sb=document.querySelector('.sidebar');const fl=document.getElementById('sb-flap');const ar=document.getElementById('sb-flap-arr');if(!fl)return;
+  const mob=window.innerWidth<=768;const hidden=mob?!sb?.classList.contains('mobile-open'):sb?.classList.contains('collapsed');
+  fl.style.left=hidden?'0':'232px';if(ar)ar.innerHTML=hidden?'&#9656;':'&#9666;';
 }
 window.toggleSidebar=function(){
   const sb=document.querySelector('.sidebar');const main=document.querySelector('.main');const mob=window.innerWidth<=768;
   if(mob){sb.classList.toggle('mobile-open');document.getElementById('sidebar-overlay').classList.toggle('visible',sb.classList.contains('mobile-open'));}
   else{const c=sb.classList.toggle('collapsed');main.classList.toggle('expanded',c);localStorage.setItem('mantex_sidebar_collapsed',c?'1':'0');}
-  _updateFlap();
+  _sbFlap();
 };
 window.closeSidebarOverlay=function(){
   document.querySelector('.sidebar')?.classList.remove('mobile-open');
-  document.getElementById('sidebar-overlay')?.classList.remove('visible');
-  _updateFlap();
+  document.getElementById('sidebar-overlay')?.classList.remove('visible');_sbFlap();
 };
 (function(){
   if(window.innerWidth>768){const c=localStorage.getItem('mantex_sidebar_collapsed');if(c==='1'){document.querySelector('.sidebar')?.classList.add('collapsed');document.querySelector('.main')?.classList.add('expanded');}}
-  window.addEventListener('resize',()=>{if(window.innerWidth>768){document.querySelector('.sidebar')?.classList.remove('mobile-open');document.getElementById('sidebar-overlay')?.classList.remove('visible');}setTimeout(_updateFlap,50);});
-  setTimeout(_updateFlap,200);
+  window.addEventListener('resize',()=>{if(window.innerWidth>768){document.querySelector('.sidebar')?.classList.remove('mobile-open');document.getElementById('sidebar-overlay')?.classList.remove('visible');}setTimeout(_sbFlap,50);});
+  setTimeout(_sbFlap,200);
 })();
-
-function _db(fn,ms){let t;return function(){clearTimeout(t);t=setTimeout(fn,ms);}}
-const _dOT=_db(()=>renderOT&&renderOT(),220);
-const _dLog=_db(()=>renderLogistica&&renderLogistica(),220);
-const _dSum=_db(()=>renderSuministros&&renderSuministros(),220);
-const _dMat=_db(()=>renderMateriales&&renderMateriales(),220);
-const _dHer=_db(()=>renderHerramientas&&renderHerramientas(),220);
-const _dEPP=_db(()=>renderEPP&&renderEPP(),220);
-const _dTec=_db(()=>renderTecnicos&&renderTecnicos(),220);
-const _dUsr=_db(()=>renderUsuarios&&renderUsuarios(),220);
 
 window.toast=function(msg,type='success'){const el=document.getElementById('toast');el.textContent=(type==='success'?'✅ ':type==='error'?'❌ ':'ℹ️ ')+msg;el.className=`show ${type}`;el.style.display='flex';clearTimeout(window._tt);window._tt=setTimeout(()=>el.style.display='none',3400);};
 </script>
