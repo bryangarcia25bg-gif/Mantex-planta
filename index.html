@@ -260,8 +260,11 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
 .area-bar-val{font-family:var(--mono);font-size:11px;color:var(--accent);min-width:70px;text-align:right}
 
 /* ── Sidebar toggle ── */
-.sidebar-toggle{position:fixed;top:12px;left:12px;z-index:200;background:var(--surface);border:1px solid var(--border);border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--muted);transition:all .2s;box-shadow:0 2px 8px var(--shadow)}
-.sidebar-toggle:hover{color:var(--accent);border-color:var(--accent)}
+.sidebar-toggle{display:none!important}
+.sidebar-flap{position:fixed;top:50%;transform:translateY(-50%);left:232px;z-index:150;width:14px;height:52px;background:var(--surface2);border:1px solid var(--border);border-left:none;border-radius:0 8px 8px 0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:left .25s ease,opacity .15s,background .15s;opacity:.25;user-select:none}
+.sidebar-flap:hover{opacity:1;background:var(--accent);border-color:var(--accent)}
+.sidebar-flap:hover .flap-arr{color:#fff!important}
+.sidebar-flap .flap-arr{font-size:9px;color:var(--muted);line-height:1;transition:color .15s}
 .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:98}
 .sidebar-overlay.visible{display:block}
 .sidebar{transition:transform .25s ease,background .25s}
@@ -275,7 +278,7 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
   .sidebar.mobile-open{transform:translateX(0);z-index:200}
   .main{margin-left:0!important}
   .sidebar-toggle{display:flex!important}
-  .topbar{padding:0 10px 0 52px}
+  .topbar{padding:0 10px}
   .topbar-title{font-size:15px}
   .search-bar{flex-wrap:wrap;gap:6px}
   .search-input{min-width:160px;flex:1}
@@ -295,6 +298,22 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
   .main{margin-left:232px}
   .main.expanded{margin-left:0}
 }
+
+/* ─ Kanban técnico ─ */
+.kanban-board{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.kanban-col{background:var(--surface2);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.kanban-col-hdr{padding:10px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.kanban-col-hdr .kc-lbl{font-family:var(--mono);font-size:10px;letter-spacing:2px}
+.kanban-col-hdr .kc-cnt{background:var(--surface);border:1px solid var(--border);border-radius:20px;font-size:10px;padding:1px 8px;font-family:var(--mono)}
+.kanban-cards{padding:8px;display:flex;flex-direction:column;gap:8px;min-height:80px}
+.kb-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.kb-card:hover{border-color:var(--accent);box-shadow:0 2px 10px var(--shadow)}
+.kb-num{font-family:var(--mono);font-size:11px;color:var(--accent);font-weight:700;margin-bottom:4px}
+.kb-desc{font-size:12px;margin-bottom:5px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.kb-meta{font-size:11px;color:var(--muted);margin-bottom:5px}
+.kb-foot{display:flex;align-items:center;justify-content:space-between;margin-top:4px}
+@media(max-width:768px){.kanban-board{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.kanban-board{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -312,7 +331,7 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
   </div>
 </div>
 
-<button class="sidebar-toggle" id="sidebar-toggle-btn" onclick="toggleSidebar()" title="Mostrar/Ocultar menú">☰</button>
+<div class="sidebar-flap" id="sidebar-flap" onclick="toggleSidebar()" title="Mostrar/Ocultar menú"><span class="flap-arr" id="flap-arr">&#9666;</span></div>
 <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebarOverlay()"></div>
 <div id="app" style="display:none">
 <nav class="sidebar">
@@ -322,7 +341,7 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
     <div class="user-pill">
       <div class="user-avatar" id="user-avatar">?</div>
       <div class="user-info"><strong id="user-display-name">—</strong><span id="user-role-label">—</span></div>
-      <button class="logout-btn" onclick="doLogout()" title="Cerrar sesión">⏻</button>
+      <button class="logout-btn" onclick="doLogout()" title="Cerrar sesión" style="font-size:11px;font-family:var(--mono);font-weight:700;padding:4px 8px;letter-spacing:1px;border:1px solid var(--border);border-radius:4px">OFF</button>
     </div>
   </div>
 </nav>
@@ -382,7 +401,7 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
       <div class="section-title">ÓRDENES DE TRABAJO</div>
       <div class="section-sub">Gestión y seguimiento de OT de mantenimiento</div>
       <div class="search-bar">
-        <input class="search-input" id="ot-search" placeholder="🔍 Buscar OT, equipo, técnico, subsistema, ubicación..." oninput="renderOT()">
+        <input class="search-input" id="ot-search" placeholder="🔍 Buscar OT, equipo, técnico, subsistema, ubicación..." oninput="_dOT()">
         <select class="form-control" style="width:140px" id="ot-f-estado" onchange="renderOT()">
           <option value="">Todos estados</option><option>Abierta</option><option>En proceso</option><option>Pausada</option><option>Cerrada</option>
         </select>
@@ -412,7 +431,7 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
             <div class="dropdown-item" onclick="exportData('ot','pdf')">📑 PDF</div>
           </div>
         </div>
-        <button class="btn btn-ghost" id="btn-del-ot" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDeleteMode('ot')">🗑 Borrar</button>
+        <button class="btn btn-danger" id="btn-del-ot" onclick="toggleDeleteMode('ot')">🗑 Borrar</button>
         <input type="file" id="file-ot" accept=".xlsx,.xls,.csv" style="display:none" onchange="loadFileImport(this,'ot')">
         <button class="btn btn-primary" id="btn-nueva-ot" onclick="openNuevaOT()">+ Nueva OT</button>
       </div>
@@ -424,11 +443,12 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
         <button class="btn btn-ghost btn-sm" onclick="toggleDeleteMode('ot')">✕ Cancelar</button>
       </div>
       <div class="stat-row" id="ot-stats"></div>
-      <div class="card"><div class="table-wrap"><table id="ot-table">
+      <div id="ot-kanban-area" style="padding:4px 0"></div>
+      <div class="card" id="ot-table-card"><div class="table-wrap"><table id="ot-table">
         <thead id="ot-thead"><tr id="ot-th-row">
           <th>N° OT</th><th>Temporada</th><th>Área Sol.</th><th>Sistema</th><th>Subsistema</th>
           <th>Ubicación</th><th>Equipo</th><th>Descripción</th><th>Tipo</th><th>Técnico</th>
-          <th>Fecha</th><th>H.Ini</th><th>H.Fin</th><th>Duración</th><th>% Avance</th><th>Estado</th><th>Costo Mat.</th><th>Acciones</th>
+          <th>Fecha</th><th>H.Ini</th><th>H.Fin</th><th>Duración</th><th>% Avance</th><th>Estado</th><th>Prioridad</th><th>Costo Mat.</th><th>Acciones</th>
         </tr></thead>
         <tbody id="ot-tbody"></tbody>
       </table></div></div>
@@ -439,7 +459,7 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
       <div class="section-title">SAP — SERVICIOS</div>
       <div class="section-sub">Seguimiento de solicitudes, pedidos y servicios</div>
       <div class="search-bar">
-        <input class="search-input" id="log-search" placeholder="🔍 Buscar sol. pedido, texto, proveedor..." oninput="renderLogistica()">
+        <input class="search-input" id="log-search" placeholder="🔍 Buscar sol. pedido, texto, proveedor..." oninput="_dLog()">
         <select class="form-control" style="width:165px" id="log-f-estadoMP" onchange="renderLogistica()">
           <option value="">Todos estados MP</option>
           <option>APROBADO</option><option>RECHAZADO</option>
@@ -484,7 +504,7 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
       <div class="section-title">SAP — SUMINISTROS</div>
       <div class="section-sub">Solicitudes de pedido de materiales y suministros</div>
       <div class="search-bar">
-        <input class="search-input" id="sum-search" placeholder="🔍 Buscar material, pedido, solicitante..." oninput="renderSuministros()">
+        <input class="search-input" id="sum-search" placeholder="🔍 Buscar material, pedido, solicitante..." oninput="_dSum()">
         <button class="btn btn-ghost btn-sm" onclick="openModal('modal-sum-cols')">⚙️ Columnas</button>
         <div class="date-range-wrap">
           <button class="btn btn-ghost" id="dr-btn-sum" onclick="toggleDateRange('sum',event)" title="Filtrar por fecha">📅 Fecha</button>
@@ -538,7 +558,7 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
       <div class="section-title">MATERIALES</div>
       <div class="section-sub">Lista de materiales disponibles para actividades</div>
       <div class="search-bar">
-        <input class="search-input" id="mat-search" placeholder="🔍 Buscar material, código, centro..." oninput="renderMateriales()">
+        <input class="search-input" id="mat-search" placeholder="🔍 Buscar material, código, centro..." oninput="_dMat()">
         <div class="dropdown" id="dd-import-mat">
           <button class="btn btn-ghost" onclick="toggleDD('dd-import-mat')">⬆️ Importar ▾</button>
           <div class="dropdown-menu">
@@ -566,7 +586,7 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
       <div class="section-title">HERRAMIENTAS</div>
       <div class="section-sub">Control de entrega y devolución</div>
       <div class="search-bar">
-        <input class="search-input" id="her-search" placeholder="🔍 Buscar herramienta, técnico..." oninput="renderHerramientas()">
+        <input class="search-input" id="her-search" placeholder="🔍 Buscar herramienta, técnico..." oninput="_dHer()">
         <button class="btn btn-ghost" id="btn-del-her" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDeleteMode('her')">🗑 Borrar</button>
         <button class="btn btn-primary" id="btn-nueva-her" onclick="openModal('modal-her-tipo')">+ Registrar</button>
       </div>
@@ -591,7 +611,7 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
       <div class="section-title">ENTREGA DE EPPs</div>
       <div class="section-sub">Control de equipos de protección personal</div>
       <div class="search-bar">
-        <input class="search-input" id="epp-search" placeholder="🔍 Buscar técnico o EPP..." oninput="renderEPP()">
+        <input class="search-input" id="epp-search" placeholder="🔍 Buscar técnico o EPP..." oninput="_dEPP()">
         <button class="btn btn-ghost" id="btn-gestionar-epp" onclick="openModal('modal-gestion-epp')">⚙️ Gestionar EPPs</button>
         <button class="btn btn-ghost" id="btn-del-epp" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDeleteMode('epp')">🗑 Borrar</button>
         <button class="btn btn-primary" id="btn-nuevo-epp" onclick="openModal('modal-epp')">📋 Registro de Entrega</button>
@@ -617,7 +637,7 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
       <div class="section-title">TÉCNICOS</div>
       <div class="section-sub">Personal de mantenimiento</div>
       <div class="search-bar">
-        <input class="search-input" id="tec-search" placeholder="🔍 Buscar técnico..." oninput="renderTecnicos()">
+        <input class="search-input" id="tec-search" placeholder="🔍 Buscar técnico..." oninput="_dTec()">
         <button class="btn btn-ghost" id="btn-del-tec" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDeleteMode('tec')">🗑 Borrar</button>
         <button class="btn btn-primary" id="btn-nuevo-tec" onclick="openModal('modal-tec')">+ Nuevo Técnico</button>
       </div>
@@ -637,7 +657,7 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
       <div class="section-title">GESTIÓN DE USUARIOS</div>
       <div class="section-sub">Crear y administrar accesos al sistema</div>
       <div class="search-bar">
-        <input class="search-input" id="usr-search" placeholder="🔍 Buscar usuario..." oninput="renderUsuarios()">
+        <input class="search-input" id="usr-search" placeholder="🔍 Buscar usuario..." oninput="_dUsr()">
         <button class="btn btn-ghost" id="btn-del-usr" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDeleteMode('usr')">🗑 Borrar</button>
         <button class="btn btn-primary" onclick="openModal('modal-usr')">+ Nuevo Usuario</button>
       </div>
@@ -692,6 +712,7 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
         <div class="form-group form-full"><label>Descripción *</label><textarea class="form-control" id="ot-desc" placeholder="Descripción de la OT..."></textarea></div>
         <div class="form-group"><label>Técnico Responsable *</label><select class="form-control" id="ot-tecnico"></select></div>
         <div class="form-group"><label>Estado</label><select class="form-control" id="ot-estado"><option>Abierta</option><option>En proceso</option><option>Pausada</option><option>Cerrada</option></select></div>
+        <div class="form-group"><label>Prioridad</label><select class="form-control" id="ot-prior"><option value="">Normal</option><option>Alta</option><option>Media</option><option>Baja</option></select></div>
       </div>
       <div class="section-divider" style="margin-top:14px">TIEMPO</div>
       <div class="form-grid3">
@@ -798,6 +819,23 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
     <div class="modal-header"><h2 id="del-title">BORRAR DATOS</h2><button class="modal-close" onclick="closeModal('modal-delete')">✕</button></div>
     <div class="modal-body" id="del-body"></div>
     <div class="modal-footer" id="del-footer"></div>
+  </div>
+</div>
+
+<!-- MODAL TEC-OT -->
+<div class="modal-overlay" id="modal-tec-ot">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header"><h2 id="tec-ot-title">ACTUALIZAR OT</h2><button class="modal-close" onclick="closeModal('modal-tec-ot')">&#10005;</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>Estado</label><select class="form-control" id="tec-ot-estado"><option>Abierta</option><option>En proceso</option><option>Pausada</option><option>Cerrada</option></select></div>
+      <div class="form-grid">
+        <div class="form-group"><label>Hora Inicio</label><input type="time" class="form-control" id="tec-ot-ini"></div>
+        <div class="form-group"><label>Hora Fin</label><input type="time" class="form-control" id="tec-ot-fin"></div>
+      </div>
+      <div class="form-group"><label>% Avance</label><input type="range" class="form-control" id="tec-ot-avance" min="0" max="100" value="0" oninput="document.getElementById('tec-ot-avval').textContent=this.value+'%'"><div style="font-family:var(--mono);font-size:12px;color:var(--accent);margin-top:3px" id="tec-ot-avval">0%</div></div>
+      <div class="form-group"><label>Comentario</label><textarea class="form-control" id="tec-ot-comment" rows="2" placeholder="Observación opcional..."></textarea></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-tec-ot')">Cancelar</button><button class="btn btn-primary" onclick="saveTecOT()">Guardar</button></div>
   </div>
 </div>
 
@@ -1105,7 +1143,7 @@ const NAV_CONFIG={
   jefatura:['dashboard','ot','logistica','suministros','reportes']
 };
 const NAV_LABELS={dashboard:'Dashboard',ot:'Órdenes de Trabajo',logistica:'SAP — Servicios',suministros:'SAP — Suministros',equipos:'Equipos',materiales:'Materiales',herramientas:'Herramientas',epp:'Entrega EPPs',tecnicos:'Técnicos',usuarios:'Gestión de Usuarios',reportes:'Indicadores'};
-const NAV_ICONS={dashboard:'📊',ot:'🔧',logistica:'📋',suministros:'🛒',equipos:'⚙️',materiales:'📦',herramientas:'🪛',epp:'🦺',tecnicos:'👷',usuarios:'👥',reportes:'📈'};
+const NAV_ICONS={dashboard:'📊',ot:'🔧',logistica:'📋',suministros:'🛒',equipos:'⚙️',materiales:'📦',herramientas:'🔩',epp:'🦺',tecnicos:'👷',usuarios:'👥',reportes:'📈'};
 const NAV_SECTIONS={dashboard:'Principal',ot:'Operaciones',logistica:'Operaciones',suministros:'Operaciones',equipos:'Recursos',materiales:'Recursos',herramientas:'Recursos',epp:'Recursos',tecnicos:'Recursos',usuarios:'Administración',reportes:'Análisis'};
 const PAGE_TITLES={dashboard:'DASHBOARD',ot:'ÓRDENES DE TRABAJO',logistica:'SAP — SERVICIOS',suministros:'SAP — SUMINISTROS',equipos:'EQUIPOS',materiales:'MATERIALES',herramientas:'HERRAMIENTAS',epp:'ENTREGA DE EPPs',tecnicos:'TÉCNICOS',usuarios:'GESTIÓN DE USUARIOS',reportes:'INDICADORES'};
 
@@ -1619,7 +1657,54 @@ window.confirmDeleteSelected=async function(){
 /* ═══════════════════════════════════════════
    OT
 ═══════════════════════════════════════════ */
+function renderKanbanTec(){
+  // Hide table-related controls
+  ['del-bar-ot','btn-del-ot','btn-nueva-ot','ot-stats'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='none';});
+  document.querySelectorAll('#page-ot .search-bar').forEach(e=>e.style.display='none');
+  const tableCard=document.getElementById('ot-table-card');if(tableCard)tableCard.style.display='none';
+  const area=document.getElementById('ot-kanban-area');if(!area)return;
+  const COLS=[
+    {id:'Abierta',color:'var(--info)'},
+    {id:'En proceso',color:'var(--warn)'},
+    {id:'Pausada',color:'var(--muted)'},
+    {id:'Cerrada',color:'var(--accent2)'}
+  ];
+  const list=filterOTByUser().slice().sort((a,b)=>{const na=parseInt((a.num||'').replace(/\D/g,''))||0,nb=parseInt((b.num||'').replace(/\D/g,''))||0;return nb-na;});
+  area.innerHTML='<div class="kanban-board">'+COLS.map(col=>{
+    const cards=list.filter(o=>o.estado===col.id);
+    return '<div class="kanban-col"><div class="kanban-col-hdr" style="border-top:3px solid '+col.color+'"><span class="kc-lbl" style="color:'+col.color+'">'+col.id.toUpperCase()+'</span><span class="kc-cnt">'+cards.length+'</span></div><div class="kanban-cards">'+(cards.length?cards.map(o=>'<div class="kb-card" onclick="openTecOT(''+o.id+'')">'+'<div class="kb-num">'+o.num+'</div>'+'<div class="kb-desc">'+(o.desc||'')+'</div>'+'<div class="kb-meta">&#9874; '+(o.equipo||'')+'</div>'+'<div class="kb-foot">'+priorBadge(o.prior)+'<span style="font-family:var(--mono);font-size:10px;color:var(--muted)">'+(o.fecha||'')+'</span></div></div>').join(''):'<div style="text-align:center;color:var(--muted);padding:20px;font-size:12px">Sin OT</div>')+'</div></div>';
+  }).join('')+'</div>';
+}
+window.openTecOT=function(id){
+  const o=otData.find(x=>x.id===id);if(!o)return;
+  editingOTId=id;
+  document.getElementById('tec-ot-title').textContent=o.num+' — '+(o.equipo||'');
+  document.getElementById('tec-ot-estado').value=o.estado||'Abierta';
+  document.getElementById('tec-ot-ini').value=o.horaIni||'';
+  document.getElementById('tec-ot-fin').value=o.horaFin||'';
+  document.getElementById('tec-ot-avance').value=o.avance||0;
+  document.getElementById('tec-ot-avval').textContent=(o.avance||0)+'%';
+  document.getElementById('tec-ot-comment').value='';
+  openModal('modal-tec-ot');
+};
+let _savingTecOT=false;
+window.saveTecOT=async function(){
+  if(_savingTecOT||!editingOTId)return;_savingTecOT=true;
+  const estado=document.getElementById('tec-ot-estado').value;
+  const ini=document.getElementById('tec-ot-ini').value;
+  const fin=document.getElementById('tec-ot-fin').value;
+  const avance=parseInt(document.getElementById('tec-ot-avance').value)||0;
+  const comment=document.getElementById('tec-ot-comment').value.trim();
+  let dur='—';
+  if(ini&&fin){const[ih,im]=ini.split(':').map(Number),[fh,fm]=fin.split(':').map(Number);let m=(fh*60+fm)-(ih*60+im);if(m<0)m+=1440;dur=Math.floor(m/60)+'h '+m%60+'m';}
+  await updateDoc(doc(db,'ot',editingOTId),{estado,horaIni:ini,horaFin:fin,duracion:dur,avance});
+  const ot=otData.find(o=>o.id===editingOTId);
+  await addActivity((ot?.num||'OT')+': "'+estado+'" '+avance+'%'+(comment?' — '+comment:''),'ot');
+  closeModal('modal-tec-ot');_savingTecOT=false;editingOTId=null;
+  toast('OT actualizada','success');
+};
 function renderOT(){
+  if(currentUser?.role==='tecnico'){renderKanbanTec();return;}
   const search=document.getElementById('ot-search')?.value?.toLowerCase()||'';
   const fE=document.getElementById('ot-f-estado')?.value||'';
   const fT=document.getElementById('ot-f-tipo')?.value||'';
@@ -1627,7 +1712,7 @@ function renderOT(){
   const bar=document.getElementById('del-bar-ot');
   const btnDel=document.getElementById('btn-del-ot');
   if(bar){bar.classList.toggle('active',!!isDelMode);}
-  if(btnDel){btnDel.textContent=isDelMode?'✕ Salir':'🗑 Borrar';btnDel.style.color=isDelMode?'':'';}
+  if(btnDel){btnDel.textContent=isDelMode?'✕ Salir':'🗑 Borrar';}
   let list=filterOTByUser().slice().sort((a,b)=>{const na=parseInt((a.num||'').replace(/\D/g,''))||0,nb=parseInt((b.num||'').replace(/\D/g,''))||0;return nb-na;}).filter(o=>{
     const m=!search||(o.num||'').toLowerCase().includes(search)||(o.desc||'').toLowerCase().includes(search)||(o.equipo||'').toLowerCase().includes(search)||(o.tecnico||'').toLowerCase().includes(search)||(o.subsistema||'').toLowerCase().includes(search)||(o.ubicacion||'').toLowerCase().includes(search);
     return m&&(!fE||o.estado===fE)&&(!fT||o.tipo===fT)&&inDateRange(o.fecha||'','ot');
@@ -1659,10 +1744,11 @@ function renderOT(){
     <td style="font-family:var(--mono);font-size:11px">${o.duracion||'—'}</td>
     <td><div style="display:flex;align-items:center;gap:4px"><div style="width:40px;background:var(--surface2);border-radius:3px;height:5px;overflow:hidden"><div style="width:${o.avance||0}%;height:100%;background:var(--accent2)"></div></div><span style="font-family:var(--mono);font-size:10px">${o.avance||0}%</span></div></td>
     <td>${estadoBadge(o.estado)}</td>
+    <td>${priorBadge(o.prior)}</td>
     <td style="font-family:var(--mono);font-size:11px">${o.costoMat||'—'}</td>
     <td style="display:flex;gap:3px;flex-wrap:nowrap">
       ${canWrite&&!isDelMode?`<button class="btn btn-ghost btn-sm" onclick="openCambioEstadoOT('${o.id}','${o.num}','${o.estado}','${o.avance||0}')">Estado</button><button class="btn btn-ghost btn-sm" onclick="verOT('${o.id}')">👁</button><button class="btn btn-ghost btn-sm" title="Editar OT" onclick="openEditOT('${o.id}')">✏️</button>`:isDelMode?'':''}
-    </td></tr>`).join(''):`<tr><td colspan="${isDelMode?19:18}">${emptyMsg('Sin órdenes de trabajo')}</td></tr>`;
+    </td></tr>`).join(''):`<tr><td colspan="${isDelMode?20:19}">${emptyMsg('Sin órdenes de trabajo')}</td></tr>`;
 }
 window.openEditOT=function(id){
   const o=otData.find(x=>x.id===id);if(!o)return;
@@ -1676,7 +1762,7 @@ window.openEditOT=function(id){
     const f={
       'ot-temporada':'temporada','ot-area-sol':'areaSol','ot-sistema':'sistema',
       'ot-subsistema':'subsistema','ot-ubicacion':'ubicacion','ot-equipo':'equipo',
-      'ot-tipo':'tipo','ot-tecnico':'tecnico','ot-estado':'estado'
+      'ot-tipo':'tipo','ot-tecnico':'tecnico','ot-estado':'estado','ot-prior':'prior'
     };
     Object.entries(f).forEach(([elId,field])=>{const el=document.getElementById(elId);if(el)el.value=o[field]||'';});
     document.getElementById('ot-desc').value=o.desc||'';
@@ -1737,7 +1823,7 @@ window.saveOT=async function(){
   let fotoUrl='';
   const fi=document.getElementById('ot-foto');
   if(fi.files[0]){await new Promise(res=>{const r=new FileReader();r.onload=e=>{fotoUrl=e.target.result;res();};r.readAsDataURL(fi.files[0]);});}
-  const payload={desc,equipo,tecnico,temporada:document.getElementById('ot-temporada').value,areaSol:document.getElementById('ot-area-sol').value,sistema:document.getElementById('ot-sistema').value,subsistema:document.getElementById('ot-subsistema').value,ubicacion:document.getElementById('ot-ubicacion').value,tipo:document.getElementById('ot-tipo').value,estado:document.getElementById('ot-estado').value,fecha:document.getElementById('ot-fecha').value||hoy(),horaIni:ini,horaFin:fin,duracion,avance,materiales:otMatsSelected.map(m=>({id:m.id,cod:m.cod||'',texto:m.texto,um:m.um,precio:m.precio,moneda:m.moneda})),costoMat:`S/ ${costo.toFixed(2)}`,obs:document.getElementById('ot-obs').value};
+  const payload={desc,equipo,tecnico,temporada:document.getElementById('ot-temporada').value,areaSol:document.getElementById('ot-area-sol').value,sistema:document.getElementById('ot-sistema').value,subsistema:document.getElementById('ot-subsistema').value,ubicacion:document.getElementById('ot-ubicacion').value,tipo:document.getElementById('ot-tipo').value,estado:document.getElementById('ot-estado').value,prior:document.getElementById('ot-prior').value||'Normal',fecha:document.getElementById('ot-fecha').value||hoy(),horaIni:ini,horaFin:fin,duracion,avance,materiales:otMatsSelected.map(m=>({id:m.id,cod:m.cod||'',texto:m.texto,um:m.um,precio:m.precio,moneda:m.moneda})),costoMat:`S/ ${costo.toFixed(2)}`,obs:document.getElementById('ot-obs').value};
   if(editingOTId){
     // MODO EDICIÓN
     if(fotoUrl)payload.fotoUrl=fotoUrl;
@@ -1774,6 +1860,7 @@ window.openNuevaOT=function(){
   ['ot-temporada','ot-area-sol','ot-sistema','ot-subsistema','ot-ubicacion'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   document.getElementById('ot-tipo').value='Correctivo';
   document.getElementById('ot-estado').value='Abierta';
+  document.getElementById('ot-prior').value='';
   const otTec=document.getElementById('ot-tecnico');if(otTec)otTec.value='';
   const otEq=document.getElementById('ot-equipo');if(otEq)otEq.value='';
   document.getElementById('ot-avance').value=0;
@@ -2194,7 +2281,8 @@ function renderTecnicos(){
   document.getElementById('tec-tbody').innerHTML=list.length?list.map(t=>{const otAct=otData.filter(o=>o.tecnico===t.nombre&&o.estado!=='Cerrada').length;return `<tr>${isDelTec?`<td class="del-col"><input type="checkbox" class="del-row-chk del-row-chk-tec" value="${t.id}" onchange="updDelCount('tec')"></td>`:''}<td style="font-family:var(--mono);font-size:11px;color:var(--accent)">${t.idTec||''}</td><td><strong>${t.nombre}</strong></td><td>${t.esp}</td><td>${t.turno}</td><td><span class="pill-num">${otAct}</span></td><td><span class="badge badge-green">Activo</span></td></tr>`;}).join(''):`<tr><td colspan="${isDelTec?8:7}">${emptyMsg('Sin técnicos')}</td></tr>`;
 }
 window.deleteTec=async function(id){if(!confirm('¿Eliminar?'))return;await deleteDoc(doc(db,'tecnicos',id));};
-window.saveTecnico=async function(){const nombre=document.getElementById('tec-nombre').value.trim();if(!nombre){toast('Nombre requerido','error');return;}await addDoc(collection(db,'tecnicos'),{nombre,idTec:document.getElementById('tec-id').value.trim()||`T-${String(tecData.length+1).padStart(3,'0')}`,esp:document.getElementById('tec-esp').value,turno:document.getElementById('tec-turno').value,createdAt:serverTimestamp()});closeModal('modal-tec');toast('Técnico registrado','success');document.getElementById('tec-nombre').value='';document.getElementById('tec-id').value='';};
+let _savingTec=false;
+window.saveTecnico=async function(){if(_savingTec)return;_savingTec=true;const nombre=document.getElementById('tec-nombre').value.trim();if(!nombre){toast('Nombre requerido','error');_savingTec=false;return;}await addDoc(collection(db,'tecnicos'),{nombre,idTec:document.getElementById('tec-id').value.trim()||`T-${String(tecData.length+1).padStart(3,'0')}`,esp:document.getElementById('tec-esp').value,turno:document.getElementById('tec-turno').value,createdAt:serverTimestamp()});closeModal('modal-tec');_savingTec=false;toast('Técnico registrado','success');document.getElementById('tec-nombre').value='';document.getElementById('tec-id').value='';};
 
 /* ── USUARIOS ── */
 function renderUsuarios(){
@@ -2250,6 +2338,7 @@ function emptyMsg(msg){return`<div style="text-align:center;color:var(--muted);p
 function estadoBadge(e){return`<span class="badge ${{Abierta:'badge-blue','En proceso':'badge-yellow',Pausada:'badge-gray',Cerrada:'badge-green'}[e]||'badge-gray'}">${e||'—'}</span>`;}
 function logEstadoBadge(e){return`<span class="badge ${{Pendiente:'badge-yellow','En proceso':'badge-blue',Facturado:'badge-orange',Cerrado:'badge-green'}[e]||'badge-gray'}">${e||'—'}</span>`;}
 function tipoBadge(t){return`<span class="badge ${{Correctivo:'badge-red',Preventivo:'badge-green',Predictivo:'badge-blue',Mejora:'badge-orange'}[t]||'badge-gray'}">${t||'—'}</span>`;}
+function priorBadge(p){const cls={Alta:"badge-red",Media:"badge-yellow",Baja:"badge-green",Normal:"badge-gray"};return`<span class="badge ${cls[p]||"badge-gray"}">${p||"Normal"}</span>`}
 function criticidadBadge(c){return`<span class="badge ${{Alta:'badge-red',Media:'badge-yellow',Baja:'badge-green'}[c]||'badge-gray'}">${c||'—'}</span>`;}
 
 /* ── MODAL / DROPDOWN ── */
@@ -2418,40 +2507,39 @@ window.toggleDD=function(wrapId){const menu=document.getElementById(wrapId)?.que
 document.addEventListener('click',e=>{if(!e.target.closest('.dropdown'))document.querySelectorAll('.dropdown-menu').forEach(m=>m.classList.remove('open'));});
 
 /* ── SIDEBAR TOGGLE ── */
+function _updateFlap(){
+  const sb=document.querySelector('.sidebar');const fl=document.getElementById('sidebar-flap');const ar=document.getElementById('flap-arr');if(!fl)return;
+  const mob=window.innerWidth<=768;
+  const hidden=mob?!sb?.classList.contains('mobile-open'):sb?.classList.contains('collapsed');
+  fl.style.left=hidden?'0':'232px';
+  if(ar)ar.innerHTML=hidden?'&#9656;':'&#9666;';
+}
 window.toggleSidebar=function(){
-  const sb=document.querySelector('.sidebar');
-  const main=document.querySelector('.main');
-  const isMobile=window.innerWidth<=768;
-  if(isMobile){
-    sb.classList.toggle('mobile-open');
-    document.getElementById('sidebar-overlay').classList.toggle('visible',sb.classList.contains('mobile-open'));
-  } else {
-    const collapsed=sb.classList.toggle('collapsed');
-    main.classList.toggle('expanded',collapsed);
-    localStorage.setItem('mantex_sidebar_collapsed',collapsed?'1':'0');
-  }
+  const sb=document.querySelector('.sidebar');const main=document.querySelector('.main');const mob=window.innerWidth<=768;
+  if(mob){sb.classList.toggle('mobile-open');document.getElementById('sidebar-overlay').classList.toggle('visible',sb.classList.contains('mobile-open'));}
+  else{const c=sb.classList.toggle('collapsed');main.classList.toggle('expanded',c);localStorage.setItem('mantex_sidebar_collapsed',c?'1':'0');}
+  _updateFlap();
 };
 window.closeSidebarOverlay=function(){
   document.querySelector('.sidebar')?.classList.remove('mobile-open');
   document.getElementById('sidebar-overlay')?.classList.remove('visible');
+  _updateFlap();
 };
-// Restore sidebar state on load
 (function(){
-  if(window.innerWidth>768){
-    const c=localStorage.getItem('mantex_sidebar_collapsed');
-    if(c==='1'){
-      document.querySelector('.sidebar')?.classList.add('collapsed');
-      document.querySelector('.main')?.classList.add('expanded');
-    }
-  }
-  // Close overlay on resize
-  window.addEventListener('resize',()=>{
-    if(window.innerWidth>768){
-      document.querySelector('.sidebar')?.classList.remove('mobile-open');
-      document.getElementById('sidebar-overlay')?.classList.remove('visible');
-    }
-  });
+  if(window.innerWidth>768){const c=localStorage.getItem('mantex_sidebar_collapsed');if(c==='1'){document.querySelector('.sidebar')?.classList.add('collapsed');document.querySelector('.main')?.classList.add('expanded');}}
+  window.addEventListener('resize',()=>{if(window.innerWidth>768){document.querySelector('.sidebar')?.classList.remove('mobile-open');document.getElementById('sidebar-overlay')?.classList.remove('visible');}setTimeout(_updateFlap,50);});
+  setTimeout(_updateFlap,200);
 })();
+
+function _db(fn,ms){let t;return function(){clearTimeout(t);t=setTimeout(fn,ms);}}
+const _dOT=_db(()=>renderOT&&renderOT(),220);
+const _dLog=_db(()=>renderLogistica&&renderLogistica(),220);
+const _dSum=_db(()=>renderSuministros&&renderSuministros(),220);
+const _dMat=_db(()=>renderMateriales&&renderMateriales(),220);
+const _dHer=_db(()=>renderHerramientas&&renderHerramientas(),220);
+const _dEPP=_db(()=>renderEPP&&renderEPP(),220);
+const _dTec=_db(()=>renderTecnicos&&renderTecnicos(),220);
+const _dUsr=_db(()=>renderUsuarios&&renderUsuarios(),220);
 
 window.toast=function(msg,type='success'){const el=document.getElementById('toast');el.textContent=(type==='success'?'✅ ':type==='error'?'❌ ':'ℹ️ ')+msg;el.className=`show ${type}`;el.style.display='flex';clearTimeout(window._tt);window._tt=setTimeout(()=>el.style.display='none',3400);};
 </script>
