@@ -263,8 +263,8 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
 .sidebar-toggle{display:none!important}
 .sb-flap{position:fixed;top:50%;transform:translateY(-50%);left:232px;z-index:150;width:14px;height:52px;background:var(--surface2);border:1px solid var(--border);border-left:none;border-radius:0 8px 8px 0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:left .25s ease,opacity .15s,background .15s;opacity:.22;user-select:none}
 .sb-flap:hover{opacity:1;background:var(--accent);border-color:var(--accent)}
-.sb-flap:hover span{color:#fff!important}
-.sb-flap span{font-size:9px;color:var(--muted);transition:color .15s}
+.sb-flap:hover .sb-arr{color:#fff}
+.sb-arr{font-size:9px;color:var(--muted);transition:color .15s;line-height:1}
 .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:98}
 .sidebar-overlay.visible{display:block}
 .sidebar{transition:transform .25s ease,background .25s}
@@ -299,17 +299,18 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
   .main.expanded{margin-left:0}
 }
 
+/* ─ Kanban técnico ─ */
 .kanban-board{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
 .kanban-col{background:var(--surface2);border:1px solid var(--border);border-radius:10px;overflow:hidden}
-.kanban-col-hdr{padding:10px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;border-top-width:3px;border-top-style:solid}
-.kanban-col-hdr .kc-lbl{font-family:var(--mono);font-size:10px;letter-spacing:2px}
-.kanban-col-hdr .kc-cnt{background:var(--surface);border:1px solid var(--border);border-radius:20px;font-size:10px;padding:1px 8px;font-family:var(--mono)}
+.kanban-col-hdr{padding:10px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;border-top:3px solid transparent}
+.kc-lbl{font-family:var(--mono);font-size:10px;letter-spacing:2px}
+.kc-cnt{background:var(--surface);border:1px solid var(--border);border-radius:20px;font-size:10px;padding:1px 8px;font-family:var(--mono)}
 .kanban-cards{padding:8px;display:flex;flex-direction:column;gap:8px;min-height:80px}
 .kb-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;transition:border-color .15s,box-shadow .15s}
 .kb-card:hover{border-color:var(--accent);box-shadow:0 2px 10px var(--shadow)}
 .kb-num{font-family:var(--mono);font-size:11px;color:var(--accent);font-weight:700;margin-bottom:4px}
 .kb-desc{font-size:12px;margin-bottom:5px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.kb-meta{font-size:11px;color:var(--muted);margin-bottom:5px}
+.kb-meta{font-size:11px;color:var(--muted);margin-bottom:4px}
 .kb-foot{display:flex;align-items:center;justify-content:space-between;margin-top:4px}
 @media(max-width:768px){.kanban-board{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:480px){.kanban-board{grid-template-columns:1fr}}
@@ -330,7 +331,7 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
   </div>
 </div>
 
-<div class="sb-flap" id="sb-flap" onclick="toggleSidebar()" title="Mostrar/Ocultar menú"><span id="sb-flap-arr">&#9666;</span></div>
+<div class="sb-flap" id="sb-flap" onclick="toggleSidebar()" title="Mostrar/Ocultar menú"><span class="sb-arr" id="sb-arr">&#9666;</span></div>
 <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebarOverlay()"></div>
 <div id="app" style="display:none">
 <nav class="sidebar">
@@ -340,7 +341,7 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
     <div class="user-pill">
       <div class="user-avatar" id="user-avatar">?</div>
       <div class="user-info"><strong id="user-display-name">—</strong><span id="user-role-label">—</span></div>
-      <button class="logout-btn" onclick="doLogout()" title="Cerrar sesión" style="font-size:11px;font-family:var(--mono);font-weight:700;padding:3px 7px;letter-spacing:1px;border:1px solid var(--border);border-radius:4px">OFF</button>
+      <button class="logout-btn" onclick="doLogout()" title="Cerrar sesión" style="font-size:11px;font-family:var(--mono);font-weight:700;padding:3px 8px;letter-spacing:1px;border:1px solid var(--border);border-radius:4px">OFF</button>
     </div>
   </div>
 </nav>
@@ -442,8 +443,8 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
         <button class="btn btn-ghost btn-sm" onclick="toggleDeleteMode('ot')">✕ Cancelar</button>
       </div>
       <div class="stat-row" id="ot-stats"></div>
-      <div id="ot-kanban-area" style="padding:4px 0"></div>
-      <div class="card" id="ot-table-card"><div class="table-wrap"><table id="ot-table">
+      <div id="ot-kb-area"></div>
+      <div class="card" id="ot-tbl-card"><div class="table-wrap"><table id="ot-table">
         <thead id="ot-thead"><tr id="ot-th-row">
           <th>N° OT</th><th>Temporada</th><th>Área Sol.</th><th>Sistema</th><th>Subsistema</th>
           <th>Ubicación</th><th>Equipo</th><th>Descripción</th><th>Tipo</th><th>Técnico</th>
@@ -826,15 +827,25 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
   <div class="modal" style="max-width:420px">
     <div class="modal-header"><h2 id="tec-ot-title">ACTUALIZAR OT</h2><button class="modal-close" onclick="closeModal('modal-tec-ot')">&#10005;</button></div>
     <div class="modal-body">
-      <div class="form-group"><label>Estado</label><select class="form-control" id="tec-ot-estado"><option>Abierta</option><option>En proceso</option><option>Pausada</option><option>Cerrada</option></select></div>
+      <div class="form-group"><label>Estado</label>
+        <select class="form-control" id="tec-ot-estado"><option>Abierta</option><option>En proceso</option><option>Pausada</option><option>Cerrada</option></select>
+      </div>
       <div class="form-grid">
         <div class="form-group"><label>Hora Inicio</label><input type="time" class="form-control" id="tec-ot-ini"></div>
         <div class="form-group"><label>Hora Fin</label><input type="time" class="form-control" id="tec-ot-fin"></div>
       </div>
-      <div class="form-group"><label>% Avance</label><input type="range" class="form-control" id="tec-ot-avance" min="0" max="100" value="0" oninput="document.getElementById('tec-ot-avval').textContent=this.value+'%'"><div style="font-family:var(--mono);font-size:12px;color:var(--accent);margin-top:3px" id="tec-ot-avval">0%</div></div>
-      <div class="form-group"><label>Comentario</label><textarea class="form-control" id="tec-ot-comment" rows="2" placeholder="Observaci&#243;n opcional..."></textarea></div>
+      <div class="form-group"><label>% Avance</label>
+        <input type="range" class="form-control" id="tec-ot-av" min="0" max="100" value="0" oninput="document.getElementById('tec-ot-avv').textContent=this.value+'%'">
+        <div style="font-family:var(--mono);font-size:12px;color:var(--accent);margin-top:3px" id="tec-ot-avv">0%</div>
+      </div>
+      <div class="form-group"><label>Comentario</label>
+        <textarea class="form-control" id="tec-ot-obs" rows="2" placeholder="Observaci&#243;n opcional..."></textarea>
+      </div>
     </div>
-    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-tec-ot')">Cancelar</button><button class="btn btn-primary" onclick="saveTecOT()">Guardar</button></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-tec-ot')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveTecOT()">Guardar</button>
+    </div>
   </div>
 </div>
 
@@ -1120,32 +1131,25 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
 
 <div id="toast"></div>
 
-<script>
-// Detect file:// protocol — Firebase ES modules don't work from file://
-if(location.protocol==='file:'){
-  document.addEventListener('DOMContentLoaded',function(){
-    var ld=document.getElementById('loading');
-    if(ld){
-      ld.style.display='flex';
-      ld.innerHTML='<div style="text-align:center;padding:40px;max-width:480px">'
-        +'<div style="font-size:42px;margin-bottom:16px">⚠️</div>'
-        +'<div style="font-family:Bebas Neue,sans-serif;font-size:28px;color:#f0a500;letter-spacing:2px">ACCESO INCORRECTO</div>'
-        +'<div style="color:#e8edf5;margin-top:14px;font-size:14px;line-height:1.6">'
-        +'Este aplicativo <strong>no puede abrirse como archivo local</strong>.<br>'
-        +'Debes acceder a través del navegador usando la URL de GitHub Pages:</div>'
-        +'<div style="margin-top:16px;background:#181c22;border:1px solid #1e2530;border-radius:8px;padding:12px 18px;font-family:monospace;font-size:13px;color:#f0a500;word-break:break-all">'
-        +'https://bryangarcia25bg-gif.github.io/Mantex-planta</div>'
-        +'<button onclick="location.href='https://bryangarcia25bg-gif.github.io/Mantex-planta'" '
-        +'style="margin-top:18px;background:#f0a500;color:#000;border:none;border-radius:8px;padding:11px 28px;'
-        +'font-size:14px;font-weight:700;cursor:pointer;letter-spacing:1px">IR AL APLICATIVO</button>'
-        +'</div>';
-    }
-  });
-}
-</script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, getDoc, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+/* ── Global helpers (must be before all render fns) ── */
+window._dbfn=function(fn,ms){var t;return function(){clearTimeout(t);t=setTimeout(fn,ms);};};
+window._dOT=window._dbfn(function(){typeof renderOT==='function'&&renderOT();},220);
+window._dLog=window._dbfn(function(){typeof renderLogistica==='function'&&renderLogistica();},220);
+window._dSum=window._dbfn(function(){typeof renderSuministros==='function'&&renderSuministros();},220);
+window._dMat=window._dbfn(function(){typeof renderMateriales==='function'&&renderMateriales();},220);
+window._dHer=window._dbfn(function(){typeof renderHerramientas==='function'&&renderHerramientas();},220);
+window._dEPP=window._dbfn(function(){typeof renderEPP==='function'&&renderEPP();},220);
+window._dTec=window._dbfn(function(){typeof renderTecnicos==='function'&&renderTecnicos();},220);
+window._dUsr=window._dbfn(function(){typeof renderUsuarios==='function'&&renderUsuarios();},220);
+
+function priorBadge(p){
+  var m={Alta:'badge-red',Media:'badge-yellow',Baja:'badge-green',Normal:'badge-gray'};
+  return '<span class="badge '+(m[p]||'badge-gray')+'">'+(p||'Normal')+'</span>';
+}
 
 const firebaseConfig = {
   apiKey: "AIzaSyDVFdyZLIj0Z5_kWMEazrbZD8kd4j__Jtk",
@@ -1171,21 +1175,8 @@ const PAGE_TITLES={dashboard:'DASHBOARD',ot:'ÓRDENES DE TRABAJO',logistica:'SAP
 
 let app,db;
 let currentUser=null;
-
-/* ─ Debounce search ─ */
-function _dbfn(fn,ms){var t;return function(){clearTimeout(t);t=setTimeout(fn,ms);};}
-window._dOT=_dbfn(function(){renderOT&&renderOT();},220);
-window._dLog=_dbfn(function(){renderLogistica&&renderLogistica();},220);
-window._dSum=_dbfn(function(){renderSuministros&&renderSuministros();},220);
-window._dMat=_dbfn(function(){renderMateriales&&renderMateriales();},220);
-window._dHer=_dbfn(function(){renderHerramientas&&renderHerramientas();},220);
-window._dEPP=_dbfn(function(){renderEPP&&renderEPP();},220);
-window._dTec=_dbfn(function(){renderTecnicos&&renderTecnicos();},220);
-window._dUsr=_dbfn(function(){renderUsuarios&&renderUsuarios();},220);
-
 let otData=[],logData=[],sumData=[],eqData=[],tecData=[],eppData=[],herData=[],matData=[],actData=[],usrData=[],listasData={},eppCatData=[];
 let deleteMode={};
-function priorBadge(p){const m={Alta:'badge-red',Media:'badge-yellow',Baja:'badge-green',Normal:'badge-gray'};return'<span class="badge '+(m[p]||'badge-gray')+'">'+(p||'Normal')+'</span>';}
 let editingOTId=null,editingLogId=null,editingUsrId=null,editingEPPId=null;
 let otCounter=1;
 let unsubscribers=[];
@@ -1232,11 +1223,10 @@ try{
   db=getFirestore(app);
   document.getElementById('loading').style.display='none';
   const saved=sessionStorage.getItem('mantex_user');
-  if(saved){currentUser=JSON.parse(saved);try{bootApp();}catch(be){const ld=document.getElementById('loading');if(ld){ld.style.display='flex';ld.innerHTML=`<div style="text-align:center;padding:40px"><div style="font-size:38px;margin-bottom:16px">⚠️</div><div style="font-family:var(--display);font-size:26px;color:var(--accent)">ERROR INICIO</div><div style="color:var(--muted);margin-top:10px;font-size:13px">${be.message}</div></div>`;}}}
+  if(saved){currentUser=JSON.parse(saved);bootApp();}
   else{document.getElementById('login-screen').style.display='flex';}
 }catch(e){
-  const ld=document.getElementById('loading');
-  if(ld){ld.style.display='flex';ld.innerHTML=`<div style="text-align:center;padding:40px"><div style="font-size:38px;margin-bottom:16px">⚠️</div><div style="font-family:var(--display);font-size:26px;color:var(--accent)">ERROR CONEXIÓN</div><div style="color:var(--muted);margin-top:10px;font-size:13px">${e.message}</div></div>`;}
+  document.getElementById('loading').innerHTML=`<div style="text-align:center;padding:40px"><div style="font-size:38px;margin-bottom:16px">⚠️</div><div style="font-family:var(--display);font-size:26px;color:var(--accent)">ERROR CONEXIÓN</div><div style="color:var(--muted);margin-top:10px;font-size:13px">${e.message}</div></div>`;
 }
 
 /* ── LOGIN ── */
@@ -1696,39 +1686,48 @@ window.confirmDeleteSelected=async function(){
 
 /* ─ KANBAN TÉCNICO ─ */
 window.openTecOT=function(id){
-  const o=otData.find(function(x){return x.id===id;});if(!o)return;
+  var o=null;
+  for(var i=0;i<otData.length;i++){if(otData[i].id===id){o=otData[i];break;}}
+  if(!o)return;
   editingOTId=id;
   document.getElementById('tec-ot-title').textContent=o.num+' — '+(o.equipo||'');
   document.getElementById('tec-ot-estado').value=o.estado||'Abierta';
   document.getElementById('tec-ot-ini').value=o.horaIni||'';
   document.getElementById('tec-ot-fin').value=o.horaFin||'';
-  document.getElementById('tec-ot-avance').value=o.avance||0;
-  document.getElementById('tec-ot-avval').textContent=(o.avance||0)+'%';
-  document.getElementById('tec-ot-comment').value='';
+  document.getElementById('tec-ot-av').value=o.avance||0;
+  document.getElementById('tec-ot-avv').textContent=(o.avance||0)+'%';
+  document.getElementById('tec-ot-obs').value='';
   openModal('modal-tec-ot');
 };
-let _savingTecOT=false;
+var _savingTecOT=false;
 window.saveTecOT=async function(){
-  if(_savingTecOT||!editingOTId)return;_savingTecOT=true;
-  const estado=document.getElementById('tec-ot-estado').value;
-  const ini=document.getElementById('tec-ot-ini').value;
-  const fin=document.getElementById('tec-ot-fin').value;
-  const avance=parseInt(document.getElementById('tec-ot-avance').value)||0;
-  const comment=document.getElementById('tec-ot-comment').value.trim();
-  let dur='—';
-  if(ini&&fin){const p1=ini.split(':').map(Number);const p2=fin.split(':').map(Number);let m=(p2[0]*60+p2[1])-(p1[0]*60+p1[1]);if(m<0)m+=1440;dur=Math.floor(m/60)+'h '+m%60+'m';}
+  if(_savingTecOT||!editingOTId)return;
+  _savingTecOT=true;
+  var estado=document.getElementById('tec-ot-estado').value;
+  var ini=document.getElementById('tec-ot-ini').value;
+  var fin=document.getElementById('tec-ot-fin').value;
+  var avance=parseInt(document.getElementById('tec-ot-av').value)||0;
+  var obs=document.getElementById('tec-ot-obs').value.trim();
+  var dur='—';
+  if(ini&&fin){
+    var p1=ini.split(':');var p2=fin.split(':');
+    var m=(parseInt(p2[0])*60+parseInt(p2[1]))-(parseInt(p1[0])*60+parseInt(p1[1]));
+    if(m<0)m+=1440;
+    dur=Math.floor(m/60)+'h '+m%60+'m';
+  }
   await updateDoc(doc(db,'ot',editingOTId),{estado:estado,horaIni:ini,horaFin:fin,duracion:dur,avance:avance});
-  const ot=otData.find(function(o){return o.id===editingOTId;});
-  await addActivity((ot?ot.num:'OT')+': "'+estado+'" '+avance+'%'+(comment?' — '+comment:''),'ot');
-  closeModal('modal-tec-ot');_savingTecOT=false;editingOTId=null;
+  var ot=null;for(var i=0;i<otData.length;i++){if(otData[i].id===editingOTId){ot=otData[i];break;}}
+  await addActivity((ot?ot.num:'OT')+': "'+estado+'" '+avance+'%'+(obs?' — '+obs:''),'ot');
+  closeModal('modal-tec-ot');
+  _savingTecOT=false;
+  editingOTId=null;
   toast('OT actualizada','success');
 };
 function renderKanbanTec(){
-  var els=['del-bar-ot','btn-del-ot','btn-nueva-ot','ot-stats'];
-  els.forEach(function(id){var e=document.getElementById(id);if(e)e.style.display='none';});
+  var hidIds=['del-bar-ot','btn-del-ot','btn-nueva-ot','ot-stats','ot-tbl-card'];
+  hidIds.forEach(function(id){var e=document.getElementById(id);if(e)e.style.display='none';});
   document.querySelectorAll('#page-ot .search-bar').forEach(function(e){e.style.display='none';});
-  var tableCard=document.getElementById('ot-table-card');if(tableCard)tableCard.style.display='none';
-  var area=document.getElementById('ot-kanban-area');if(!area)return;
+  var area=document.getElementById('ot-kb-area');if(!area)return;
   var COLS=[
     {id:'Abierta',color:'var(--info)'},
     {id:'En proceso',color:'var(--warn)'},
@@ -1743,22 +1742,23 @@ function renderKanbanTec(){
   var html='<div class="kanban-board">';
   COLS.forEach(function(col){
     var cards=list.filter(function(o){return o.estado===col.id;});
-    html+='<div class="kanban-col"><div class="kanban-col-hdr" style="border-top-color:'+col.color+'">'
+    html+='<div class="kanban-col">'
+      +'<div class="kanban-col-hdr" style="border-top-color:'+col.color+'">'
       +'<span class="kc-lbl" style="color:'+col.color+'">'+col.id.toUpperCase()+'</span>'
       +'<span class="kc-cnt">'+cards.length+'</span></div>'
       +'<div class="kanban-cards">';
-    if(cards.length){
+    if(cards.length===0){
+      html+='<div style="text-align:center;color:var(--muted);padding:20px;font-size:12px">Sin OT</div>';
+    } else {
       cards.forEach(function(o){
         html+='<div class="kb-card" onclick="openTecOT(''+o.id+'')">'
           +'<div class="kb-num">'+o.num+'</div>'
           +'<div class="kb-desc">'+(o.desc||'')+'</div>'
           +'<div class="kb-meta">&#9874; '+(o.equipo||'')+'</div>'
           +'<div class="kb-foot">'+priorBadge(o.prior)
-          +'<span style="font-family:var(--mono);font-size:10px;color:var(--muted)">'+(o.fecha||'')+'</span></div>'
-          +'</div>';
+          +'<span style="font-family:var(--mono);font-size:10px;color:var(--muted)">'+(o.fecha||'')+'</span>'
+          +'</div></div>';
       });
-    } else {
-      html+='<div style="text-align:center;color:var(--muted);padding:20px;font-size:12px">Sin OT</div>';
     }
     html+='</div></div>';
   });
@@ -1886,7 +1886,7 @@ window.saveOT=async function(){
   let fotoUrl='';
   const fi=document.getElementById('ot-foto');
   if(fi.files[0]){await new Promise(res=>{const r=new FileReader();r.onload=e=>{fotoUrl=e.target.result;res();};r.readAsDataURL(fi.files[0]);});}
-  const payload={desc,equipo,tecnico,temporada:document.getElementById('ot-temporada').value,areaSol:document.getElementById('ot-area-sol').value,sistema:document.getElementById('ot-sistema').value,subsistema:document.getElementById('ot-subsistema').value,ubicacion:document.getElementById('ot-ubicacion').value,tipo:document.getElementById('ot-tipo').value,estado:document.getElementById('ot-estado').value,prior:document.getElementById('ot-prior')?.value||'Normal',fecha:document.getElementById('ot-fecha').value||hoy(),horaIni:ini,horaFin:fin,duracion,avance,materiales:otMatsSelected.map(m=>({id:m.id,cod:m.cod||'',texto:m.texto,um:m.um,precio:m.precio,moneda:m.moneda})),costoMat:`S/ ${costo.toFixed(2)}`,obs:document.getElementById('ot-obs').value};
+  const payload={desc,equipo,tecnico,temporada:document.getElementById('ot-temporada').value,areaSol:document.getElementById('ot-area-sol').value,sistema:document.getElementById('ot-sistema').value,subsistema:document.getElementById('ot-subsistema').value,ubicacion:document.getElementById('ot-ubicacion').value,tipo:document.getElementById('ot-tipo').value,estado:document.getElementById('ot-estado').value,prior:(document.getElementById('ot-prior')||{value:'Normal'}).value||'Normal',fecha:document.getElementById('ot-fecha').value||hoy(),horaIni:ini,horaFin:fin,duracion,avance,materiales:otMatsSelected.map(m=>({id:m.id,cod:m.cod||'',texto:m.texto,um:m.um,precio:m.precio,moneda:m.moneda})),costoMat:`S/ ${costo.toFixed(2)}`,obs:document.getElementById('ot-obs').value};
   if(editingOTId){
     // MODO EDICIÓN
     if(fotoUrl)payload.fotoUrl=fotoUrl;
@@ -1923,7 +1923,7 @@ window.openNuevaOT=function(){
   ['ot-temporada','ot-area-sol','ot-sistema','ot-subsistema','ot-ubicacion'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   document.getElementById('ot-tipo').value='Correctivo';
   document.getElementById('ot-estado').value='Abierta';
-  const _prEl=document.getElementById('ot-prior');if(_prEl)_prEl.value='';
+  var _prEl=document.getElementById('ot-prior');if(_prEl)_prEl.value='';
   const otTec=document.getElementById('ot-tecnico');if(otTec)otTec.value='';
   const otEq=document.getElementById('ot-equipo');if(otEq)otEq.value='';
   document.getElementById('ot-avance').value=0;
@@ -2345,7 +2345,8 @@ function renderTecnicos(){
 }
 window.deleteTec=async function(id){if(!confirm('¿Eliminar?'))return;await deleteDoc(doc(db,'tecnicos',id));};
 let _savingTec=false;
-window.saveTecnico=async function(){if(_savingTec)return;_savingTec=true;const nombre=document.getElementById('tec-nombre').value.trim();if(!nombre){toast('Nombre requerido','error');_savingTec=false;return;}await addDoc(collection(db,'tecnicos'),{nombre,idTec:document.getElementById('tec-id').value.trim()||`T-${String(tecData.length+1).padStart(3,'0')}`,esp:document.getElementById('tec-esp').value,turno:document.getElementById('tec-turno').value,createdAt:serverTimestamp()});closeModal('modal-tec');_savingTec=false;toast('Técnico registrado','success');document.getElementById('tec-nombre').value='';document.getElementById('tec-id').value='';};
+window.saveTecnico=async function(){if(_savingTec)return;_savingTec=true;
+const nombre=document.getElementById('tec-nombre').value.trim();if(!nombre){toast('Nombre requerido','error');_savingTec=false;return;}await addDoc(collection(db,'tecnicos'),{nombre,idTec:document.getElementById('tec-id').value.trim()||`T-${String(tecData.length+1).padStart(3,'0')}`,esp:document.getElementById('tec-esp').value,turno:document.getElementById('tec-turno').value,createdAt:serverTimestamp()});closeModal('modal-tec');_savingTec=false;toast('Técnico registrado','success');document.getElementById('tec-nombre').value='';document.getElementById('tec-id').value='';};
 
 /* ── USUARIOS ── */
 function renderUsuarios(){
@@ -2569,25 +2570,51 @@ window.toggleDD=function(wrapId){const menu=document.getElementById(wrapId)?.que
 document.addEventListener('click',e=>{if(!e.target.closest('.dropdown'))document.querySelectorAll('.dropdown-menu').forEach(m=>m.classList.remove('open'));});
 
 /* ── SIDEBAR TOGGLE ── */
-function _sbFlap(){
-  const sb=document.querySelector('.sidebar');const fl=document.getElementById('sb-flap');const ar=document.getElementById('sb-flap-arr');if(!fl)return;
-  const mob=window.innerWidth<=768;const hidden=mob?!sb?.classList.contains('mobile-open'):sb?.classList.contains('collapsed');
-  fl.style.left=hidden?'0':'232px';if(ar)ar.innerHTML=hidden?'&#9656;':'&#9666;';
+function _sbUpd(){
+  var sb=document.querySelector('.sidebar');
+  var fl=document.getElementById('sb-flap');
+  var ar=document.getElementById('sb-arr');
+  if(!fl)return;
+  var mob=window.innerWidth<=768;
+  var hidden=mob?!sb.classList.contains('mobile-open'):sb.classList.contains('collapsed');
+  fl.style.left=hidden?'0':'232px';
+  if(ar)ar.innerHTML=hidden?'&#9656;':'&#9666;';
 }
 window.toggleSidebar=function(){
-  const sb=document.querySelector('.sidebar');const main=document.querySelector('.main');const mob=window.innerWidth<=768;
-  if(mob){sb.classList.toggle('mobile-open');document.getElementById('sidebar-overlay').classList.toggle('visible',sb.classList.contains('mobile-open'));}
-  else{const c=sb.classList.toggle('collapsed');main.classList.toggle('expanded',c);localStorage.setItem('mantex_sidebar_collapsed',c?'1':'0');}
-  _sbFlap();
+  var sb=document.querySelector('.sidebar');
+  var main=document.querySelector('.main');
+  var mob=window.innerWidth<=768;
+  if(mob){
+    sb.classList.toggle('mobile-open');
+    document.getElementById('sidebar-overlay').classList.toggle('visible',sb.classList.contains('mobile-open'));
+  } else {
+    var c=sb.classList.toggle('collapsed');
+    main.classList.toggle('expanded',c);
+    localStorage.setItem('mantex_sidebar_collapsed',c?'1':'0');
+  }
+  _sbUpd();
 };
 window.closeSidebarOverlay=function(){
-  document.querySelector('.sidebar')?.classList.remove('mobile-open');
-  document.getElementById('sidebar-overlay')?.classList.remove('visible');_sbFlap();
+  document.querySelector('.sidebar').classList.remove('mobile-open');
+  var ov=document.getElementById('sidebar-overlay');if(ov)ov.classList.remove('visible');
+  _sbUpd();
 };
 (function(){
-  if(window.innerWidth>768){const c=localStorage.getItem('mantex_sidebar_collapsed');if(c==='1'){document.querySelector('.sidebar')?.classList.add('collapsed');document.querySelector('.main')?.classList.add('expanded');}}
-  window.addEventListener('resize',()=>{if(window.innerWidth>768){document.querySelector('.sidebar')?.classList.remove('mobile-open');document.getElementById('sidebar-overlay')?.classList.remove('visible');}setTimeout(_sbFlap,50);});
-  setTimeout(_sbFlap,200);
+  if(window.innerWidth>768){
+    var c=localStorage.getItem('mantex_sidebar_collapsed');
+    if(c==='1'){
+      var sb=document.querySelector('.sidebar');if(sb)sb.classList.add('collapsed');
+      var mn=document.querySelector('.main');if(mn)mn.classList.add('expanded');
+    }
+  }
+  window.addEventListener('resize',function(){
+    if(window.innerWidth>768){
+      var sb=document.querySelector('.sidebar');if(sb)sb.classList.remove('mobile-open');
+      var ov=document.getElementById('sidebar-overlay');if(ov)ov.classList.remove('visible');
+    }
+    setTimeout(_sbUpd,50);
+  });
+  setTimeout(_sbUpd,300);
 })();
 
 window.toast=function(msg,type='success'){const el=document.getElementById('toast');el.textContent=(type==='success'?'✅ ':type==='error'?'❌ ':'ℹ️ ')+msg;el.className=`show ${type}`;el.style.display='flex';clearTimeout(window._tt);window._tt=setTimeout(()=>el.style.display='none',3400);};
