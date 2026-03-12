@@ -261,10 +261,10 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
 
 /* ── Sidebar toggle ── */
 .sidebar-toggle{display:none!important}
-.sb-flap{position:fixed;top:50%;transform:translateY(-50%);left:232px;z-index:150;width:14px;height:52px;background:var(--surface2);border:1px solid var(--border);border-left:none;border-radius:0 8px 8px 0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:left .25s ease,opacity .15s,background .15s;opacity:.22;user-select:none}
+.sb-flap{position:fixed;top:50%;transform:translateY(-50%);left:232px;z-index:150;width:14px;height:56px;background:var(--surface2);border:1px solid var(--border);border-left:none;border-radius:0 8px 8px 0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:left .25s ease,opacity .2s,background .2s;opacity:.2;user-select:none}
 .sb-flap:hover{opacity:1;background:var(--accent);border-color:var(--accent)}
 .sb-flap:hover .sb-arr{color:#fff}
-.sb-arr{font-size:9px;color:var(--muted);transition:color .15s;line-height:1}
+.sb-arr{font-size:9px;color:var(--muted);line-height:1;transition:color .2s}
 .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:98}
 .sidebar-overlay.visible{display:block}
 .sidebar{transition:transform .25s ease,background .25s}
@@ -299,21 +299,21 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
   .main.expanded{margin-left:0}
 }
 
-/* ─ Kanban técnico ─ */
-.kanban-board{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-.kanban-col{background:var(--surface2);border:1px solid var(--border);border-radius:10px;overflow:hidden}
-.kanban-col-hdr{padding:10px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;border-top:3px solid transparent}
-.kc-lbl{font-family:var(--mono);font-size:10px;letter-spacing:2px}
-.kc-cnt{background:var(--surface);border:1px solid var(--border);border-radius:20px;font-size:10px;padding:1px 8px;font-family:var(--mono)}
-.kanban-cards{padding:8px;display:flex;flex-direction:column;gap:8px;min-height:80px}
+/* ── Kanban técnico ── */
+.kb-board{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding-top:4px}
+.kb-col{background:var(--surface2);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.kb-col-hdr{padding:10px 13px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;border-top:3px solid transparent}
+.kb-col-lbl{font-family:var(--mono);font-size:10px;letter-spacing:2px}
+.kb-col-cnt{background:var(--surface);border:1px solid var(--border);border-radius:20px;font-size:10px;padding:1px 8px;font-family:var(--mono)}
+.kb-cards{padding:8px;display:flex;flex-direction:column;gap:8px;min-height:60px}
 .kb-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;transition:border-color .15s,box-shadow .15s}
 .kb-card:hover{border-color:var(--accent);box-shadow:0 2px 10px var(--shadow)}
 .kb-num{font-family:var(--mono);font-size:11px;color:var(--accent);font-weight:700;margin-bottom:4px}
 .kb-desc{font-size:12px;margin-bottom:5px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .kb-meta{font-size:11px;color:var(--muted);margin-bottom:4px}
 .kb-foot{display:flex;align-items:center;justify-content:space-between;margin-top:4px}
-@media(max-width:768px){.kanban-board{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:480px){.kanban-board{grid-template-columns:1fr}}
+@media(max-width:768px){.kb-board{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.kb-board{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -341,7 +341,7 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
     <div class="user-pill">
       <div class="user-avatar" id="user-avatar">?</div>
       <div class="user-info"><strong id="user-display-name">—</strong><span id="user-role-label">—</span></div>
-      <button class="logout-btn" onclick="doLogout()" title="Cerrar sesión" style="font-size:11px;font-family:var(--mono);font-weight:700;padding:3px 8px;letter-spacing:1px;border:1px solid var(--border);border-radius:4px">OFF</button>
+      <button class="logout-btn" onclick="doLogout()" title="Cerrar sesión" style="font-family:var(--mono);font-size:10px;font-weight:700;padding:2px 7px;letter-spacing:1px;border:1px solid var(--border);border-radius:4px">OFF</button>
     </div>
   </div>
 </nav>
@@ -443,12 +443,12 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
         <button class="btn btn-ghost btn-sm" onclick="toggleDeleteMode('ot')">✕ Cancelar</button>
       </div>
       <div class="stat-row" id="ot-stats"></div>
-      <div id="ot-kb-area"></div>
+      <div id="ot-kb-wrap"></div>
       <div class="card" id="ot-tbl-card"><div class="table-wrap"><table id="ot-table">
         <thead id="ot-thead"><tr id="ot-th-row">
           <th>N° OT</th><th>Temporada</th><th>Área Sol.</th><th>Sistema</th><th>Subsistema</th>
           <th>Ubicación</th><th>Equipo</th><th>Descripción</th><th>Tipo</th><th>Técnico</th>
-          <th>Fecha</th><th>H.Ini</th><th>H.Fin</th><th>Duración</th><th>% Avance</th><th>Estado</th><th>Prioridad</th><th>Costo Mat.</th><th>Acciones</th>
+          <th>Fecha</th><th>H.Ini</th><th>H.Fin</th><th>Duración</th><th>% Avance</th><th>Estado</th><th>Costo Mat.</th><th>Acciones</th>
         </tr></thead>
         <tbody id="ot-tbody"></tbody>
       </table></div></div>
@@ -712,7 +712,6 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
         <div class="form-group form-full"><label>Descripción *</label><textarea class="form-control" id="ot-desc" placeholder="Descripción de la OT..."></textarea></div>
         <div class="form-group"><label>Técnico Responsable *</label><select class="form-control" id="ot-tecnico"></select></div>
         <div class="form-group"><label>Estado</label><select class="form-control" id="ot-estado"><option>Abierta</option><option>En proceso</option><option>Pausada</option><option>Cerrada</option></select></div>
-        <div class="form-group"><label>Prioridad</label><select class="form-control" id="ot-prior"><option value="">Normal</option><option>Alta</option><option>Media</option><option>Baja</option></select></div>
       </div>
       <div class="section-divider" style="margin-top:14px">TIEMPO</div>
       <div class="form-grid3">
@@ -822,10 +821,13 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
   </div>
 </div>
 
-<!-- MODAL TEC-OT -->
+<!-- MODAL KANBAN TEC -->
 <div class="modal-overlay" id="modal-tec-ot">
   <div class="modal" style="max-width:420px">
-    <div class="modal-header"><h2 id="tec-ot-title">ACTUALIZAR OT</h2><button class="modal-close" onclick="closeModal('modal-tec-ot')">&#10005;</button></div>
+    <div class="modal-header">
+      <h2 id="tec-ot-title">ACTUALIZAR OT</h2>
+      <button class="modal-close" onclick="closeModal('modal-tec-ot')">&#10005;</button>
+    </div>
     <div class="modal-body">
       <div class="form-group"><label>Estado</label>
         <select class="form-control" id="tec-ot-estado"><option>Abierta</option><option>En proceso</option><option>Pausada</option><option>Cerrada</option></select>
@@ -1134,22 +1136,21 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, getDoc, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-/* ── Global helpers (must be before all render fns) ── */
-window._dbfn=function(fn,ms){var t;return function(){clearTimeout(t);t=setTimeout(fn,ms);};};
-window._dOT=window._dbfn(function(){typeof renderOT==='function'&&renderOT();},220);
-window._dLog=window._dbfn(function(){typeof renderLogistica==='function'&&renderLogistica();},220);
-window._dSum=window._dbfn(function(){typeof renderSuministros==='function'&&renderSuministros();},220);
-window._dMat=window._dbfn(function(){typeof renderMateriales==='function'&&renderMateriales();},220);
-window._dHer=window._dbfn(function(){typeof renderHerramientas==='function'&&renderHerramientas();},220);
-window._dEPP=window._dbfn(function(){typeof renderEPP==='function'&&renderEPP();},220);
-window._dTec=window._dbfn(function(){typeof renderTecnicos==='function'&&renderTecnicos();},220);
-window._dUsr=window._dbfn(function(){typeof renderUsuarios==='function'&&renderUsuarios();},220);
-
+/* ── Helpers globales ── */
+window._dbFn=function(fn,ms){var t;return function(){clearTimeout(t);t=setTimeout(fn,ms);};};
+window._dOT =window._dbFn(function(){typeof renderOT==="function"&&renderOT();},200);
+window._dLog=window._dbFn(function(){typeof renderLogistica==="function"&&renderLogistica();},200);
+window._dSum=window._dbFn(function(){typeof renderSuministros==="function"&&renderSuministros();},200);
+window._dMat=window._dbFn(function(){typeof renderMateriales==="function"&&renderMateriales();},200);
+window._dHer=window._dbFn(function(){typeof renderHerramientas==="function"&&renderHerramientas();},200);
+window._dEPP=window._dbFn(function(){typeof renderEPP==="function"&&renderEPP();},200);
+window._dTec=window._dbFn(function(){typeof renderTecnicos==="function"&&renderTecnicos();},200);
+window._dUsr=window._dbFn(function(){typeof renderUsuarios==="function"&&renderUsuarios();},200);
 function priorBadge(p){
-  var m={Alta:'badge-red',Media:'badge-yellow',Baja:'badge-green',Normal:'badge-gray'};
-  return '<span class="badge '+(m[p]||'badge-gray')+'">'+(p||'Normal')+'</span>';
+  var cls={Alta:"badge-red",Media:"badge-yellow",Baja:"badge-green",Normal:"badge-gray"};
+  return '<span class="badge '+(cls[p]||"badge-gray")+">"+(p||"Normal")+"</span>";
 }
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyDVFdyZLIj0Z5_kWMEazrbZD8kd4j__Jtk",
@@ -1683,7 +1684,6 @@ window.confirmDeleteSelected=async function(){
 /* ═══════════════════════════════════════════
    OT
 ═══════════════════════════════════════════ */
-
 /* ─ KANBAN TÉCNICO ─ */
 window.openTecOT=function(id){
   var o=null;
@@ -1699,10 +1699,10 @@ window.openTecOT=function(id){
   document.getElementById('tec-ot-obs').value='';
   openModal('modal-tec-ot');
 };
-var _savingTecOT=false;
+var _savTecOT=false;
 window.saveTecOT=async function(){
-  if(_savingTecOT||!editingOTId)return;
-  _savingTecOT=true;
+  if(_savTecOT||!editingOTId)return;
+  _savTecOT=true;
   var estado=document.getElementById('tec-ot-estado').value;
   var ini=document.getElementById('tec-ot-ini').value;
   var fin=document.getElementById('tec-ot-fin').value;
@@ -1710,54 +1710,55 @@ window.saveTecOT=async function(){
   var obs=document.getElementById('tec-ot-obs').value.trim();
   var dur='—';
   if(ini&&fin){
-    var p1=ini.split(':');var p2=fin.split(':');
-    var m=(parseInt(p2[0])*60+parseInt(p2[1]))-(parseInt(p1[0])*60+parseInt(p1[1]));
+    var h1=ini.split(':');var h2=fin.split(':');
+    var m=(parseInt(h2[0])*60+parseInt(h2[1]))-(parseInt(h1[0])*60+parseInt(h1[1]));
     if(m<0)m+=1440;
     dur=Math.floor(m/60)+'h '+m%60+'m';
   }
-  await updateDoc(doc(db,'ot',editingOTId),{estado:estado,horaIni:ini,horaFin:fin,duracion:dur,avance:avance});
+  await updateDoc(doc(db,"ot",editingOTId),{estado:estado,horaIni:ini,horaFin:fin,duracion:dur,avance:avance});
   var ot=null;for(var i=0;i<otData.length;i++){if(otData[i].id===editingOTId){ot=otData[i];break;}}
   await addActivity((ot?ot.num:'OT')+': "'+estado+'" '+avance+'%'+(obs?' — '+obs:''),'ot');
   closeModal('modal-tec-ot');
-  _savingTecOT=false;
+  _savTecOT=false;
   editingOTId=null;
   toast('OT actualizada','success');
 };
 function renderKanbanTec(){
-  var hidIds=['del-bar-ot','btn-del-ot','btn-nueva-ot','ot-stats','ot-tbl-card'];
-  hidIds.forEach(function(id){var e=document.getElementById(id);if(e)e.style.display='none';});
-  document.querySelectorAll('#page-ot .search-bar').forEach(function(e){e.style.display='none';});
-  var area=document.getElementById('ot-kb-area');if(!area)return;
+  ['del-bar-ot','btn-del-ot','btn-nueva-ot','ot-stats','ot-tbl-card'].forEach(function(id){
+    var e=document.getElementById(id);if(e)e.style.display="none";
+  });
+  document.querySelectorAll("#page-ot .search-bar").forEach(function(e){e.style.display="none";});
+  var area=document.getElementById("ot-kb-wrap");if(!area)return;
   var COLS=[
-    {id:'Abierta',color:'var(--info)'},
-    {id:'En proceso',color:'var(--warn)'},
-    {id:'Pausada',color:'var(--muted)'},
-    {id:'Cerrada',color:'var(--accent2)'}
+    {id:"Abierta",    color:"#1e90ff"},
+    {id:"En proceso", color:"#ffa502"},
+    {id:"Pausada",    color:"#5a6480"},
+    {id:"Cerrada",    color:"#00d4aa"}
   ];
   var list=filterOTByUser().slice().sort(function(a,b){
-    var na=parseInt((a.num||'').replace(/\D/g,''))||0;
-    var nb=parseInt((b.num||'').replace(/\D/g,''))||0;
+    var na=parseInt((a.num||"").replace(/\D/g,""))||0;
+    var nb=parseInt((b.num||"").replace(/\D/g,""))||0;
     return nb-na;
   });
-  var html='<div class="kanban-board">';
+  var html='<div class="kb-board">';
   COLS.forEach(function(col){
     var cards=list.filter(function(o){return o.estado===col.id;});
-    html+='<div class="kanban-col">'
-      +'<div class="kanban-col-hdr" style="border-top-color:'+col.color+'">'
-      +'<span class="kc-lbl" style="color:'+col.color+'">'+col.id.toUpperCase()+'</span>'
-      +'<span class="kc-cnt">'+cards.length+'</span></div>'
-      +'<div class="kanban-cards">';
-    if(cards.length===0){
-      html+='<div style="text-align:center;color:var(--muted);padding:20px;font-size:12px">Sin OT</div>';
+    html+='<div class="kb-col">'
+         +'<div class="kb-col-hdr" style="border-top-color:'+col.color+'">'
+         +'<span class="kb-col-lbl" style="color:'+col.color+'">'+col.id.toUpperCase()+'</span>'
+         +'<span class="kb-col-cnt">'+cards.length+'</span></div>'
+         +'<div class="kb-cards">';
+    if(!cards.length){
+      html+='<div style="text-align:center;color:var(--muted);padding:20px;font-size:12px">Sin OT asignadas</div>';
     } else {
       cards.forEach(function(o){
-        html+='<div class="kb-card" onclick="openTecOT(''+o.id+'')">'
-          +'<div class="kb-num">'+o.num+'</div>'
-          +'<div class="kb-desc">'+(o.desc||'')+'</div>'
-          +'<div class="kb-meta">&#9874; '+(o.equipo||'')+'</div>'
-          +'<div class="kb-foot">'+priorBadge(o.prior)
-          +'<span style="font-family:var(--mono);font-size:10px;color:var(--muted)">'+(o.fecha||'')+'</span>'
-          +'</div></div>';
+        html+='<div class="kb-card" onclick="openTecOT(\''+o.id+'\')">'
+             +'<div class="kb-num">'+o.num+'</div>'
+             +'<div class="kb-desc">'+( o.desc||"")+'</div>'
+             +'<div class="kb-meta">&#9874; '+(o.equipo||"—")+'</div>'
+             +'<div class="kb-foot">'
+             +'<span style="font-family:var(--mono);font-size:10px;color:var(--muted)">'+(o.fecha||"")+'</span>'
+             +'</div></div>';
       });
     }
     html+='</div></div>';
@@ -1767,7 +1768,7 @@ function renderKanbanTec(){
 }
 
 function renderOT(){
-  if(currentUser&&currentUser.role==='tecnico'){renderKanbanTec();return;}
+  if(currentUser&&currentUser.role==="tecnico"){renderKanbanTec();return;}
   const search=document.getElementById('ot-search')?.value?.toLowerCase()||'';
   const fE=document.getElementById('ot-f-estado')?.value||'';
   const fT=document.getElementById('ot-f-tipo')?.value||'';
@@ -1807,11 +1808,10 @@ function renderOT(){
     <td style="font-family:var(--mono);font-size:11px">${o.duracion||'—'}</td>
     <td><div style="display:flex;align-items:center;gap:4px"><div style="width:40px;background:var(--surface2);border-radius:3px;height:5px;overflow:hidden"><div style="width:${o.avance||0}%;height:100%;background:var(--accent2)"></div></div><span style="font-family:var(--mono);font-size:10px">${o.avance||0}%</span></div></td>
     <td>${estadoBadge(o.estado)}</td>
-    <td>${priorBadge(o.prior)}</td>
     <td style="font-family:var(--mono);font-size:11px">${o.costoMat||'—'}</td>
     <td style="display:flex;gap:3px;flex-wrap:nowrap">
       ${canWrite&&!isDelMode?`<button class="btn btn-ghost btn-sm" onclick="openCambioEstadoOT('${o.id}','${o.num}','${o.estado}','${o.avance||0}')">Estado</button><button class="btn btn-ghost btn-sm" onclick="verOT('${o.id}')">👁</button><button class="btn btn-ghost btn-sm" title="Editar OT" onclick="openEditOT('${o.id}')">✏️</button>`:isDelMode?'':''}
-    </td></tr>`).join(''):`<tr><td colspan="${isDelMode?20:19}">${emptyMsg('Sin órdenes de trabajo')}</td></tr>`;
+    </td></tr>`).join(''):`<tr><td colspan="${isDelMode?19:18}">${emptyMsg('Sin órdenes de trabajo')}</td></tr>`;
 }
 window.openEditOT=function(id){
   const o=otData.find(x=>x.id===id);if(!o)return;
@@ -1825,7 +1825,7 @@ window.openEditOT=function(id){
     const f={
       'ot-temporada':'temporada','ot-area-sol':'areaSol','ot-sistema':'sistema',
       'ot-subsistema':'subsistema','ot-ubicacion':'ubicacion','ot-equipo':'equipo',
-      'ot-tipo':'tipo','ot-tecnico':'tecnico','ot-estado':'estado','ot-prior':'prior'
+      'ot-tipo':'tipo','ot-tecnico':'tecnico','ot-estado':'estado'
     };
     Object.entries(f).forEach(([elId,field])=>{const el=document.getElementById(elId);if(el)el.value=o[field]||'';});
     document.getElementById('ot-desc').value=o.desc||'';
@@ -1886,7 +1886,7 @@ window.saveOT=async function(){
   let fotoUrl='';
   const fi=document.getElementById('ot-foto');
   if(fi.files[0]){await new Promise(res=>{const r=new FileReader();r.onload=e=>{fotoUrl=e.target.result;res();};r.readAsDataURL(fi.files[0]);});}
-  const payload={desc,equipo,tecnico,temporada:document.getElementById('ot-temporada').value,areaSol:document.getElementById('ot-area-sol').value,sistema:document.getElementById('ot-sistema').value,subsistema:document.getElementById('ot-subsistema').value,ubicacion:document.getElementById('ot-ubicacion').value,tipo:document.getElementById('ot-tipo').value,estado:document.getElementById('ot-estado').value,prior:(document.getElementById('ot-prior')||{value:'Normal'}).value||'Normal',fecha:document.getElementById('ot-fecha').value||hoy(),horaIni:ini,horaFin:fin,duracion,avance,materiales:otMatsSelected.map(m=>({id:m.id,cod:m.cod||'',texto:m.texto,um:m.um,precio:m.precio,moneda:m.moneda})),costoMat:`S/ ${costo.toFixed(2)}`,obs:document.getElementById('ot-obs').value};
+  const payload={desc,equipo,tecnico,temporada:document.getElementById('ot-temporada').value,areaSol:document.getElementById('ot-area-sol').value,sistema:document.getElementById('ot-sistema').value,subsistema:document.getElementById('ot-subsistema').value,ubicacion:document.getElementById('ot-ubicacion').value,tipo:document.getElementById('ot-tipo').value,estado:document.getElementById('ot-estado').value,fecha:document.getElementById('ot-fecha').value||hoy(),horaIni:ini,horaFin:fin,duracion,avance,materiales:otMatsSelected.map(m=>({id:m.id,cod:m.cod||'',texto:m.texto,um:m.um,precio:m.precio,moneda:m.moneda})),costoMat:`S/ ${costo.toFixed(2)}`,obs:document.getElementById('ot-obs').value};
   if(editingOTId){
     // MODO EDICIÓN
     if(fotoUrl)payload.fotoUrl=fotoUrl;
@@ -1923,7 +1923,6 @@ window.openNuevaOT=function(){
   ['ot-temporada','ot-area-sol','ot-sistema','ot-subsistema','ot-ubicacion'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   document.getElementById('ot-tipo').value='Correctivo';
   document.getElementById('ot-estado').value='Abierta';
-  var _prEl=document.getElementById('ot-prior');if(_prEl)_prEl.value='';
   const otTec=document.getElementById('ot-tecnico');if(otTec)otTec.value='';
   const otEq=document.getElementById('ot-equipo');if(otEq)otEq.value='';
   document.getElementById('ot-avance').value=0;
@@ -2344,9 +2343,11 @@ function renderTecnicos(){
   document.getElementById('tec-tbody').innerHTML=list.length?list.map(t=>{const otAct=otData.filter(o=>o.tecnico===t.nombre&&o.estado!=='Cerrada').length;return `<tr>${isDelTec?`<td class="del-col"><input type="checkbox" class="del-row-chk del-row-chk-tec" value="${t.id}" onchange="updDelCount('tec')"></td>`:''}<td style="font-family:var(--mono);font-size:11px;color:var(--accent)">${t.idTec||''}</td><td><strong>${t.nombre}</strong></td><td>${t.esp}</td><td>${t.turno}</td><td><span class="pill-num">${otAct}</span></td><td><span class="badge badge-green">Activo</span></td></tr>`;}).join(''):`<tr><td colspan="${isDelTec?8:7}">${emptyMsg('Sin técnicos')}</td></tr>`;
 }
 window.deleteTec=async function(id){if(!confirm('¿Eliminar?'))return;await deleteDoc(doc(db,'tecnicos',id));};
-let _savingTec=false;
-window.saveTecnico=async function(){if(_savingTec)return;_savingTec=true;
-const nombre=document.getElementById('tec-nombre').value.trim();if(!nombre){toast('Nombre requerido','error');_savingTec=false;return;}await addDoc(collection(db,'tecnicos'),{nombre,idTec:document.getElementById('tec-id').value.trim()||`T-${String(tecData.length+1).padStart(3,'0')}`,esp:document.getElementById('tec-esp').value,turno:document.getElementById('tec-turno').value,createdAt:serverTimestamp()});closeModal('modal-tec');_savingTec=false;toast('Técnico registrado','success');document.getElementById('tec-nombre').value='';document.getElementById('tec-id').value='';};
+var _savTec=false;
+window.saveTecnico=async function(){
+  if(_savTec)return;_savTec=true;
+  const nombre=document.getElementById('tec-nombre').value.trim();
+  if(!nombre){toast('Nombre requerido','error');_savTec=false;return;}await addDoc(collection(db,'tecnicos'),{nombre,idTec:document.getElementById('tec-id').value.trim()||`T-${String(tecData.length+1).padStart(3,'0')}`,esp:document.getElementById('tec-esp').value,turno:document.getElementById('tec-turno').value,createdAt:serverTimestamp()});closeModal('modal-tec');_savTec=false;toast('Técnico registrado','success');document.getElementById('tec-nombre').value='';document.getElementById('tec-id').value='';};
 
 /* ── USUARIOS ── */
 function renderUsuarios(){
@@ -2570,7 +2571,7 @@ window.toggleDD=function(wrapId){const menu=document.getElementById(wrapId)?.que
 document.addEventListener('click',e=>{if(!e.target.closest('.dropdown'))document.querySelectorAll('.dropdown-menu').forEach(m=>m.classList.remove('open'));});
 
 /* ── SIDEBAR TOGGLE ── */
-function _sbUpd(){
+function _sbFlap(){
   var sb=document.querySelector('.sidebar');
   var fl=document.getElementById('sb-flap');
   var ar=document.getElementById('sb-arr');
@@ -2586,35 +2587,36 @@ window.toggleSidebar=function(){
   var mob=window.innerWidth<=768;
   if(mob){
     sb.classList.toggle('mobile-open');
-    document.getElementById('sidebar-overlay').classList.toggle('visible',sb.classList.contains('mobile-open'));
+    var ov=document.getElementById('sidebar-overlay');
+    if(ov)ov.classList.toggle('visible',sb.classList.contains('mobile-open'));
   } else {
     var c=sb.classList.toggle('collapsed');
     main.classList.toggle('expanded',c);
     localStorage.setItem('mantex_sidebar_collapsed',c?'1':'0');
   }
-  _sbUpd();
+  _sbFlap();
 };
 window.closeSidebarOverlay=function(){
-  document.querySelector('.sidebar').classList.remove('mobile-open');
+  var sb=document.querySelector('.sidebar');if(sb)sb.classList.remove('mobile-open');
   var ov=document.getElementById('sidebar-overlay');if(ov)ov.classList.remove('visible');
-  _sbUpd();
+  _sbFlap();
 };
 (function(){
   if(window.innerWidth>768){
     var c=localStorage.getItem('mantex_sidebar_collapsed');
     if(c==='1'){
-      var sb=document.querySelector('.sidebar');if(sb)sb.classList.add('collapsed');
+      var sb2=document.querySelector('.sidebar');if(sb2)sb2.classList.add('collapsed');
       var mn=document.querySelector('.main');if(mn)mn.classList.add('expanded');
     }
   }
   window.addEventListener('resize',function(){
     if(window.innerWidth>768){
-      var sb=document.querySelector('.sidebar');if(sb)sb.classList.remove('mobile-open');
+      var sb2=document.querySelector('.sidebar');if(sb2)sb2.classList.remove('mobile-open');
       var ov=document.getElementById('sidebar-overlay');if(ov)ov.classList.remove('visible');
     }
-    setTimeout(_sbUpd,50);
+    setTimeout(_sbFlap,50);
   });
-  setTimeout(_sbUpd,300);
+  setTimeout(_sbFlap,250);
 })();
 
 window.toast=function(msg,type='success'){const el=document.getElementById('toast');el.textContent=(type==='success'?'✅ ':type==='error'?'❌ ':'ℹ️ ')+msg;el.className=`show ${type}`;el.style.display='flex';clearTimeout(window._tt);window._tt=setTimeout(()=>el.style.display='none',3400);};
