@@ -403,7 +403,7 @@ input[type="time"]{text-align:center}
     <div class="login-sub">Gestión de Mantenimiento Industrial</div>
     <input class="login-input" id="login-user" placeholder="Usuario" autocomplete="off" onkeydown="if(event.key==='Enter')document.getElementById('login-pass').focus()">
     <input class="login-input" id="login-pass" type="password" placeholder="Contraseña" onkeydown="if(event.key==='Enter')doLogin()">
-    <button class="login-btn" onclick="doLogin()">INGRESAR</button>
+    <button class="login-btn" onclick="doLogin()" id="btn-login-main">INGRESAR</button>
     <div class="login-note">🔒 Sistema seguro · Firebase Firestore</div>
   </div>
 </div>
@@ -447,7 +447,7 @@ input[type="time"]{text-align:center}
             <button class="dash-gear" onclick="toggleDD('dash-settings-dd')">⚙️ Personalizar ▾</button>
             <div class="dropdown-menu">
               <div class="dropdown-item" onclick="toggleEditMode()">✏️ Activar modo edición</div>
-              <div class="dropdown-item" onclick="openModal('modal-dash-config')">📐 Configurar widgets</div>
+              <div class="dropdown-item" onclick="openDashConfig()">📐 Configurar widgets</div>
               <div class="dropdown-item" onclick="resetDashLayout()">↺ Restablecer todo</div>
             </div>
           </div>
@@ -1142,7 +1142,7 @@ input[type="time"]{text-align:center}
       <div class="form-group"><label>Observaciones <span style="color:var(--muted);font-size:10px">(opcional)</span></label><textarea class="form-control" id="cerrar-ot-obs" rows="3" placeholder="Trabajos realizados..."></textarea></div>
       <div class="form-group" style="margin-top:10px;border-top:1px solid var(--border);padding-top:12px">
         <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-          <span style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px">FIRMA DIGITAL <span style="color:var(--muted);font-size:9px;font-weight:normal">(opcional)</span></span>
+          <span style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px">FIRMA DIGITAL <span style="color:var(--danger);font-size:9px;font-weight:600">* OBLIGATORIA</span></span>
           <button type="button" class="btn btn-ghost btn-sm" onclick="_clearFirmaCerrar()" style="font-size:11px;padding:2px 8px">🗑 Limpiar</button>
         </label>
         <canvas id="firma-cerrar-canvas" width="400" height="120"
@@ -1584,7 +1584,7 @@ const DEFAULT_WIDGETS=[
   {id:'ot-estados-pie',label:'Estados de OT',icon:'🥧',full:false,visible:true,custom:false},
   {id:'svc-pendientes',label:'Servicios Pendientes',icon:'📋',full:false,visible:true,custom:false},
   {id:'costo-areas',label:'Costo por Área',icon:'💰',full:false,visible:true,custom:false},
-  {id:'mant-por-mes',label:'Mantenimiento por Mes',icon:'📅',full:true,visible:true,custom:false},
+  {id:'mant-por-mes',label:'Mantenimiento por Tipo',icon:'📅',full:false,visible:true,custom:false},
 ];
 let kpiLayout=(()=>{
   const saved=JSON.parse(localStorage.getItem('mantex_kpi_layout')||'null');
@@ -1853,10 +1853,7 @@ function fillWidgetContent(w){
   } else if(w.id==='costo-areas'){
     renderCostoAreas(el);
   } else if(w.id==='ot-estados-pie'){
-    const dot=getDashOT();
-    const abiertas=dot.filter(o=>o.estado!=='Cerrada').length;
-    const cerradas=dot.filter(o=>o.estado==='Cerrada').length;
-    el.innerHTML=`<div style='display:flex;justify-content:center;align-items:center;width:100%;height:100%'>`+svgDonut([{value:abiertas,color:'var(--accent)',label:'Abiertas'},{value:cerradas,color:'var(--accent2)',label:'Cerradas'}],180)+`</div>`;
+    renderEstadosBar(el);
   } else if(w.id==='mant-por-mes'){
     renderMantPorMes(el);
   } else if(w.custom){
@@ -1883,6 +1880,9 @@ function renderMantPorMes(el){
     return {label,prev,corr,total:ots.length};
   });
   const maxVal=Math.max(...data.map(d=>Math.max(d.prev,d.corr)),1);
+  const isDarkM=document.documentElement.getAttribute('data-theme')==='dark'||!document.documentElement.getAttribute('data-theme');
+  const textColorM=isDarkM?'rgba(255,255,255,0.55)':'rgba(0,0,0,0.6)';
+  const gridColorM=isDarkM?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.08)';
   const W=560,H=200,PAD_L=28,PAD_R=16,PAD_T=20,PAD_B=36,GAP=8;
   const cols=data.length;
   const colW=(W-PAD_L-PAD_R)/cols;
@@ -1894,8 +1894,8 @@ function renderMantPorMes(el){
   for(let i=0;i<=YTICKS;i++){
     const y=PAD_T+chartH-(chartH*i/YTICKS);
     const val=Math.round(maxVal*i/YTICKS);
-    gridLines+=`<line x1="${PAD_L}" y1="${y}" x2="${W-PAD_R}" y2="${y}" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>`;
-    yLabels+=`<text x="${PAD_L-4}" y="${y+4}" fill="rgba(255,255,255,0.35)" font-size="9" text-anchor="end">${val}</text>`;
+    gridLines+=`<line x1="${PAD_L}" y1="${y}" x2="${W-PAD_R}" y2="${y}" stroke="${gridColorM}" stroke-width="1"/>`;
+    yLabels+=`<text x="${PAD_L-4}" y="${y+4}" fill="${textColorM}" font-size="9" text-anchor="end">${val}</text>`;
   }
   // Bars + labels
   let bars='',xLabels='',tooltip='';
@@ -1912,7 +1912,7 @@ function renderMantPorMes(el){
     const escC=d.corr.toString().replace(/&/g,'&amp;');
     bars+=`<rect class="mpm-bar-p" x="${xP.toFixed(1)}" y="${yP.toFixed(1)}" width="${barW.toFixed(1)}" height="${hP.toFixed(1)}" rx="3" fill="#1e3a8a" data-label="${d.label}" data-prev="${escP}" data-corr="${escC}" onmouseenter="showMPMTooltip(event,'${d.label}',${d.prev},${d.corr},'${tooltipId}')" onmouseleave="hideMPMTooltip('${tooltipId}')"/>`;
     bars+=`<rect class="mpm-bar-c" x="${xC.toFixed(1)}" y="${yC.toFixed(1)}" width="${barW.toFixed(1)}" height="${hC.toFixed(1)}" rx="3" fill="#f0a500" data-label="${d.label}" data-prev="${escP}" data-corr="${escC}" onmouseenter="showMPMTooltip(event,'${d.label}',${d.prev},${d.corr},'${tooltipId}')" onmouseleave="hideMPMTooltip('${tooltipId}')"/>`;
-    xLabels+=`<text x="${cx.toFixed(1)}" y="${H-8}" fill="rgba(255,255,255,0.55)" font-size="10" text-anchor="middle">${d.label}</text>`;
+    xLabels+=`<text x="${cx.toFixed(1)}" y="${H-8}" fill="${textColorM}" font-size="10" text-anchor="middle">${d.label}</text>`;
   });
   // Legend
   const legend=`<div style="display:flex;gap:16px;align-items:center;padding:8px 14px 4px;font-size:11px;color:var(--muted)">
@@ -1928,9 +1928,9 @@ function renderMantPorMes(el){
 }
 window.showMPMTooltip=function(e,label,prev,corr,id){
   const el=document.getElementById(id);if(!el)return;
-  el.innerHTML=`<div style="font-weight:700;margin-bottom:4px;color:#f0a500">${label}</div>
+  el.innerHTML=corr!==null?`<div style="font-weight:700;margin-bottom:4px;color:#f0a500">${label}</div>
     <div style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;background:#1e3a8a;border-radius:2px;display:inline-block"></span>Preventivo : <strong>${prev}</strong></div>
-    <div style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;background:#f0a500;border-radius:2px;display:inline-block"></span><span style="color:#f0a500">Correctivo</span> : <strong style="color:#f0a500">${corr}</strong></div>`;
+    <div style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;background:#f0a500;border-radius:2px;display:inline-block"></span><span style="color:#f0a500">Correctivo</span> : <strong style="color:#f0a500">${corr}</strong></div>`:`<div style="font-weight:700;margin-bottom:4px">${label}</div><div>Total: <strong>${prev}</strong></div>`;
   const rect=e.target.closest('svg').parentElement.getBoundingClientRect();
   const svgRect=e.target.getBoundingClientRect();
   const x=svgRect.left-rect.left+svgRect.width/2;
@@ -1941,6 +1941,51 @@ window.showMPMTooltip=function(e,label,prev,corr,id){
 };
 window.hideMPMTooltip=function(id){const el=document.getElementById(id);if(el)el.style.display='none';};
 
+
+/* ── Estados de OT — bar chart (same style as MantPorTipo) ── */
+function renderEstadosBar(el){
+  const dot=getDashOT();
+  const ESTADOS=[
+    {label:'Abierta',  color:'#1e3a8a', val:dot.filter(o=>o.estado==='Abierta').length},
+    {label:'En proceso',color:'#b45309',val:dot.filter(o=>o.estado==='En proceso').length},
+    {label:'Pausada',  color:'#6b21a8', val:dot.filter(o=>o.estado==='Pausada').length},
+    {label:'Cerrada',  color:'#065f46', val:dot.filter(o=>o.estado==='Cerrada').length},
+  ].filter(e=>e.val>0);
+  if(!ESTADOS.length){el.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted)">Sin datos</div>';return;}
+  const maxVal=Math.max(...ESTADOS.map(e=>e.val),1);
+  const W=360,H=180,PAD_L=24,PAD_R=12,PAD_T=16,PAD_B=32;
+  const chartH=H-PAD_T-PAD_B;
+  const colW=(W-PAD_L-PAD_R)/ESTADOS.length;
+  const barW=colW*0.55;
+  const YTICKS=4;
+  let gridLines='',yLabels='',bars='',xLabels='';
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark'||!document.documentElement.getAttribute('data-theme');
+  const textColor=isDark?'rgba(255,255,255,0.55)':'rgba(0,0,0,0.6)';
+  const gridColor=isDark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.08)';
+  for(let i=0;i<=YTICKS;i++){
+    const y=PAD_T+chartH-(chartH*i/YTICKS);
+    const val=Math.round(maxVal*i/YTICKS);
+    gridLines+=`<line x1="${PAD_L}" y1="${y.toFixed(1)}" x2="${W-PAD_R}" y2="${y.toFixed(1)}" stroke="${gridColor}" stroke-width="1"/>`;
+    yLabels+=`<text x="${(PAD_L-4).toFixed(1)}" y="${(y+4).toFixed(1)}" fill="${textColor}" font-size="9" text-anchor="end">${val}</text>`;
+  }
+  const tid='est-tt-'+Math.random().toString(36).slice(2);
+  ESTADOS.forEach((e,i)=>{
+    const cx=PAD_L+colW*i+colW/2;
+    const bx=cx-barW/2;
+    const h=e.val>0?Math.max(4,chartH*e.val/maxVal):0;
+    const by=PAD_T+chartH-h;
+    bars+=`<rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${barW.toFixed(1)}" height="${h.toFixed(1)}" rx="3" fill="${e.color}" onmouseenter="showMPMTooltip(event,'${e.label}',${e.val},null,'${tid}')" onmouseleave="hideMPMTooltip('${tid}')"/>`;
+    const shortLabel=e.label.length>8?e.label.slice(0,7)+'…':e.label;
+    xLabels+=`<text x="${cx.toFixed(1)}" y="${(H-8).toFixed(1)}" fill="${textColor}" font-size="9" text-anchor="middle">${shortLabel}</text>`;
+  });
+  el.innerHTML=`<div style="padding:8px 10px 4px;font-size:10px;font-family:var(--mono);color:var(--muted);letter-spacing:1px">ESTADO ACTUAL DE OT</div>
+  <div style="position:relative;overflow:visible;padding:0 4px">
+    <svg viewBox="0 0 ${W} ${H}" width="100%" preserveAspectRatio="xMidYMid meet" style="display:block">
+      ${gridLines}${yLabels}${bars}${xLabels}
+    </svg>
+    <div id="${tid}" style="display:none;position:absolute;background:rgba(20,20,30,0.95);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:6px 10px;font-size:11px;color:#fff;pointer-events:none;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,.4)"></div>
+  </div>`;
+}
 /* ── Costo por Área ── */
 function renderCostoAreas(el){
   const map={};
@@ -1963,9 +2008,8 @@ function renderCostoAreas(el){
   </div>`;}).join('')}`;
   const filtered=isAll?areas:areas.filter(a=>dashAreaFilter.has(a));
   const maxVal=filtered.length?Math.max(...filtered.map(a=>map[a])):1;
-  const AREA_COLORS=['#1e90ff','#ffa502','#00d4aa','#ff6b81','#a55eea','#00c6cf','#fd9644','#26de81','#fc5c65','#2bcbba'];
   const barsHtml=filtered.map((a,ai)=>{
-    const bColor=AREA_COLORS[ai%AREA_COLORS.length];
+    const bColor='#1e3a8a';
     const pct=maxVal>0?Math.round(map[a]/maxVal*100):0;
     return `<div class="area-bar-row"><div class="area-bar-label" title="${a}">${a}</div><div class="area-bar-track"><div class="area-bar-fill" style="width:${pct}%;background:${bColor};box-shadow:0 0 6px ${bColor}44"></div></div><div class="area-bar-val" style="color:${bColor}">S/ ${map[a].toFixed(0)}</div></div>`;
   }).join('');
@@ -2007,7 +2051,16 @@ window.openDashConfig=function(){
     ${k.custom?`<button class="kpi-icon-btn del" onclick="removeCustomKPI('${k.id}')">✕</button>`:''}
   </div>`).join('');
   // Widget list
-  const wList=document.getElementById('widget-config-list');
+  const wList=document.getElementById('widget-config-list').innerHTML=widgetLayout.map(w=>{
+    const chk=w.visible?'checked':'';
+    const fullChk=w.full?'checked':'';
+    const customBtn=w.custom?`<button class="kpi-icon-btn del" onclick="removeCustomWidget('${w.id}')">✕</button>`:'';
+    return `<div class="widget-row" id="wcfg-${w.id}">
+      <label><input type="checkbox" id="wchk-${w.id}" ${chk} style="accent-color:var(--accent)"> ${w.icon} <input type="text" id="wlbl-${w.id}" value="${w.label}" class="form-control" style="width:130px;padding:3px 7px;font-size:12px" onclick="event.stopPropagation()"></label>
+      <label style="font-size:11px;color:var(--muted);display:flex;align-items:center;gap:4px;white-space:nowrap"><input type="checkbox" id="wfull-${w.id}" ${fullChk} style="accent-color:var(--accent)"> Ancho completo</label>
+      ${customBtn}
+    </div>`;
+  }).join('');
   wList.innerHTML=widgetLayout.map(w=>`<div class="widget-row" id="wcfg-${w.id}">
     <label style="display:flex;align-items:center;gap:5px;flex-shrink:0"><input type="checkbox" id="wchk-${w.id}" ${w.visible?'checked':''} style="accent-color:var(--accent)"> ${w.icon}</label>
     <input type="text" id="wlbl-${w.id}" value="${w.label.replace(/"/g,'&quot;')}" class="form-control" style="flex:1;padding:3px 8px;font-size:12px" placeholder="Nombre del widget" onclick="event.stopPropagation()">
@@ -3123,6 +3176,7 @@ window.saveOT=async function(){
   if(editingOTId){
     // MODO EDICIÓN
     if(fotoUrl)payload.fotoUrl=fotoUrl;
+    if(estadoVal!=='Cerrada')payload.firmaTecnico='';
     await updateDoc(doc(db,'ot',editingOTId),payload);
     const ot=otData.find(o=>o.id===editingOTId);
     await addActivity(`${ot?.num||'OT'} editada por ${currentUser.name}`,'ot');
@@ -3184,7 +3238,7 @@ window.openNuevaOT=function(){
   setTimeout(()=>{const mb=document.querySelector('#modal-ot .modal-body');if(mb)mb.scrollTop=0;},50);
 };
 window.openCambioEstadoOT=function(id,num,estado,avance){editingOTId=id;document.getElementById('est-ot-num').textContent=num;document.getElementById('est-ot-val').value=estado;document.getElementById('est-ot-avance').value=avance||0;document.getElementById('est-ot-comment').value='';document.getElementById('modal-estado-ot').classList.add('open');};
-window.confirmEstadoOT=async function(){const nuevoEstado=document.getElementById('est-ot-val').value;const avance=document.getElementById('est-ot-avance').value;const comment=document.getElementById('est-ot-comment').value.trim();await updateDoc(doc(db,'ot',editingOTId),{estado:nuevoEstado,avance:parseInt(avance)});const ot=otData.find(o=>o.id===editingOTId);await addActivity(`${ot?.num} → "${nuevoEstado}" ${avance}%${comment?' — '+comment:''}`,'ot');closeModal('modal-estado-ot');toast(`OT: ${nuevoEstado}`,'success');};
+window.confirmEstadoOT=async function(){const nuevoEstado=document.getElementById('est-ot-val').value;const avance=document.getElementById('est-ot-avance').value;const comment=document.getElementById('est-ot-comment').value.trim();const estadoPayload={estado:nuevoEstado,avance:parseInt(avance)};if(nuevoEstado!=='Cerrada'){estadoPayload.firmaTecnico='';}await updateDoc(doc(db,'ot',editingOTId),estadoPayload);const ot=otData.find(o=>o.id===editingOTId);await addActivity(`${ot?.num} → "${nuevoEstado}" ${avance}%${comment?' — '+comment:''}`,'ot');closeModal('modal-estado-ot');toast(`OT: ${nuevoEstado}`,'success');};
 window.deleteOT=async function(id){if(!confirm('¿Eliminar OT?'))return;await deleteDoc(doc(db,'ot',id));toast('OT eliminada','success');};
 
 /* ── IMPORT / EXPORT ── */
