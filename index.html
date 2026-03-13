@@ -1123,14 +1123,13 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
       </div>
       <div class="form-group"><label>% Avance *</label><input type="range" class="form-control" id="cerrar-ot-av" min="0" max="100" value="100" oninput="document.getElementById('cerrar-ot-avv').textContent=this.value+'%'"><div style="font-family:var(--mono);font-size:12px;color:var(--accent);margin-top:3px" id="cerrar-ot-avv">100%</div></div>
       <div class="form-group"><label>Observaciones <span style="color:var(--muted);font-size:10px">(opcional)</span></label><textarea class="form-control" id="cerrar-ot-obs" rows="3" placeholder="Trabajos realizados..."></textarea></div>
-    </div>
-          <div class="form-group" style="margin-top:14px">
-        <label style="display:flex;justify-content:space-between;align-items:center">
-          <span>Firma Digital <span style="color:var(--muted);font-size:10px">(opcional)</span></span>
+      <div class="form-group" style="margin-top:10px;border-top:1px solid var(--border);padding-top:12px">
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px">FIRMA DIGITAL <span style="color:var(--muted);font-size:9px;font-weight:normal">(opcional)</span></span>
           <button type="button" class="btn btn-ghost btn-sm" onclick="_clearFirma()" style="font-size:11px;padding:2px 8px">🗑 Limpiar</button>
         </label>
-        <canvas id="firma-canvas" width="400" height="130"
-          style="border:1.5px solid var(--border);border-radius:8px;background:#fff;width:100%;cursor:crosshair;touch-action:none;display:block;margin-top:6px"></canvas>
+        <canvas id="firma-canvas" width="400" height="120"
+          style="border:1.5px solid var(--border);border-radius:8px;background:#fff;width:100%;cursor:crosshair;touch-action:none;display:block"></canvas>
         <div style="font-size:10px;color:var(--muted);margin-top:4px;text-align:center">Firme con el dedo (celular) o el mouse (desktop)</div>
       </div>
     </div>
@@ -1412,7 +1411,7 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
     <div class="modal-body"><div class="form-grid">
       <div class="form-group"><label>Nombre *</label><input type="text" class="form-control" id="tec-nombre"></div>
       <div class="form-group"><label>ID / Ficha</label><input type="text" class="form-control" id="tec-id"></div>
-      <div class="form-group"><label>Especialidad</label><select class="form-control" id="tec-esp"><option>Mecánico</option><option>Eléctrico</option><option>Instrumentista</option><option>Soldador</option><option>Lubricador</option><option>General</option></select></div>
+      <div class="form-group"><label>Especialidad</label><select class="form-control" id="tec-esp"><option>Electricista</option><option>Mecánico</option><option>Frigorista</option><option>Operario Mantenimiento</option><option>Instrumentista</option><option>Soldador</option><option>General</option></select></div>
       <div class="form-group"><label>Turno</label><select class="form-control" id="tec-turno"><option>Día</option><option>Tarde</option><option>Noche</option><option>Rotativo</option></select></div>
     </div></div>
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-tec')">Cancelar</button><button class="btn btn-primary" onclick="saveTecnico()">Guardar</button></div>
@@ -2754,12 +2753,16 @@ function _buildOTPDFHtml(o){
 </style>
 <div class="ot-pdf">
   <!-- HEADER -->
-  <table style="margin-bottom:4px">
+  <table style="margin-bottom:4px;border-collapse:collapse">
     <tr>
-      <td style="border:none;width:80px"><img src="${LOGO}" style="width:72px;height:auto"></td>
-      <td class="hdr-title">ORDEN DE TRABAJO</td>
-      <td style="border:none;width:120px;text-align:right;vertical-align:top">
-        <div class="hdr-code">PEA-F-OP-MTP-001.07</div>
+      <td style="border:1px solid #333;width:90px;text-align:center;vertical-align:middle;padding:4px">
+        <img src="${LOGO}" style="width:78px;height:auto">
+      </td>
+      <td style="border:1px solid #333;text-align:center;vertical-align:middle;padding:6px">
+        <div style="font-size:15pt;font-weight:bold;letter-spacing:2px">ORDEN DE TRABAJO</div>
+      </td>
+      <td style="border:1px solid #333;width:160px;text-align:center;vertical-align:middle;padding:6px">
+        <div style="font-size:10pt;font-weight:bold">PEA-F-OP-MTP-001.07</div>
       </td>
     </tr>
   </table>
@@ -3452,14 +3455,39 @@ function renderTecnicos(){
   const btnDelTec=document.getElementById('btn-del-tec');if(btnDelTec)btnDelTec.textContent=isDelTec?'✕ Salir':'🗑 Borrar';
   const tec_th=document.querySelector('#tec-tbody')?.closest('table')?.querySelector('thead tr');
   if(tec_th){const ec=tec_th.querySelector('th.del-col');if(isDelTec&&!ec){const th=document.createElement('th');th.className='del-col';th.style.cssText='width:28px';th.innerHTML='';tec_th.insertBefore(th,tec_th.firstChild);}else if(!isDelTec&&ec)ec.remove();}
-  document.getElementById('tec-tbody').innerHTML=list.length?list.map(t=>{const otAct=otData.filter(o=>o.tecnico===t.nombre&&o.estado!=='Cerrada').length;return `<tr>${isDelTec?`<td class="del-col"><input type="checkbox" class="del-row-chk del-row-chk-tec" value="${t.id}" onchange="updDelCount('tec')"></td>`:''}<td style="font-family:var(--mono);font-size:11px;color:var(--accent)">${t.idTec||''}</td><td><strong>${t.nombre}</strong></td><td>${t.esp}</td><td>${t.turno}</td><td><span class="pill-num">${otAct}</span></td><td><span class="badge badge-green">Activo</span></td></tr>`;}).join(''):`<tr><td colspan="${isDelTec?8:7}">${emptyMsg('Sin técnicos')}</td></tr>`;
+  document.getElementById('tec-tbody').innerHTML=list.length?list.map(t=>{const otAct=otData.filter(o=>o.tecnico===t.nombre&&o.estado!=='Cerrada').length;return `<tr>${isDelTec?`<td class="del-col"><input type="checkbox" class="del-row-chk del-row-chk-tec" value="${t.id}" onchange="updDelCount('tec')"></td>`:''}<td style="font-family:var(--mono);font-size:11px;color:var(--accent)">${t.idTec||''}</td><td><strong>${t.nombre}</strong></td><td>${t.esp}</td><td>${t.turno}</td><td><span class="pill-num">${otAct}</span></td><td><span class="badge badge-green">Activo</span></td><td style="white-space:nowrap">${canWrite?`<button class="btn btn-ghost btn-sm" onclick="openEditTecnico('${t.id}')" title="Editar">✏️</button>`:''}</td></tr>`;}).join(''):`<tr><td colspan="${isDelTec?8:7}">${emptyMsg('Sin técnicos')}</td></tr>`;
 }
 window.deleteTec=async function(id){if(!confirm('¿Eliminar?'))return;await deleteDoc(doc(db,'tecnicos',id));};
 var _savTec=false;
+window.openEditTecnico=function(id){
+  const t=tecData.find(x=>x.id===id);if(!t)return;
+  document.querySelector('#modal-tec .modal-header h2').textContent='EDITAR TÉCNICO';
+  document.getElementById('tec-nombre').value=t.nombre||'';
+  document.getElementById('tec-id').value=t.idTec||'';
+  const espSel=document.getElementById('tec-esp');
+  if(espSel){espSel.value=t.esp||'Electricista';}
+  const turSel=document.getElementById('tec-turno');
+  if(turSel)turSel.value=t.turno||'Rotativo';
+  editingTecId=id;
+  openModal('modal-tec');
+};
+var editingTecId=null;
 window.saveTecnico=async function(){
   if(_savTec)return;_savTec=true;
   const nombre=document.getElementById('tec-nombre').value.trim();
-  if(!nombre){toast('Nombre requerido','error');_savTec=false;return;}await addDoc(collection(db,'tecnicos'),{nombre,idTec:document.getElementById('tec-id').value.trim()||`T-${String(tecData.length+1).padStart(3,'0')}`,esp:document.getElementById('tec-esp').value,turno:document.getElementById('tec-turno').value,createdAt:serverTimestamp()});closeModal('modal-tec');_savTec=false;toast('Técnico registrado','success');document.getElementById('tec-nombre').value='';document.getElementById('tec-id').value='';};
+  if(!nombre){toast('Nombre requerido','error');_savTec=false;return;}const tecPayload={nombre,idTec:document.getElementById('tec-id').value.trim()||`T-\${String(tecData.length+1).padStart(3,'0')}`,esp:document.getElementById('tec-esp').value,turno:document.getElementById('tec-turno').value};
+  if(editingTecId){
+    await updateDoc(doc(db,'tecnicos',editingTecId),tecPayload);
+    editingTecId=null;
+    toast('Técnico actualizado','success');
+  } else {
+    tecPayload.createdAt=serverTimestamp();
+    await addDoc(collection(db,'tecnicos'),tecPayload);
+    toast('Técnico registrado','success');
+  }
+  document.querySelector('#modal-tec .modal-header h2').textContent='NUEVO TÉCNICO';
+  closeModal('modal-tec');_savTec=false;
+  document.getElementById('tec-nombre').value='';document.getElementById('tec-id').value='';};
 
 /* ── USUARIOS ── */
 function renderUsuarios(){
