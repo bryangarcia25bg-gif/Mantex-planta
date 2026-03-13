@@ -216,6 +216,14 @@ input[type="time"]{text-align:center}
 #modal-tec-ot>.modal>.modal-body{overflow-y:auto;max-height:calc(92vh - 120px)}
 #modal-cerrar-ot>.modal{overflow:visible}
 #modal-cerrar-ot>.modal>.modal-body{overflow-y:auto;max-height:calc(92vh - 120px)}
+.multi-sel-wrap{position:relative;display:inline-block}
+.multi-sel-btn{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:5px 10px;font-size:12px;cursor:pointer;white-space:nowrap;font-family:var(--mono)}
+.multi-sel-btn:hover{border-color:var(--accent)}
+.multi-sel-panel{display:none;position:absolute;top:calc(100% + 4px);left:0;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 2px;z-index:500;min-width:150px;box-shadow:0 8px 24px var(--shadow)}
+.multi-sel-panel.open{display:block}
+.ms-opt{display:flex;align-items:center;gap:8px;padding:5px 12px;font-size:12px;cursor:pointer;white-space:nowrap;border-radius:4px;margin:0 4px}
+.ms-opt:hover{background:var(--surface2)}
+.ms-opt input{accent-color:var(--accent);cursor:pointer}
 .bar-chart-wrap{padding:10px 14px 14px}
 .bar-chart-title{font-family:var(--mono);font-size:10px;letter-spacing:1.5px;color:var(--muted);margin-bottom:10px}
 
@@ -480,12 +488,23 @@ input[type="time"]{text-align:center}
       <div class="section-sub">Gestión y seguimiento de OT de mantenimiento</div>
       <div class="search-bar">
         <input class="search-input" id="ot-search" placeholder="🔍 Buscar OT, equipo, técnico, subsistema, ubicación..." oninput="_dOT()">
-        <select class="form-control" style="width:140px" id="ot-f-estado" onchange="renderOT()">
-          <option value="">Todos estados</option><option>Abierta</option><option>En proceso</option><option>Pausada</option><option>Cerrada</option>
-        </select>
-        <select class="form-control" style="width:140px" id="ot-f-tipo" onchange="renderOT()">
-          <option value="">Todos tipos</option><option>Correctivo</option><option>Preventivo</option><option>Predictivo</option><option>Mejora</option>
-        </select>
+        <div class="multi-sel-wrap" id="ot-estado-ms-wrap">
+          <button class="multi-sel-btn" onclick="toggleMultiSel('ot-estado-ms')" id="ot-estado-ms-btn">Todos estados ▾</button>
+          <div class="multi-sel-panel" id="ot-estado-ms">
+            <label class="ms-opt"><input type="checkbox" value="Asignada" onchange="applyOTFilters()"> Asignada</label>
+            <label class="ms-opt"><input type="checkbox" value="En proceso" onchange="applyOTFilters()"> En proceso</label>
+            <label class="ms-opt"><input type="checkbox" value="Cerrada" onchange="applyOTFilters()"> Cerrada</label>
+          </div>
+        </div>
+        <div class="multi-sel-wrap" id="ot-tipo-ms-wrap">
+          <button class="multi-sel-btn" onclick="toggleMultiSel('ot-tipo-ms')" id="ot-tipo-ms-btn">Todos tipos ▾</button>
+          <div class="multi-sel-panel" id="ot-tipo-ms">
+            <label class="ms-opt"><input type="checkbox" value="Correctivo" onchange="applyOTFilters()"> Correctivo</label>
+            <label class="ms-opt"><input type="checkbox" value="Preventivo" onchange="applyOTFilters()"> Preventivo</label>
+            <label class="ms-opt"><input type="checkbox" value="Predictivo" onchange="applyOTFilters()"> Predictivo</label>
+            <label class="ms-opt"><input type="checkbox" value="Mejora" onchange="applyOTFilters()"> Mejora</label>
+          </div>
+        </div>
         <div class="date-range-wrap">
           <button class="btn btn-ghost" id="dr-btn-ot" onclick="toggleDateRange('ot',event)" title="Filtrar por fecha">📅 Fecha</button>
           <div class="date-range-panel" id="drp-ot">
@@ -550,10 +569,14 @@ input[type="time"]{text-align:center}
           <option value="">Todos estados MP</option>
           <option>APROBADO</option><option>RECHAZADO</option>
         </select>
-        <select class="form-control" style="width:150px" id="log-f-estadoOP" onchange="renderLogistica()">
-          <option value="">Todos los estados</option>
-          <option>PENDIENTE</option><option>FINALIZADO</option><option>CANCELADO</option>
-        </select>
+        <div class="multi-sel-wrap" id="log-op-ms-wrap">
+          <button class="multi-sel-btn" onclick="toggleMultiSel('log-op-ms')" id="log-op-ms-btn">Todos estados ▾</button>
+          <div class="multi-sel-panel" id="log-op-ms">
+            <label class="ms-opt"><input type="checkbox" value="PENDIENTE" onchange="applyLogFilters()"> PENDIENTE</label>
+            <label class="ms-opt"><input type="checkbox" value="FINALIZADO" onchange="applyLogFilters()"> FINALIZADO</label>
+            <label class="ms-opt"><input type="checkbox" value="CANCELADO" onchange="applyLogFilters()"> CANCELADO</label>
+          </div>
+        </div>
         <div class="date-range-wrap">
           <button class="btn btn-ghost" id="dr-btn-log" onclick="toggleDateRange('log',event)" title="Filtrar por fecha">📅 Fecha</button>
           <div class="date-range-panel" id="drp-log">
@@ -898,7 +921,7 @@ input[type="time"]{text-align:center}
       <div class="form-grid">
         <div class="form-group form-full"><label>Descripción *</label><textarea class="form-control" id="ot-desc" placeholder="Descripción de la OT..."></textarea></div>
         <div class="form-group"><label>Técnico Responsable *</label><select class="form-control" id="ot-tecnico"></select></div>
-        <div class="form-group"><label>Estado</label><select class="form-control" id="ot-estado" onchange="onOTEstadoChange(this.value)"><option>Abierta</option><option>En proceso</option><option>Pausada</option><option>Cerrada</option></select></div>
+        <div class="form-group"><label>Estado</label><select class="form-control" id="ot-estado" onchange="onOTEstadoChange(this.value)"><option>Asignada</option><option>En proceso</option><option>Cerrada</option></select></div>
         <div class="form-group"><label>Prioridad</label><select class="form-control" id="ot-prioridad"><option value="">— Sin prioridad —</option><option value="Alta">&#128308; Alta</option><option value="Media">&#128993; Media</option><option value="Baja">&#128994; Baja</option></select></div>
       </div>
           <div id="ot-firma-section" style="display:none;margin-bottom:14px">
@@ -966,7 +989,7 @@ input[type="time"]{text-align:center}
     <div class="modal-body">
       <div style="font-family:var(--mono);color:var(--accent);font-size:13px;margin-bottom:13px" id="est-ot-num"></div>
       <div class="form-grid">
-        <div class="form-group"><label>Estado</label><select class="form-control" id="est-ot-val"><option>Abierta</option><option>En proceso</option><option>Pausada</option><option>Cerrada</option></select></div>
+        <div class="form-group"><label>Estado</label><select class="form-control" id="est-ot-val"><option>Asignada</option><option>En proceso</option><option>Cerrada</option></select></div>
         <div class="form-group"><label>% Avance</label><input type="number" class="form-control" id="est-ot-avance" min="0" max="100"></div>
       </div>
       <div class="form-group" style="margin-top:11px"><label>Comentario</label><textarea class="form-control" id="est-ot-comment" style="min-height:55px"></textarea></div>
@@ -1165,7 +1188,7 @@ input[type="time"]{text-align:center}
       <div class="form-group">
         <label>Estado</label>
         <select class="form-control" id="tec-ot-estado" onchange="onTecEstadoChange(this.value)">
-          <option>Abierta</option><option>En proceso</option><option>Pausada</option><option>Cerrada</option>
+          <option>Asignada</option><option>En proceso</option><option>Cerrada</option>
         </select>
       </div>
       <!-- Campos obligatorios al cerrar -->
@@ -1191,7 +1214,7 @@ input[type="time"]{text-align:center}
         </div>
         <div class="form-group" style="border-top:1px solid var(--border);padding-top:12px">
           <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-            <span style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px">FIRMA DIGITAL <span style="color:var(--muted);font-size:9px;font-weight:normal">(opcional)</span></span>
+            <span style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px">FIRMA DIGITAL <span style="color:var(--danger);font-size:9px;font-weight:600">* OBLIGATORIA</span></span>
             <button type="button" class="btn btn-ghost btn-sm" onclick="_clearFirmaTec()" style="font-size:11px;padding:2px 8px">&#128465; Limpiar</button>
           </label>
           <canvas id="firma-tec-canvas" width="380" height="120"
@@ -1575,7 +1598,7 @@ let visibleSumCols=SUM_COLS.map(c=>c.key);
 /* ── DASHBOARD LAYOUT ── */
 const DEFAULT_KPI=[
   {id:'kpi-ot-total',label:'Total OT',icon:'📊',color:'blue',link:'ot',visible:true,custom:false},
-  {id:'kpi-ot-act',label:'OT Activas',icon:'🔧',color:'orange',link:'ot',filterState:'__activas__',visible:true,custom:false},
+  {id:'kpi-ot-act',label:'OT Abiertas',icon:'🔧',color:'orange',link:'ot',filterState:'__activas__',visible:true,custom:false},
   {id:'kpi-ot-enproc',label:'OT En Proceso',icon:'⚙️',color:'cyan',link:'ot',filterState:'En proceso',visible:true,custom:false},
   {id:'kpi-ot-cerr',label:'OT Cerradas',icon:'✅',color:'green',link:'ot',filterState:'Cerrada',visible:true,custom:false},
 ];
@@ -1780,19 +1803,13 @@ window.navigateKPI=function(page,filterState){
   if(!filterState)return;
   setTimeout(()=>{
     if(filterState==='__activas__'){
-      // filter: non-cerradas
-      const sel=document.getElementById('ot-f-estado');
-      if(sel){sel.value='';} // show all then user sees activas highlighted
-      // Apply filter to show only non-cerrada
-      const inp=document.getElementById('ot-search');if(inp)inp.value='';
-      // Set the filter dropdown
-      const fE=document.getElementById('ot-f-estado');
-      if(fE){fE.value='Abierta';} // default to Abierta as proxy
-      renderOT();
-    } else {
-      const fE=document.getElementById('ot-f-estado');
-      if(fE){fE.value=filterState;renderOT();}
+      setMultiSelValues('ot-estado-ms',['Asignada','En proceso']);
+      setMultiSelBtn('ot-estado-ms-btn',['Asignada','En proceso'],'Todos estados');
+    } else if(filterState){
+      setMultiSelValues('ot-estado-ms',[filterState]);
+      setMultiSelBtn('ot-estado-ms-btn',[filterState],'Todos estados');
     }
+    renderOT();
   },200);
 };
 window.onKPIDragStart=function(e,id){dragType='kpi';dragId=id;document.getElementById('kpi-card-'+id)?.classList.add('dragging');e.dataTransfer.effectAllowed='move';};
@@ -1853,7 +1870,15 @@ function fillWidgetContent(w){
   } else if(w.id==='costo-areas'){
     renderCostoAreas(el);
   } else if(w.id==='ot-estados-pie'){
-    renderEstadosBar(el);
+    const dot=getDashOT();
+    const asignadas=dot.filter(o=>o.estado==='Asignada'||o.estado==='Abierta').length;
+    const enproc=dot.filter(o=>o.estado==='En proceso').length;
+    const cerradas=dot.filter(o=>o.estado==='Cerrada').length;
+    el.innerHTML=`<div style='display:flex;justify-content:center;align-items:center;width:100%;height:100%;padding:8px'>`+svgDonut([
+      {value:asignadas,color:'#3B82F6',label:'Asignada'},
+      {value:enproc,color:'#F59E0B',label:'En proceso'},
+      {value:cerradas,color:'#10B981',label:'Cerrada'}
+    ],160)+`</div>`;
   } else if(w.id==='mant-por-mes'){
     renderMantPorMes(el);
   } else if(w.custom){
@@ -1946,9 +1971,8 @@ window.hideMPMTooltip=function(id){const el=document.getElementById(id);if(el)el
 function renderEstadosBar(el){
   const dot=getDashOT();
   const ESTADOS=[
-    {label:'Abierta',  color:'#1e3a8a', val:dot.filter(o=>o.estado==='Abierta').length},
+    {label:'Abierta',  color:'#1e3a8a', val:dot.filter(o=>o.estado==='Asignada'||o.estado==='Abierta').length},
     {label:'En proceso',color:'#b45309',val:dot.filter(o=>o.estado==='En proceso').length},
-    {label:'Pausada',  color:'#6b21a8', val:dot.filter(o=>o.estado==='Pausada').length},
     {label:'Cerrada',  color:'#065f46', val:dot.filter(o=>o.estado==='Cerrada').length},
   ].filter(e=>e.val>0);
   if(!ESTADOS.length){el.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted)">Sin datos</div>';return;}
@@ -2577,9 +2601,8 @@ window.saveProg=async function(){
 var _kb2Drag={id:null,from:null};
 var _kb2Close={id:null,from:null};
 const KB2_COLS=[
-  {id:'Abierta',    color:'#1e90ff', icon:'&#9679;'},
-  {id:'En proceso', color:'#ffa502', icon:'&#9654;'},
-  {id:'Pausada',    color:'#5a6480', icon:'&#9646;&#9646;'},
+  {id:'Asignada',   color:'#3B82F6', icon:'&#9679;'},
+  {id:'En proceso', color:'#F59E0B', icon:'&#9654;'},
   {id:'Cerrada',    color:'#00d4aa', icon:'&#10003;'}
 ];
 
@@ -2775,7 +2798,7 @@ window.openTecOT=function(id){
   if(!o)return;
   editingOTId=id;
   document.getElementById('tec-ot-title').textContent=o.num+' — '+(o.equipo||'');
-  document.getElementById('tec-ot-estado').value=o.estado||'Abierta';
+  document.getElementById('tec-ot-estado').value=o.estado||'Asignada';
   document.getElementById('tec-ot-ini').value=o.horaIni||'';
   document.getElementById('tec-ot-fin').value=o.horaFin||'';
   document.getElementById('tec-ot-ini2').value=o.horaIni||'';
@@ -2785,7 +2808,7 @@ window.openTecOT=function(id){
   document.getElementById('tec-ot-av2').value=o.avance||0;
   document.getElementById('tec-ot-avv2').textContent=(o.avance||0)+'%';
   document.getElementById('tec-ot-obs').value='';
-  onTecEstadoChange(o.estado||'Abierta');
+  onTecEstadoChange(o.estado||'Asignada');
   openModal('modal-tec-ot');
   // Init firma canvas after modal opens
   setTimeout(()=>_initFirmaTec(),150);
@@ -2834,9 +2857,8 @@ function renderKanbanTec(){
   document.querySelectorAll("#page-ot .search-bar").forEach(function(e){e.style.display="none";});
   var area=document.getElementById("ot-kb-wrap");if(!area)return;
   var COLS=[
-    {id:"Abierta",    color:"#1e90ff", icon:"&#128308;"},
-    {id:"En proceso", color:"#ffa502", icon:"&#9654;"},
-    {id:"Pausada",    color:"#5a6480", icon:"&#9646;&#9646;"}
+    {id:"Asignada",   color:"#3B82F6", icon:"&#128308;"},
+    {id:"En proceso", color:"#F59E0B", icon:"&#9654;"}
   ];
   var list=filterOTByUser().slice().sort(function(a,b){
     var na=parseInt((a.num||"").replace(/\D/g,""))||0;
@@ -2889,8 +2911,8 @@ function renderKanbanTec(){
 function renderOT(){
   if(currentUser&&currentUser.role==="tecnico"){renderKanbanTec();return;}
   const search=document.getElementById('ot-search')?.value?.toLowerCase()||'';
-  const fE=document.getElementById('ot-f-estado')?.value||'';
-  const fT=document.getElementById('ot-f-tipo')?.value||'';
+  const fEstados=getMultiSelValues('ot-estado-ms');
+  const fTipos=getMultiSelValues('ot-tipo-ms');
   const isDelMode=deleteMode['ot'];
   const bar=document.getElementById('del-bar-ot');
   const btnDel=document.getElementById('btn-del-ot');
@@ -2898,10 +2920,10 @@ function renderOT(){
   if(btnDel){btnDel.textContent=isDelMode?'✕ Salir':'🗑 Borrar';}
   let list=filterOTByUser().slice().sort((a,b)=>{const na=parseInt((a.num||'').replace(/\D/g,''))||0,nb=parseInt((b.num||'').replace(/\D/g,''))||0;return nb-na;}).filter(o=>{
     const m=!search||(o.num||'').toLowerCase().includes(search)||(o.desc||'').toLowerCase().includes(search)||(o.equipo||'').toLowerCase().includes(search)||(o.tecnico||'').toLowerCase().includes(search)||(o.subsistema||'').toLowerCase().includes(search)||(o.ubicacion||'').toLowerCase().includes(search);
-    return m&&(!fE||o.estado===fE)&&(!fT||o.tipo===fT)&&inDateRange(o.fecha||'','ot');
+    return m&&(fEstados.length===0||fEstados.includes(o.estado))&&(fTipos.length===0||fTipos.includes(o.tipo))&&inDateRange(o.fecha||'','ot');
   });
   lastFilteredOT=[...list];
-  const stats={Abierta:0,'En proceso':0,Pausada:0,Cerrada:0};
+  const stats={Asignada:0,'En proceso':0,Cerrada:0};
   filterOTByUser().forEach(o=>stats[o.estado]=(stats[o.estado]||0)+1);
   document.getElementById('ot-stats').innerHTML=Object.entries(stats).map(([k,v])=>`<div class="stat-box"><div class="val">${v}</div><div class="lbl">${k}</div></div>`).join('');
   // Update del-col header — solo muestra columna vacía sin checkbox (ya está en del-bar)
@@ -2954,7 +2976,7 @@ window.openEditOT=function(id){
       'ot-tipo':'tipo','ot-tecnico':'tecnico','ot-estado':'estado','ot-prioridad':'prioridad'
     };
     Object.entries(f).forEach(([elId,field])=>{const el=document.getElementById(elId);if(el)el.value=o[field]||'';});
-    onOTEstadoChange(o.estado||'Abierta');
+    onOTEstadoChange(o.estado||'Asignada');
     const mb=document.querySelector('#modal-ot .modal-body');if(mb)mb.scrollTop=0;
     document.getElementById('ot-desc').value=o.desc||'';
     document.getElementById('ot-fecha').value=o.fecha||hoy();
@@ -3219,7 +3241,7 @@ window.openNuevaOT=function(){
   ['ot-hora-ini','ot-hora-fin'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   ['ot-temporada','ot-area-sol','ot-sistema','ot-subsistema','ot-ubicacion'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   document.getElementById('ot-tipo').value='Correctivo';
-  document.getElementById('ot-estado').value='Abierta';
+  document.getElementById('ot-estado').value='Asignada';
   const opEl=document.getElementById('ot-prioridad');if(opEl)opEl.value='';
   const otTec=document.getElementById('ot-tecnico');if(otTec)otTec.value='';
   const otEq=document.getElementById('ot-equipo');if(otEq)otEq.value='';
@@ -3352,14 +3374,14 @@ function exportPDF(title,data,keys){
 function renderLogistica(){
   const search=document.getElementById('log-search')?.value?.toLowerCase()||'';
   const fEstadoMP=document.getElementById('log-f-estadoMP')?.value||'';
-  const fEstadoOP=document.getElementById('log-f-estadoOP')?.value||'';
+  const fEstadoOPArr=getMultiSelValues('log-op-ms');
   const sortDir='desc';
   const isDelMode=deleteMode['log'];
   const bar=document.getElementById('del-bar-log');if(bar)bar.classList.toggle('active',!!isDelMode);
   const btnDel=document.getElementById('btn-del-log');if(btnDel)btnDel.textContent=isDelMode?'✕ Salir':'🗑 Borrar';
   let list=logData.filter(s=>{
     const m=!search||(s.solped||'').toLowerCase().includes(search)||(s.texto||'').toLowerCase().includes(search)||(s.proveedor||'').toLowerCase().includes(search)||(s.pedido||'').toLowerCase().includes(search)||(s.factura||'').toLowerCase().includes(search);
-    return m&&(!fEstadoMP||s.estadoMP===fEstadoMP)&&(!fEstadoOP||s.estadoOP===fEstadoOP)&&inDateRange(s.fesol||'','log');
+    return m&&(!fEstadoMP||s.estadoMP===fEstadoMP)&&(fEstadoOPArr.length===0||fEstadoOPArr.includes(s.estadoOP))&&inDateRange(s.fesol||'','log');
   });
   list=list.sort((a,b)=>{const da=a.fesol||'',db=b.fesol||'';return sortDir==='asc'?da.localeCompare(db):db.localeCompare(da);});
   const canWrite=ROLE_WRITE[currentUser.role];
@@ -3828,7 +3850,7 @@ function renderReportes(){
   const tipos={};otData.forEach(o=>tipos[o.tipo]=(tipos[o.tipo]||0)+1);
   document.getElementById('rep-tipos').innerHTML=Object.entries(tipos).map(([k,v])=>`<div style="margin-bottom:11px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>${k}</span><span style="font-family:var(--mono)">${v} (${total?Math.round(v/total*100):0}%)</span></div><div class="prog-bar"><div class="prog-fill" style="width:${total?Math.round(v/total*100):0}%"></div></div></div>`).join('')||emptyMsg('Sin datos');
   const estados={};otData.forEach(o=>estados[o.estado]=(estados[o.estado]||0)+1);
-  const ec={Abierta:'var(--info)','En proceso':'var(--accent)',Pausada:'var(--warn)',Cerrada:'var(--accent2)'};
+  const ec={Asignada:'#3B82F6','En proceso':'#F59E0B',Cerrada:'#10B981'};
   document.getElementById('rep-estados').innerHTML=Object.entries(estados).map(([k,v])=>`<div style="margin-bottom:11px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>${k}</span><span style="font-family:var(--mono)">${v}</span></div><div class="prog-bar"><div class="prog-fill" style="width:${total?Math.round(v/total*100):0}%;background:${ec[k]||'var(--accent2)'}"></div></div></div>`).join('')||emptyMsg('Sin datos');
 }
 
@@ -3851,7 +3873,7 @@ function fmtFecha(d){if(!d)return'—';const p=d.split('-');if(p.length!==3)retu
 
 function fmtTs(ts){if(!ts)return'—';try{return ts.toDate().toLocaleString('es-PE',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});}catch(e){return'—';}}
 function emptyMsg(msg){return`<div style="text-align:center;color:var(--muted);padding:26px;font-size:13px">${msg}</div>`;}
-function estadoBadge(e){return`<span class="badge ${{Abierta:'badge-blue','En proceso':'badge-yellow',Pausada:'badge-gray',Cerrada:'badge-green'}[e]||'badge-gray'}">${e||'—'}</span>`;}
+function estadoBadge(e){return`<span class="badge ${{Asignada:'badge-blue','En proceso':'badge-yellow',Cerrada:'badge-green'}[e]||'badge-gray'}">${e||'—'}</span>`;}
 function logEstadoBadge(e){return`<span class="badge ${{Pendiente:'badge-yellow','En proceso':'badge-blue',Facturado:'badge-orange',Cerrado:'badge-green'}[e]||'badge-gray'}">${e||'—'}</span>`;}
 function tipoBadge(t){return`<span class="badge ${{Correctivo:'badge-red',Preventivo:'badge-green',Predictivo:'badge-blue',Mejora:'badge-orange'}[t]||'badge-gray'}">${t||'—'}</span>`;}
 function criticidadBadge(c){return`<span class="badge ${{Alta:'badge-red',Media:'badge-yellow',Baja:'badge-green'}[c]||'badge-gray'}">${c||'—'}</span>`;}
@@ -4089,6 +4111,45 @@ window.toggleSidebar=function(){
     return c.toDataURL('image/jpeg',0.7);
   };
 })();
+
+
+/* ── Multi-select filter helpers ── */
+window.toggleMultiSel=function(id){
+  document.querySelectorAll('.multi-sel-panel.open').forEach(p=>{if(p.id!==id)p.classList.remove('open');});
+  document.getElementById(id)?.classList.toggle('open');
+};
+document.addEventListener('click',function(ev){
+  if(!ev.target.closest('.multi-sel-wrap'))
+    document.querySelectorAll('.multi-sel-panel').forEach(p=>p.classList.remove('open'));
+});
+function getMultiSelValues(panelId){
+  const panel=document.getElementById(panelId);
+  if(!panel)return[];
+  const checked=[...panel.querySelectorAll('input[type=checkbox]:checked')].map(c=>c.value);
+  return checked;
+}
+function setMultiSelBtn(btnId,values,allLabel){
+  const btn=document.getElementById(btnId);
+  if(!btn)return;
+  btn.textContent=values.length===0?allLabel+' ▾':values.join(', ')+' ▾';
+}
+window.applyOTFilters=function(){
+  setMultiSelBtn('ot-estado-ms-btn',getMultiSelValues('ot-estado-ms'),'Todos estados');
+  setMultiSelBtn('ot-tipo-ms-btn',getMultiSelValues('ot-tipo-ms'),'Todos tipos');
+  renderOT();
+};
+window.applyLogFilters=function(){
+  setMultiSelBtn('log-op-ms-btn',getMultiSelValues('log-op-ms'),'Todos estados');
+  renderLogistica();
+};
+/* Set multi-select from a list of values (for navigateKPI) */
+window.setMultiSelValues=function(panelId,values){
+  const panel=document.getElementById(panelId);
+  if(!panel)return;
+  panel.querySelectorAll('input[type=checkbox]').forEach(c=>{
+    c.checked=values.length===0||values.includes(c.value);
+  });
+};
 
 /* ── Swipe to open/close sidebar on mobile ── */
 (function(){
