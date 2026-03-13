@@ -1092,7 +1092,7 @@ input[type="time"]{text-align:center}
   <div class="modal" style="max-width:560px">
     <div class="modal-header">
       <h2 id="prog-modal-title">NUEVA ACTIVIDAD</h2>
-      <button class="modal-close" onclick="closeModal('modal-prog')">&#10005;</button>
+      <button class="modal-close" onclick="closeModal('modal-prog');_savingProg=false;const _spb=document.querySelector('#modal-prog .btn-primary');if(_spb){_spb.disabled=false;_spb.textContent='Guardar';}">&#10005;</button>
     </div>
     <div class="modal-body">
       <div class="form-grid">
@@ -1608,7 +1608,7 @@ const DEFAULT_WIDGETS=[
   {id:'svc-pendientes',label:'Servicios Pendientes',icon:'📋',full:false,visible:true,custom:false},
   {id:'costo-areas',label:'Costo por Área',icon:'💰',full:false,visible:true,custom:false},
   {id:'mant-por-mes',label:'Mantenimiento por Tipo',icon:'📅',full:false,visible:true,custom:false},
-  {id:'prog-resumen',label:'Programación Resumen',icon:'📆',full:true,visible:true,custom:false},
+  {id:'prog-calendario',label:'Programación Actividades',icon:'📆',full:false,visible:true,custom:false},
 ];
 let kpiLayout=(()=>{
   const saved=JSON.parse(localStorage.getItem('mantex_kpi_layout')||'null');
@@ -1881,12 +1881,13 @@ function fillWidgetContent(w){
     const cerradas=dot.filter(o=>o.estado==='Cerrada').length;
     const canceladas=dot.filter(o=>o.estado==='Cancelado').length;
     const tDot=dot.length;
-    const tBox=`<div style="display:flex;flex-direction:column;justify-content:center;align-items:center;min-width:54px;padding-right:8px;border-right:1px solid var(--border)"><div style="font-size:26px;font-weight:800;color:var(--text);line-height:1">${tDot}</div><div style="font-family:var(--mono);font-size:8px;color:var(--muted);letter-spacing:1px;margin-top:2px">TOTAL OT</div></div>`;
+    const tBox=`<div style="display:flex;flex-direction:column;justify-content:center;align-items:center;min-width:54px;padding-right:8px;border-right:1px solid var(--border)"><div style="font-size:38px;font-weight:800;color:var(--text);line-height:1">${tDot}</div><div style="font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1px;margin-top:3px">TOTAL OT</div></div>`;
     el.innerHTML=`<div style='display:flex;justify-content:center;align-items:center;width:100%;height:100%;padding:8px;gap:6px'>${tBox}`+svgDonut([{value:asignadas,color:'#3B82F6',label:'Asignada'},{value:enproc,color:'#F59E0B',label:'En proceso'},{value:cerradas,color:'#10B981',label:'Cerrada'},{value:canceladas,color:'#EF4444',label:'Cancelado'}],145)+`</div>`;
   } else if(w.id==='mant-por-mes'){
     renderMantPorMes(el);
-  } else if(w.id==='prog-resumen'){
-    renderProgResumen(el);
+  } else if(w.id==='prog-calendario'){
+    renderProgCalendario(el);
+
   } else if(w.custom){
     el.innerHTML=`<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">Widget personalizado</div>`;
   }
@@ -2019,7 +2020,93 @@ function renderEstadosBar(el){
   </div>`;
 }
 
-function renderProgResumen(el){const MESES=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];const TIPOS=[{key:'Preventivo',color:'#3B82F6'},{key:'Correctivo',color:'#F59E0B'},{key:'Predictivo',color:'#10B981'}];const now=new Date();const months=[];for(let i=5;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);months.push({key:d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'),label:MESES[d.getMonth()]});}const isDkP=document.documentElement.getAttribute('data-theme')==='dark'||!document.documentElement.getAttribute('data-theme');const tP=isDkP?'rgba(255,255,255,0.55)':'rgba(0,0,0,0.6)';const gP=isDkP?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.08)';const data=months.map(({key,label})=>{const acts=progData.filter(a=>(a.fechaIni||'').startsWith(key)||(a.fechaFin||'').startsWith(key));const byTipo={};TIPOS.forEach(t=>{byTipo[t.key]=acts.filter(a=>a.tipo===t.key).length;});return{label,byTipo,total:acts.length};});const maxV=Math.max(...data.map(d=>d.total),1);const W=600;const H=200;const PL=28;const PR=16;const PT=20;const PB=36;const cH=H-PT-PB;const cols=data.length;const cW=(W-PL-PR)/cols;const gW=cW-6;const bW=Math.max(4,Math.floor(gW/TIPOS.length)-2);let gL='',yL='',brs='',xL='';const tid='pr-'+Math.random().toString(36).slice(2);for(let i=0;i<=4;i++){const y=PT+cH-(cH*i/4);const v=Math.round(maxV*i/4);gL+='<line x1="'+PL+'" y1="'+y.toFixed(1)+'" x2="'+(W-PR)+'" y2="'+y.toFixed(1)+'" stroke="'+gP+'" stroke-width="1"/>';yL+='<text x="'+(PL-4).toFixed(1)+'" y="'+(y+4).toFixed(1)+'" fill="'+tP+'" font-size="9" text-anchor="end">'+v+'</text>';}data.forEach((d,i)=>{const cx=PL+cW*i+cW/2;const sx=cx-gW/2;TIPOS.forEach((t,ti)=>{const v=d.byTipo[t.key]||0;const bx=sx+ti*(bW+2);const h=v>0?Math.max(3,cH*v/maxV):0;const by=PT+cH-h;if(h>0){brs+='<rect x="'+bx.toFixed(1)+'" y="'+by.toFixed(1)+'" width="'+bW+'" height="'+h.toFixed(1)+'" rx="2" fill="'+t.color+'" onmouseenter="showMPMTooltip(event,\'' + d.label+' '+t.key+'\','+v+',null,\''+tid+'\')" onmouseleave="hideMPMTooltip(\''+tid+'\')" />';}});xL+='<text x="'+cx.toFixed(1)+'" y="'+(H-8).toFixed(1)+'" fill="'+tP+'" font-size="10" text-anchor="middle">'+d.label+'</text>';});const legend=TIPOS.map(t=>'<span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted)"><svg width="10" height="10"><rect width="10" height="10" rx="2" fill="'+t.color+'"/></svg>'+t.key+'</span>').join('');el.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 14px 4px"><div style="display:flex;gap:12px">'+legend+'</div><span style="font-family:var(--mono);font-size:10px;color:var(--muted)">'+progData.length+' actividades</span></div><div style="position:relative;overflow:visible;padding:0 4px"><svg viewBox="0 0 '+W+' '+H+'" width="100%" preserveAspectRatio="xMidYMid meet" style="display:block">'+gL+yL+brs+xL+'</svg><div id="'+tid+'" style="display:none;position:absolute;background:rgba(20,20,30,.95);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:6px 10px;font-size:11px;color:#fff;pointer-events:none;z-index:999"></div></div>';}
+
+/* ── Prog Actividades — mini calendar widget ── */
+function renderProgCalendario(el){
+  const DIAS=['L','M','X','J','V','S','D'];
+  const MESES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const TIPO_COLOR={Preventivo:'#3B82F6',Correctivo:'#F59E0B',Predictivo:'#10B981',Diario:'#A78BFA'};
+  // Get or init current calendar month
+  if(!window._calMonth)window._calMonth=new Date().getMonth();
+  if(!window._calYear)window._calYear=new Date().getFullYear();
+  const month=window._calMonth;
+  const year=window._calYear;
+  const today=new Date();today.setHours(0,0,0,0);
+  // First day of month (0=Sun…6=Sat → convert to Mon-first)
+  const firstDay=new Date(year,month,1);
+  const dayOfWeek=(firstDay.getDay()+6)%7; // Mon=0
+  const daysInMonth=new Date(year,month+1,0).getDate();
+  // Build activity map: day → [activities]
+  const actMap={};
+  progData.forEach(a=>{
+    const fi=a.fechaIni||'';
+    const ff=a.fechaFin||'';
+    if(!fi)return;
+    const start=new Date(fi+'T12:00:00');
+    const end=ff?new Date(ff+'T12:00:00'):start;
+    for(let d=new Date(start);d<=end;d.setDate(d.getDate()+1)){
+      if(d.getFullYear()===year&&d.getMonth()===month){
+        const key=d.getDate();
+        if(!actMap[key])actMap[key]=[];
+        actMap[key].push(a);
+      }
+    }
+  });
+  // Calendar ID for tooltip
+  const calId='cal-'+Math.random().toString(36).slice(2);
+  // Build calendar HTML
+  const isDk=document.documentElement.getAttribute('data-theme')==='dark'||!document.documentElement.getAttribute('data-theme');
+  const dayBg=isDk?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.03)';
+  const todayBg='#EF4444';
+  let cells='';
+  // Empty cells before first day
+  for(let i=0;i<dayOfWeek;i++) cells+=`<div style="min-height:52px"></div>`;
+  for(let d=1;d<=daysInMonth;d++){
+    const isToday=today.getFullYear()===year&&today.getMonth()===month&&today.getDate()===d;
+    const acts=actMap[d]||[];
+    const dots=acts.slice(0,3).map(a=>`<div style="width:6px;height:6px;border-radius:50%;background:${TIPO_COLOR[a.tipo]||'#8B5CF6'};flex-shrink:0"></div>`).join('');
+    const more=acts.length>3?`<div style="font-size:8px;color:var(--muted)">+${acts.length-3}</div>`:'';
+    const tipContent=acts.length?acts.slice(0,4).map(a=>`${a.tipo}: ${(a.desc||'').slice(0,28)}`).join('|'):'';
+    cells+=`<div style="min-height:52px;background:${dayBg};border-radius:4px;padding:3px 4px;cursor:${acts.length?'pointer':'default'}" ${acts.length?`onmouseenter="showCalTip(event,'${d} ${MESES[month]}','${tipContent.replace(/'/g,'`')}','${calId}')" onmouseleave="hideCalTip('${calId}')"`:''}>
+      <div style="font-size:10px;font-weight:700;${isToday?`color:#fff;background:${todayBg};border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;`:'color:var(--muted);'}">${d}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:2px;margin-top:3px">${dots}${more}</div>
+    </div>`;
+  }
+  el.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px 5px;border-bottom:1px solid var(--border)">
+    <button onclick="calNav(-1)" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:2px 6px">&#8249;</button>
+    <span style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--text)">${MESES[month].slice(0,3).toUpperCase()} ${year}</span>
+    <button onclick="calNav(1)" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:2px 6px">&#8250;</button>
+  </div>
+  <div style="padding:4px 6px">
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px">
+      ${DIAS.map(d=>`<div style="text-align:center;font-size:9px;font-family:var(--mono);color:var(--muted);padding:2px 0">${d}</div>`).join('')}
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px" id="${calId}-grid">${cells}</div>
+  </div>
+  <div style="display:flex;gap:8px;padding:4px 10px 6px;flex-wrap:wrap">
+    ${Object.entries(TIPO_COLOR).map(([k,c])=>`<span style="display:flex;align-items:center;gap:3px;font-size:9px;color:var(--muted)"><span style="width:7px;height:7px;border-radius:50%;background:${c};display:inline-block"></span>${k}</span>`).join('')}
+  </div>
+  <div id="${calId}" style="display:none;position:fixed;background:rgba(15,15,25,0.97);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:8px 12px;font-size:11px;color:#fff;z-index:9999;max-width:220px;box-shadow:0 6px 20px rgba(0,0,0,.5)"></div>`;
+}
+window.calNav=function(dir){
+  window._calMonth=(window._calMonth||new Date().getMonth())+dir;
+  if(window._calMonth>11){window._calMonth=0;window._calYear=(window._calYear||new Date().getFullYear())+1;}
+  if(window._calMonth<0){window._calMonth=11;window._calYear=(window._calYear||new Date().getFullYear())-1;}
+  // Re-render the prog-calendario widget
+  const el=document.getElementById('dw-content-prog-calendario');
+  if(el)renderProgCalendario(el);
+};
+window.showCalTip=function(e,date,content,id){
+  const el=document.getElementById(id);if(!el)return;
+  const items=content.split('|').filter(Boolean);
+  el.innerHTML='<div style="font-weight:700;color:#F59E0B;margin-bottom:4px">'+date+'</div>'+items.map(i=>'<div style="margin-bottom:2px;font-size:10px">• '+i+'</div>').join('');
+  el.style.display='block';
+  const r=e.target.getBoundingClientRect();
+  el.style.left=Math.min(r.left,window.innerWidth-230)+'px';
+  el.style.top=(r.bottom+4)+'px';
+};
+window.hideCalTip=function(id){const el=document.getElementById(id);if(el)el.style.display='none';};
+
 /* ── Costo por Área ── */
 function renderCostoAreas(el){
   const map={};
@@ -2043,16 +2130,32 @@ function renderCostoAreas(el){
   const filtered=isAll?areas:areas.filter(a=>dashAreaFilter.has(a));
   const maxVal=filtered.length?Math.max(...filtered.map(a=>map[a])):1;
   const total=filtered.reduce((s,a)=>s+(map[a]||0),0);
-  const n=filtered.length||1;
-  const W2=Math.max(260,Math.min(500,n*70+60));const H2=180;const PL=52;const PR=12;const PT=16;const PB=36;const cH=H2-PT-PB;const cW=(W2-PL-PR)/n;const bW2=cW*0.55;
+  // Compact horizontal bars — professional, easy to read
+  const totalCA=filtered.reduce((s,a)=>s+(map[a]||0),0);
   const isDkCA=document.documentElement.getAttribute('data-theme')==='dark'||!document.documentElement.getAttribute('data-theme');
-  const tCA=isDkCA?'rgba(255,255,255,0.55)':'rgba(0,0,0,0.6)';const gCA=isDkCA?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.08)';
-  let gL='',yL='',brs='',xL='';const tid2='ca-'+Math.random().toString(36).slice(2);
-  for(let i=0;i<=4;i++){const y2=PT+cH-(cH*i/4);const vv=Math.round(maxVal*i/4);const vf=vv>=1000?'S/'+Math.round(vv/1000)+'k':'S/'+vv;gL+=`<line x1="${PL}" y1="${y2.toFixed(1)}" x2="${W2-PR}" y2="${y2.toFixed(1)}" stroke="${gCA}" stroke-width="1"/>`;yL+=`<text x="${(PL-4).toFixed(1)}" y="${(y2+4).toFixed(1)}" fill="${tCA}" font-size="9" text-anchor="end">${vf}</text>`;}
-  filtered.forEach((a,i)=>{const cx2=PL+cW*i+cW/2;const bx2=cx2-bW2/2;const vv2=map[a]||0;const h2=vv2>0?Math.max(4,cH*vv2/maxVal):0;const by2=PT+cH-h2;const ea=a.replace(/["'<>&]/g,'?');brs+=`<rect x="${bx2.toFixed(1)}" y="${by2.toFixed(1)}" width="${bW2.toFixed(1)}" height="${h2.toFixed(1)}" rx="3" fill="#1e3a8a" onmouseenter="showCATooltip(event,this.dataset.a,${vv2.toFixed(0)},'${tid2}')" onmouseleave="hideCATooltip('${tid2}')" data-a="${ea}"/>`;const sa=a.length>7?a.slice(0,6)+'…':a;xL+=`<text x="${cx2.toFixed(1)}" y="${(H2-8).toFixed(1)}" fill="${tCA}" font-size="9" text-anchor="middle">${sa}</text>`;});
-  el.innerHTML=`<div style="padding:8px 14px 4px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center"><div class="area-ms-wrap"><button class="area-ms-btn" onclick="toggleAreaPanel(event)">📊 ${btnLabel} ▾</button><div class="area-ms-panel" id="area-ms-panel">${panelHtml}</div></div><span style="font-family:var(--mono);font-size:10px;color:var(--accent)">S/ ${total.toFixed(0)}</span></div><div style="position:relative;overflow:visible;padding:0 4px"><svg viewBox="0 0 ${W2} ${H2}" width="100%" preserveAspectRatio="xMidYMid meet" style="display:block">${gL}${yL}${brs}${xL}</svg><div id="${tid2}" style="display:none;position:absolute;background:rgba(20,20,30,.95);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:6px 10px;font-size:11px;color:#fff;pointer-events:none;z-index:999"></div></div>`;
-
+  const textCA=isDkCA?'rgba(255,255,255,0.75)':'rgba(0,0,0,0.75)';
+  const mutedCA=isDkCA?'rgba(255,255,255,0.4)':'rgba(0,0,0,0.4)';
+  const trackCA=isDkCA?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.07)';
+  const barsHtml2=filtered.map((a,i)=>{
+    const pct=maxVal>0?Math.round(map[a]/maxVal*100):0;
+    const valFmt=map[a]>=1000?'S/'+(map[a]/1000).toFixed(1)+'k':'S/'+map[a].toFixed(0);
+    const shortA=a.length>16?a.slice(0,15)+'…':a;
+    const pctBar=Math.max(2,pct);
+    return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <div style="width:100px;font-size:11px;color:${textCA};text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0" title="${a}">${shortA}</div>
+      <div style="flex:1;background:${trackCA};border-radius:4px;height:14px;overflow:hidden;min-width:60px">
+        <div style="width:${pctBar}%;height:100%;background:#2563EB;border-radius:4px;transition:width .5s ease"></div>
+      </div>
+      <div style="font-family:var(--mono);font-size:10px;color:#60A5FA;min-width:48px;text-align:right;flex-shrink:0">${valFmt}</div>
+    </div>`;
+  }).join('');
+  el.innerHTML=`<div style="padding:7px 12px 5px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+    <div class="area-ms-wrap"><button class="area-ms-btn" onclick="toggleAreaPanel(event)">📊 ${btnLabel} ▾</button><div class="area-ms-panel" id="area-ms-panel">${panelHtml}</div></div>
+    <span style="font-family:var(--mono);font-size:10px;color:var(--accent)">S/ ${totalCA.toFixed(0)}</span>
+  </div>
+  <div style="padding:10px 14px">${barsHtml2||'<div style="color:var(--muted);font-size:12px">Sin datos</div>'}</div>`;
 }
+window.toggleAre
 window.toggleAreaPanel=function(e){
   e.stopPropagation();
   const panel=document.getElementById('area-ms-panel');
@@ -2579,9 +2682,9 @@ window.saveProg=async function(){
   const tipo=document.getElementById('prog-tipo').value;
   const estado=document.getElementById('prog-estado').value;
   const desc=document.getElementById('prog-desc').value.trim();
-  if(!desc){toast('La descripción es obligatoria','error');_savingProg=false;return;}
+  if(!desc){toast('La descripción es obligatoria','error');_savingProg=false;const sb0=document.querySelector('#modal-prog .btn-primary');if(sb0){sb0.disabled=false;sb0.textContent='Guardar';}return;}
   const fechaIni=document.getElementById('prog-fecha-ini').value;
-  if(!fechaIni){toast('La fecha de inicio es obligatoria','error');_savingProg=false;return;}
+  if(!fechaIni){toast('La fecha de inicio es obligatoria','error');_savingProg=false;const sb0b=document.querySelector('#modal-prog .btn-primary');if(sb0b){sb0b.disabled=false;sb0b.textContent='Guardar';}return;}
   const payload={
     tipo,estado,desc,
     equipo:document.getElementById('prog-equipo').value.trim(),
