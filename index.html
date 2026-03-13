@@ -211,10 +211,11 @@ input[type="time"]::-webkit-datetime-edit-fields-wrapper{padding:0}
 input[type="time"]::-webkit-inner-spin-button{display:none}
 input[type="time"]{text-align:center}
 .form-group input[type="time"].form-control{-webkit-appearance:none;appearance:none}
-/* ensure time picker popover not clipped on mobile */
-.modal-overlay{overflow:visible}
-.modal-overlay .modal{overflow:visible}
-.modal-overlay .modal .modal-body{overflow-y:auto;overflow-x:visible}
+/* time picker: only override tec-ot & cerrar-ot modals, not all */
+#modal-tec-ot>.modal{overflow:visible}
+#modal-tec-ot>.modal>.modal-body{overflow-y:auto;max-height:calc(92vh - 120px)}
+#modal-cerrar-ot>.modal{overflow:visible}
+#modal-cerrar-ot>.modal>.modal-body{overflow-y:auto;max-height:calc(92vh - 120px)}
 .bar-chart-wrap{padding:10px 14px 14px}
 .bar-chart-title{font-family:var(--mono);font-size:10px;letter-spacing:1.5px;color:var(--muted);margin-bottom:10px}
 
@@ -897,10 +898,17 @@ input[type="time"]{text-align:center}
       <div class="form-grid">
         <div class="form-group form-full"><label>Descripción *</label><textarea class="form-control" id="ot-desc" placeholder="Descripción de la OT..."></textarea></div>
         <div class="form-group"><label>Técnico Responsable *</label><select class="form-control" id="ot-tecnico"></select></div>
-        <div class="form-group"><label>Estado</label><select class="form-control" id="ot-estado"><option>Abierta</option><option>En proceso</option><option>Pausada</option><option>Cerrada</option></select></div>
+        <div class="form-group"><label>Estado</label><select class="form-control" id="ot-estado" onchange="onOTEstadoChange(this.value)"><option>Abierta</option><option>En proceso</option><option>Pausada</option><option>Cerrada</option></select></div>
         <div class="form-group"><label>Prioridad</label><select class="form-control" id="ot-prioridad"><option value="">— Sin prioridad —</option><option value="Alta">&#128308; Alta</option><option value="Media">&#128993; Media</option><option value="Baja">&#128994; Baja</option></select></div>
       </div>
-      <div class="section-divider" style="margin-top:14px">TIEMPO</div>
+          <div id="ot-firma-section" style="display:none;margin-bottom:14px">
+      <div class="section-divider" style="margin-top:14px">FIRMA DIGITAL</div>
+      <div style="background:rgba(240,165,0,.08);border:1px solid rgba(240,165,0,.25);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--warn);margin-bottom:10px">&#9888; Al cerrar la OT la firma digital es obligatoria.</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px">FIRMA T&Eacute;CNICO / RESPONSABLE</span><button type="button" class="btn btn-ghost btn-sm" onclick="_clearFirma()" style="font-size:11px;padding:2px 8px">&#128465; Limpiar</button></div>
+      <canvas id="firma-canvas" width="560" height="140" style="border:1.5px solid var(--border);border-radius:8px;background:#fff;width:100%;cursor:crosshair;touch-action:none;display:block"></canvas>
+      <div style="font-size:10px;color:var(--muted);margin-top:4px;text-align:center">Firme con el dedo (celular) o el mouse (desktop)</div>
+    </div>
+<div class="section-divider" style="margin-top:14px">TIEMPO</div>
       <div class="form-grid3">
         <div class="form-group"><label>Fecha</label><input type="date" class="form-control" id="ot-fecha"></div>
         <div class="form-group"><label>Hora Inicio</label><input type="time" class="form-control" id="ot-hora-ini" oninput="calcDuracion()"></div>
@@ -1135,9 +1143,9 @@ input[type="time"]{text-align:center}
       <div class="form-group" style="margin-top:10px;border-top:1px solid var(--border);padding-top:12px">
         <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
           <span style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px">FIRMA DIGITAL <span style="color:var(--muted);font-size:9px;font-weight:normal">(opcional)</span></span>
-          <button type="button" class="btn btn-ghost btn-sm" onclick="_clearFirma()" style="font-size:11px;padding:2px 8px">🗑 Limpiar</button>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="_clearFirmaCerrar()" style="font-size:11px;padding:2px 8px">🗑 Limpiar</button>
         </label>
-        <canvas id="firma-canvas" width="400" height="120"
+        <canvas id="firma-cerrar-canvas" width="400" height="120"
           style="border:1.5px solid var(--border);border-radius:8px;background:#fff;width:100%;cursor:crosshair;touch-action:none;display:block"></canvas>
         <div style="font-size:10px;color:var(--muted);margin-top:4px;text-align:center">Firme con el dedo (celular) o el mouse (desktop)</div>
       </div>
@@ -2616,7 +2624,7 @@ function renderKanbanBoard(){
       if(fin)fin.value=o&&o.horaFin||'';
       if(av){av.value=100;if(avv)avv.textContent='100%';}
       if(obs)obs.value='';
-      openModal('modal-cerrar-ot');window._initFirma&&window._initFirma();
+      openModal('modal-cerrar-ot');window._initFirmaCerrar&&window._initFirmaCerrar();
     } else {
       _kb2ApplyMove(_kb2Drag.id,toCol,null);
     }
@@ -2639,7 +2647,8 @@ window._confirmarCerrarOT=async function(){
   let m=(parseInt(h2[0])*60+parseInt(h2[1]))-(parseInt(h1[0])*60+parseInt(h1[1]));
   if(m<0)m+=1440;
   const dur=Math.floor(m/60)+'h '+m%60+'m';
-  const firmaDataURL=window._getFirmaDataURL?window._getFirmaDataURL():null;
+  const firmaDataURL=window._getFirmaCerrarDataURL?window._getFirmaCerrarDataURL():null;
+  if(!firmaDataURL){toast('La firma digital es obligatoria para cerrar la OT','error');return;}
   await _kb2ApplyMove(_kb2Close.id,'Cerrada',{horaIni:ini,horaFin:fin,avance,obs,duracion:dur,firmaTecnico:firmaDataURL||''});
   closeModal('modal-cerrar-ot');
   _kb2Close={id:null,from:null};
@@ -2892,6 +2901,8 @@ window.openEditOT=function(id){
       'ot-tipo':'tipo','ot-tecnico':'tecnico','ot-estado':'estado','ot-prioridad':'prioridad'
     };
     Object.entries(f).forEach(([elId,field])=>{const el=document.getElementById(elId);if(el)el.value=o[field]||'';});
+    onOTEstadoChange(o.estado||'Abierta');
+    const mb=document.querySelector('#modal-ot .modal-body');if(mb)mb.scrollTop=0;
     document.getElementById('ot-desc').value=o.desc||'';
     document.getElementById('ot-fecha').value=o.fecha||hoy();
     document.getElementById('ot-hora-ini').value=o.horaIni||'';
@@ -3094,6 +3105,11 @@ window.saveOT=async function(){
   const equipo=document.getElementById('ot-equipo').value;
   const tecnico=document.getElementById('ot-tecnico').value;
   if(!desc||!equipo||!tecnico){toast('Completa los campos requeridos (*)','error');_savingOT=false;if(btnSave){btnSave.disabled=false;btnSave.textContent=editingOTId?'Guardar cambios':'Crear OT';}return;}
+  const estadoVal=document.getElementById('ot-estado').value;
+  if(estadoVal==='Cerrada'){
+    const firmaOT=window._getFirmaDataURL?window._getFirmaDataURL():null;
+    if(!firmaOT){toast('La firma digital es obligatoria para cerrar la OT','error');_savingOT=false;if(btnSave){btnSave.disabled=false;btnSave.textContent=editingOTId?'Guardar cambios':'Crear OT';}return;}
+  }
   const ini=document.getElementById('ot-hora-ini').value,fin=document.getElementById('ot-hora-fin').value;
   let duracion='—';
   if(ini&&fin){const [ih,im]=ini.split(':').map(Number),[fh,fm]=fin.split(':').map(Number);let m=(fh*60+fm)-(ih*60+im);if(m<0)m+=1440;duracion=`${Math.floor(m/60)}h ${m%60}m`;}
@@ -3102,7 +3118,8 @@ window.saveOT=async function(){
   let fotoUrl='';
   const fi=document.getElementById('ot-foto');
   if(fi.files[0]){await new Promise(res=>{const r=new FileReader();r.onload=e=>{fotoUrl=e.target.result;res();};r.readAsDataURL(fi.files[0]);});}
-  const payload={desc,equipo,tecnico,temporada:document.getElementById('ot-temporada').value,areaSol:document.getElementById('ot-area-sol').value,sistema:document.getElementById('ot-sistema').value,subsistema:document.getElementById('ot-subsistema').value,ubicacion:document.getElementById('ot-ubicacion').value,tipo:document.getElementById('ot-tipo').value,estado:document.getElementById('ot-estado').value,fecha:document.getElementById('ot-fecha').value||hoy(),horaIni:ini,horaFin:fin,duracion,avance,materiales:otMatsSelected.map(m=>({id:m.id,cod:m.cod||'',texto:m.texto,um:m.um,precio:m.precio,moneda:m.moneda})),costoMat:`S/ ${costo.toFixed(2)}`,prioridad:document.getElementById('ot-prioridad')?.value||'',obs:document.getElementById('ot-obs').value};
+  const firmaPayload=estadoVal==='Cerrada'&&window._getFirmaDataURL?window._getFirmaDataURL():null;
+  const payload={desc,equipo,tecnico,temporada:document.getElementById('ot-temporada').value,areaSol:document.getElementById('ot-area-sol').value,sistema:document.getElementById('ot-sistema').value,subsistema:document.getElementById('ot-subsistema').value,ubicacion:document.getElementById('ot-ubicacion').value,tipo:document.getElementById('ot-tipo').value,estado:document.getElementById('ot-estado').value,fecha:document.getElementById('ot-fecha').value||hoy(),horaIni:ini,horaFin:fin,duracion,avance,materiales:otMatsSelected.map(m=>({id:m.id,cod:m.cod||'',texto:m.texto,um:m.um,precio:m.precio,moneda:m.moneda})),costoMat:`S/ ${costo.toFixed(2)}`,prioridad:document.getElementById('ot-prioridad')?.value||'',obs:document.getElementById('ot-obs').value,...(firmaPayload?{firmaTecnico:firmaPayload}:{})};
   if(editingOTId){
     // MODO EDICIÓN
     if(fotoUrl)payload.fotoUrl=fotoUrl;
@@ -3129,6 +3146,16 @@ window.saveOT=async function(){
   renderOTMats();
 };
 
+window.onOTEstadoChange=function(val){
+  var sec=document.getElementById('ot-firma-section');
+  if(!sec)return;
+  if(val==='Cerrada'){
+    sec.style.display='block';
+    window._initFirma&&window._initFirma();
+  } else {
+    sec.style.display='none';
+  }
+};
 window.openNuevaOT=function(){
   editingOTId=null;
   document.getElementById('ot-modal-title').textContent='NUEVA ORDEN DE TRABAJO';
@@ -3151,6 +3178,7 @@ window.openNuevaOT=function(){
   otMatsSelected=[];
   renderOTMats();
   populateMatSelect();
+  const fSec=document.getElementById('ot-firma-section');if(fSec)fSec.style.display='none';
   openModal('modal-ot');
   // Scroll modal body to top after opening
   setTimeout(()=>{const mb=document.querySelector('#modal-ot .modal-body');if(mb)mb.scrollTop=0;},50);
@@ -3994,6 +4022,9 @@ window.toggleSidebar=function(){
     canvas.addEventListener('touchend',stop);
   }
   window._initFirma=function(){setTimeout(()=>{canvas=getCanvas();if(canvas){canvas._firmainit=false;init();}},150);};
+  window._clearFirmaCerrar=function(){const c=document.getElementById('firma-cerrar-canvas');if(c)c.getContext('2d').clearRect(0,0,c.width,c.height);};
+  window._getFirmaCerrarDataURL=function(){const c=document.getElementById('firma-cerrar-canvas');if(!c)return null;const d=c.getContext('2d').getImageData(0,0,c.width,c.height).data;const has=Array.from(d).some((v,i)=>i%4!==3&&v<250);return has?c.toDataURL('image/jpeg',0.7):null;};
+  window._initFirmaCerrar=function(){setTimeout(()=>{const c=document.getElementById('firma-cerrar-canvas');if(!c||c._cinit)return;c._cinit=true;const ct=c.getContext('2d');ct.strokeStyle='#111';ct.lineWidth=2.2;ct.lineCap='round';ct.lineJoin='round';let dr=false,lx=0,ly=0;function pos(e){const r=c.getBoundingClientRect();const sx=c.width/r.width,sy=c.height/r.height;if(e.touches)return{x:(e.touches[0].clientX-r.left)*sx,y:(e.touches[0].clientY-r.top)*sy};return{x:(e.clientX-r.left)*sx,y:(e.clientY-r.top)*sy};}function start(e){e.preventDefault();dr=true;const p=pos(e);lx=p.x;ly=p.y;ct.beginPath();ct.arc(p.x,p.y,1.1,0,Math.PI*2);ct.fillStyle='#111';ct.fill();}function move(e){e.preventDefault();if(!dr)return;const p=pos(e);ct.beginPath();ct.moveTo(lx,ly);ct.lineTo(p.x,p.y);ct.stroke();lx=p.x;ly=p.y;}function stop(){dr=false;}c.addEventListener('mousedown',start);c.addEventListener('mousemove',move);c.addEventListener('mouseup',stop);c.addEventListener('mouseleave',stop);c.addEventListener('touchstart',start,{passive:false});c.addEventListener('touchmove',move,{passive:false});c.addEventListener('touchend',stop);},150);};
   window._clearFirma=function(){canvas=getCanvas();if(!canvas)return;ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);};
   window._getFirmaDataURL=function(){
     const c=getCanvas();if(!c)return null;
