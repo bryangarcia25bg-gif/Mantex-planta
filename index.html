@@ -443,7 +443,11 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
       <div class="dash-filter-bar" id="dash-filter-bar">
         <span style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px;flex-shrink:0">FILTRAR:</span>
         <button class="filter-chip active" id="dflt-all" onclick="setDashFilter('all',this)">⏺ Todo</button>
-        <button class="filter-chip" id="dflt-year" onclick="setDashFilter('year',this)">Año</button>
+        <div class="dropdown" id="dd-year-filter" style="position:relative">
+          <button class="filter-chip" id="dflt-year" onclick="toggleYearPicker()">Año</button>
+          <div id="year-picker-dd" style="display:none;position:absolute;top:38px;left:0;z-index:500;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px;box-shadow:0 8px 24px rgba(0,0,0,.5);display:none">
+          </div>
+        </div>
         <button class="filter-chip" id="dflt-month" onclick="setDashFilter('month',this)">Mes</button>
         <button class="filter-chip" id="dflt-week" onclick="setDashFilter('week',this)">Semana</button>
         <div id="dash-filter-val-wrap" style="display:none;align-items:center;gap:6px">
@@ -513,7 +517,7 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
         <thead id="ot-thead"><tr id="ot-th-row">
           <th>N° OT</th><th>Temporada</th><th>Área Sol.</th><th>Sistema</th><th>Subsistema</th>
           <th>Ubicación</th><th>Equipo</th><th>Descripción</th><th>Tipo</th><th>Técnico</th>
-          <th>Fecha</th><th>H.Ini</th><th>H.Fin</th><th>Duración</th><th>% Avance</th><th>Estado</th><th>Costo Mat.</th><th>Acciones</th>
+          <th>Fecha</th><th>H.Ini</th><th>H.Fin</th><th>Duración</th><th>% Avance</th><th>Estado</th><th>Costo Mat.</th><th>Prioridad</th><th>Acciones</th>
         </tr></thead>
         <tbody id="ot-tbody"></tbody>
       </table></div></div>
@@ -623,8 +627,41 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
 
       <!-- Panel: Preventivo -->
       <div class="prog-panel active" id="ppanel-preventivo">
+        <!-- Summary cards -->
+        <div id="prev-summary-cards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px">
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00d4aa" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span style="font-family:var(--mono);font-size:10px;color:#00d4aa;letter-spacing:1px;font-weight:700">AL DÍA</span></div>
+            <div id="prev-al-dia" style="font-family:var(--display);font-size:34px;color:var(--text)">0</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:4px">Completadas o en ejecución</div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffa502" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span style="font-family:var(--mono);font-size:10px;color:#ffa502;letter-spacing:1px;font-weight:700">PRÓXIMOS</span></div>
+            <div id="prev-proximos" style="font-family:var(--display);font-size:34px;color:var(--text)">0</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:4px">En los próximos 7 días</div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff4757" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span style="font-family:var(--mono);font-size:10px;color:#ff4757;letter-spacing:1px;font-weight:700">VENCIDOS</span></div>
+            <div id="prev-vencidos" style="font-family:var(--display);font-size:34px;color:var(--text)">0</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:4px">Fecha pasada sin completar</div>
+          </div>
+        </div>
         <div class="search-bar">
           <input class="search-input" id="prog-search-prev" placeholder="&#128269; Buscar actividad, equipo, responsable..." oninput="renderProgTable('preventivo')">
+          <div class="dropdown" id="dd-import-prog">
+            <button class="btn btn-ghost" onclick="toggleDD('dd-import-prog')">&#11014; Importar &#9662;</button>
+            <div class="dropdown-menu">
+              <div class="dropdown-item" onclick="openModal('modal-import-prog')">&#128202; Excel (.xlsx)</div>
+              <div class="dropdown-item" onclick="openModal('modal-import-prog')">&#128196; CSV</div>
+            </div>
+          </div>
+          <div class="dropdown" id="dd-export-prog">
+            <button class="btn btn-ghost" onclick="toggleDD('dd-export-prog')">&#11015; Exportar &#9662;</button>
+            <div class="dropdown-menu">
+              <div class="dropdown-item" onclick="exportProg('xlsx')">&#128202; Excel (.xlsx)</div>
+              <div class="dropdown-item" onclick="exportProg('csv')">&#128196; CSV</div>
+              <div class="dropdown-item" onclick="exportProg('pdf')">&#128196; PDF</div>
+            </div>
+          </div>
           <button class="btn btn-ghost" id="btn-del-prog-prev" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDeleteMode('prog-prev')">&#128465; Borrar</button>
           <button class="btn btn-primary" onclick="openProgModal('Preventivo')">+ Nueva Actividad</button>
         </div>
@@ -853,6 +890,7 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
         <div class="form-group form-full"><label>Descripción *</label><textarea class="form-control" id="ot-desc" placeholder="Descripción de la OT..."></textarea></div>
         <div class="form-group"><label>Técnico Responsable *</label><select class="form-control" id="ot-tecnico"></select></div>
         <div class="form-group"><label>Estado</label><select class="form-control" id="ot-estado"><option>Abierta</option><option>En proceso</option><option>Pausada</option><option>Cerrada</option></select></div>
+        <div class="form-group"><label>Prioridad</label><select class="form-control" id="ot-prioridad"><option value="">— Sin prioridad —</option><option value="Alta">&#128308; Alta</option><option value="Media">&#128993; Media</option><option value="Baja">&#128994; Baja</option></select></div>
       </div>
       <div class="section-divider" style="margin-top:14px">TIEMPO</div>
       <div class="form-grid3">
@@ -959,6 +997,29 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
     <div class="modal-header"><h2 id="del-title">BORRAR DATOS</h2><button class="modal-close" onclick="closeModal('modal-delete')">✕</button></div>
     <div class="modal-body" id="del-body"></div>
     <div class="modal-footer" id="del-footer"></div>
+  </div>
+</div>
+
+<!-- MODAL IMPORT PROG -->
+<div class="modal-overlay" id="modal-import-prog">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-header">
+      <h2>IMPORTAR ACTIVIDADES</h2>
+      <button class="modal-close" onclick="closeModal('modal-import-prog')">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <div style="background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.3);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--warn)">
+        &#9888; El archivo debe tener columnas: <b>tipo, desc, equipo, responsable, fechaIni, fechaFin, anio, estado</b>
+      </div>
+      <div class="form-group">
+        <label>Seleccionar archivo</label>
+        <input type="file" class="form-control" id="prog-import-file" accept=".xlsx,.xls,.csv">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-import-prog')">Cancelar</button>
+      <button class="btn btn-primary" onclick="importProg()">Importar</button>
+    </div>
   </div>
 </div>
 
@@ -1386,13 +1447,13 @@ const firebaseConfig = {
 const ROLE_LABELS={planner:"Planner",supervisor:"Supervisor",tecnico:"Técnico",jefatura:"Jefatura"};
 const ROLE_WRITE={planner:true,supervisor:true,tecnico:false,jefatura:false};
 const NAV_CONFIG={
-  planner:['dashboard','kanban','ot','logistica','suministros','prog','equipos','materiales','herramientas','epp','tecnicos','usuarios','reportes'],
-  supervisor:['dashboard','kanban','ot','logistica','suministros','prog','equipos','materiales','herramientas','epp','tecnicos','reportes'],
+  planner:['dashboard','kanban','ot','prog','logistica','suministros','equipos','materiales','herramientas','epp','tecnicos','usuarios','reportes'],
+  supervisor:['dashboard','kanban','ot','prog','logistica','suministros','equipos','materiales','herramientas','epp','tecnicos','reportes'],
   tecnico:['ot'],
-  jefatura:['dashboard','kanban','ot','logistica','suministros','prog','reportes']
+  jefatura:['dashboard','kanban','ot','prog','logistica','suministros','reportes']
 };
 const NAV_LABELS={dashboard:'Dashboard',kanban:'Kanban OT',prog:'Programación',ot:'Órdenes de Trabajo',logistica:'SAP — Servicios',suministros:'SAP — Suministros',equipos:'Equipos',materiales:'Materiales',herramientas:'Herramientas',epp:'Entrega EPPs',tecnicos:'Técnicos',usuarios:'Gestión de Usuarios',reportes:'Indicadores'};
-const NAV_ICONS={dashboard:'📊',kanban:'📌',prog:'📅',ot:'🛠️',logistica:'📋',suministros:'🛒',equipos:'⚙️',materiales:'📦',herramientas:'🔨',epp:'🦺',tecnicos:'👷',usuarios:'👥',reportes:'📈'};
+const NAV_ICONS={dashboard:'📊',kanban:'📌',prog:'📅',ot:'🔧',logistica:'📋',suministros:'🛒',equipos:'⚙️',materiales:'📦',herramientas:'🔨',epp:'🦺',tecnicos:'👷',usuarios:'👥',reportes:'📈'};
 const NAV_SECTIONS={dashboard:'Principal',kanban:'Operaciones',prog:'Operaciones',ot:'Operaciones',logistica:'Operaciones',suministros:'Operaciones',equipos:'Recursos',materiales:'Recursos',herramientas:'Recursos',epp:'Recursos',tecnicos:'Recursos',usuarios:'Administración',reportes:'Análisis'};
 const PAGE_TITLES={dashboard:'DASHBOARD',kanban:'KANBAN — ÓRDENES DE TRABAJO',prog:'PROGRAMACIÓN DE ACTIVIDADES',ot:'ÓRDENES DE TRABAJO',logistica:'SAP — SERVICIOS',suministros:'SAP — SUMINISTROS',equipos:'EQUIPOS',materiales:'MATERIALES',herramientas:'HERRAMIENTAS',epp:'ENTREGA DE EPPs',tecnicos:'TÉCNICOS',usuarios:'GESTIÓN DE USUARIOS',reportes:'INDICADORES'};
 
@@ -1473,7 +1534,7 @@ function bootApp(){
   (function startClock(){const tick=()=>{const n=new Date();const hh=String(n.getHours()).padStart(2,'0');const mm=String(n.getMinutes()).padStart(2,'0');const ss=String(n.getSeconds()).padStart(2,'0');const el=document.getElementById('topbar-clock');if(el)el.textContent=hh+':'+mm+':'+ss;};tick();setInterval(tick,1000);})();
   buildNav();subscribeAll();setDefaultDates();
   const _startPage=(currentUser.role==='tecnico')?'ot':NAV_CONFIG[currentUser.role][0];
-  window.navigate(_startPage,null);
+  navigate(_startPage,null);
 }
 function buildNav(){
   const pages=NAV_CONFIG[currentUser.role]||['dashboard'];
@@ -1508,7 +1569,7 @@ function computeOTCounter(){
 }
 
 /* ── NAV ── */
-window.navigate=function(page,el){
+function navigate(page,el){
   ['ot','log','sum','mat','epp','tec','usr','her','eq'].forEach(k=>{deleteMode[k]=false;});
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
@@ -1519,7 +1580,8 @@ window.navigate=function(page,el){
   const r={dashboard:renderDashboard,kanban:renderKanbanBoard,prog:renderProg,ot:renderOT,logistica:renderLogistica,suministros:renderSuministros,equipos:renderEquipos,materiales:renderMateriales,herramientas:renderHerramientas,epp:renderEPP,tecnicos:renderTecnicos,usuarios:renderUsuarios,reportes:renderReportes};
   if(r[page])r[page]();
   document.querySelectorAll('.dropdown-menu').forEach(m=>m.classList.remove('open'));
-};
+}
+window.navigate=navigate;
 
 /* ═══════════════════════════════════════════
    DASHBOARD
@@ -1654,7 +1716,7 @@ function fillWidgetContent(w){
   const el=document.getElementById(`dw-content-${w.id}`);if(!el)return;
   if(w.id==='ot-recientes'){
     const rec=filterOTByUser().slice(0,6);
-    el.innerHTML=rec.length?`<div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table style="min-width:340px"><thead><tr><th>OT</th><th>Equipo</th><th>Avance</th><th>Estado</th></tr></thead><tbody>${rec.map(o=>`<tr><td><span class="pill-num">${o.num}</span></td><td>${o.equipo||''}</td><td style="font-family:var(--mono)">${o.avance||0}%</td><td>${estadoBadge(o.estado)}</td></tr>`).join('')}</tbody></table></div>`:emptyMsg('Sin OT');
+    el.innerHTML=rec.length?`<div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table style="min-width:340px"><thead><tr><th>OT</th><th>Equipo</th><th>Avance</th><th>Estado</th></tr></thead><tbody>${rec.map(o=>`<tr><td><span class="pill-num">${o.num}</span></td><td>${o.equipo||''}</td><td style="font-family:var(--mono)">${o.avance||0}%</td><td>${estadoBadge(o.estado)}</td>${(()=>{const p=o.prioridad;if(!p||p==='')return '<td style="color:var(--muted);font-size:11px">—</td>';const clr=p==='Alta'?'#ff4757':p==='Media'?'#ffa502':'#00d4aa';const bg=p==='Alta'?'rgba(255,71,87,.15)':p==='Media'?'rgba(255,165,2,.15)':'rgba(0,212,170,.15)';return `<td><span style="background:${bg};color:${clr};border:1px solid ${clr}44;border-radius:4px;padding:2px 8px;font-size:10px;font-family:var(--mono);font-weight:700">${p}</span></td>`;})()}</tr>`).join('')}</tbody></table></div>`:emptyMsg('Sin OT');
   } else if(w.id==='svc-pendientes'){
     const pend=logData.filter(s=>s.estado==='Pendiente'||s.estado==='En proceso').slice(0,6);
     el.innerHTML=pend.length?`<table><thead><tr><th>Sol.Pedido</th><th>Texto</th><th>Estado</th></tr></thead><tbody>${pend.map(s=>`<tr><td style="font-family:var(--mono);font-size:11px">${s.solped||'—'}</td><td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.texto||''}</td><td>${logEstadoBadge(s.estado)}</td></tr>`).join('')}</tbody></table>`:emptyMsg('Sin servicios pendientes ✅');
@@ -1953,11 +2015,34 @@ window.switchProgTab=function(tab){
 };
 
 function renderProg(){
+  updatePrevSummaryCards();
   if(_activeProgTab==='preventivo'||_activeProgTab==='diario')renderProgTable(_activeProgTab);
   else if(_activeProgTab==='cronograma')renderCronograma();
   else if(_activeProgTab==='kanban')renderProgKanban();
 }
 
+function updatePrevSummaryCards(){
+  const today=new Date();today.setHours(0,0,0,0);
+  const in7=new Date(today.getTime()+7*86400000);
+  const list=progData.filter(a=>['Preventivo','Correctivo','Predictivo'].includes(a.tipo));
+  const alDia=list.filter(a=>a.estado==='Completada'||a.estado==='En proceso').length;
+  const proximos=list.filter(a=>{
+    if(a.estado==='Completada'||a.estado==='Cancelada')return false;
+    const fi=a.fechaIni?new Date(a.fechaIni+'T00:00:00'):null;
+    return fi&&fi>=today&&fi<=in7;
+  }).length;
+  const vencidos=list.filter(a=>{
+    if(a.estado==='Completada'||a.estado==='Cancelada')return false;
+    const fi=a.fechaIni?new Date(a.fechaIni+'T00:00:00'):null;
+    return fi&&fi<today;
+  }).length;
+  const el1=document.getElementById('prev-al-dia');
+  const el2=document.getElementById('prev-proximos');
+  const el3=document.getElementById('prev-vencidos');
+  if(el1)el1.textContent=alDia;
+  if(el2)el2.textContent=proximos;
+  if(el3)el3.textContent=vencidos;
+}
 function renderProgTable(subtype){
   const isPrev=subtype==='preventivo';
   const tipos=isPrev?['Preventivo','Correctivo','Predictivo']:['Diario'];
@@ -2086,7 +2171,8 @@ function renderProgKanban(){
   if(!area)return;
   let html='<div class="prog-kanban">';
   PROG_KB_COLS.forEach(col=>{
-    const cards=progData.filter(a=>a.estado===col.id);
+    let cards=progData.filter(a=>a.estado===col.id);
+    if(col.id==='Completada')cards=cards.slice(0,4);
     html+=`<div class="prog-kb-col">
       <div class="prog-kb-hdr" style="border-top-color:${col.color}">
         <span class="prog-kb-lbl" style="color:${col.color}">${col.id.toUpperCase()}</span>
@@ -2140,6 +2226,57 @@ window.editProg=function(id){
   document.getElementById('prog-obs').value=a.obs||'';
   openModal('modal-prog');
 };
+
+window.exportProg=function(fmt){
+  const types=['Preventivo','Correctivo','Predictivo'];
+  const list=progData.filter(a=>types.includes(a.tipo));
+  if(!list.length){toast('Sin datos para exportar','error');return;}
+  const cols=['tipo','desc','equipo','responsable','fechaIni','fechaFin','anio','semana','estado','obs'];
+  const headers=['Tipo','Descripción','Equipo','Responsable','Fecha Inicio','Fecha Final','Año','Semana','Estado','Observaciones'];
+  if(fmt==='csv'){
+    const csv=[headers.join(','),...list.map(r=>cols.map(c=>`"${(r[c]||'').toString().replace(/"/g,'""')}"`).join(','))].join('\n');
+    const blob=new Blob([csv],{type:'text/csv'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='preventivo.csv';a.click();
+  } else if(fmt==='xlsx'){
+    const ws=[headers,...list.map(r=>cols.map(c=>r[c]||''))];
+    const max=ws[0].length;
+    const wsTxt=ws.map(r=>r.map(c=>`<Cell><Data ss:Type="String">${c}</Data></Cell>`).join('')).map(r=>`<Row>${r}</Row>`).join('');
+    const xml=`<?xml version="1.0"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Worksheet ss:Name="Preventivo"><Table>${wsTxt}</Table></Worksheet></Workbook>`;
+    const blob=new Blob([xml],{type:'application/vnd.ms-excel'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='preventivo.xls';a.click();
+  } else if(fmt==='pdf'){
+    const w=window.open('','_blank');
+    let html='<html><head><title>Preventivo</title><style>body{font-family:Arial,sans-serif;font-size:12px}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:6px 8px;text-align:left}th{background:#2d3561;color:#fff}</style></head><body>';
+    html+=`<h2 style="margin-bottom:8px">Plan de Mantenimiento Preventivo</h2><p style="color:#666">Exportado: ${new Date().toLocaleDateString('es-PE')}</p>`;
+    html+='<table><thead><tr>'+headers.map(h=>`<th>${h}</th>`).join('')+'</tr></thead><tbody>';
+    html+=list.map(r=>`<tr>${cols.map(c=>`<td>${r[c]||''}</td>`).join('')}</tr>`).join('');
+    html+='</tbody></table></body></html>';
+    w.document.write(html);w.document.close();w.print();
+  }
+  toast('Exportación lista','success');
+};
+window.importProg=async function(){
+  const f=document.getElementById('prog-import-file').files[0];
+  if(!f){toast('Selecciona un archivo','error');return;}
+  const text=await f.text();
+  const lines=text.split('\n').filter(l=>l.trim());
+  if(lines.length<2){toast('Archivo vacío','error');return;}
+  const headers=lines[0].split(',').map(h=>h.replace(/"/g,'').trim().toLowerCase());
+  let count=0;
+  for(let i=1;i<lines.length;i++){
+    const vals=lines[i].split(',').map(v=>v.replace(/"/g,'').trim());
+    if(!vals[0])continue;
+    const row={fechaCreacion:serverTimestamp(),creadoPor:currentUser.name};
+    headers.forEach((h,j)=>row[h]=vals[j]||'');
+    if(!row.tipo)row.tipo='Preventivo';
+    if(!row.estado)row.estado='Pendiente';
+    await addDoc(collection(db,'prog_actividades'),row);
+    count++;
+  }
+  closeModal('modal-import-prog');
+  toast(`${count} actividades importadas`,'success');
+};
+
 window.saveProg=async function(){
   if(_savingProg)return; _savingProg=true;
   const tipo=document.getElementById('prog-tipo').value;
@@ -2473,7 +2610,7 @@ window.openEditOT=function(id){
     const f={
       'ot-temporada':'temporada','ot-area-sol':'areaSol','ot-sistema':'sistema',
       'ot-subsistema':'subsistema','ot-ubicacion':'ubicacion','ot-equipo':'equipo',
-      'ot-tipo':'tipo','ot-tecnico':'tecnico','ot-estado':'estado'
+      'ot-tipo':'tipo','ot-tecnico':'tecnico','ot-estado':'estado','ot-prioridad':'prioridad'
     };
     Object.entries(f).forEach(([elId,field])=>{const el=document.getElementById(elId);if(el)el.value=o[field]||'';});
     document.getElementById('ot-desc').value=o.desc||'';
@@ -2534,7 +2671,7 @@ window.saveOT=async function(){
   let fotoUrl='';
   const fi=document.getElementById('ot-foto');
   if(fi.files[0]){await new Promise(res=>{const r=new FileReader();r.onload=e=>{fotoUrl=e.target.result;res();};r.readAsDataURL(fi.files[0]);});}
-  const payload={desc,equipo,tecnico,temporada:document.getElementById('ot-temporada').value,areaSol:document.getElementById('ot-area-sol').value,sistema:document.getElementById('ot-sistema').value,subsistema:document.getElementById('ot-subsistema').value,ubicacion:document.getElementById('ot-ubicacion').value,tipo:document.getElementById('ot-tipo').value,estado:document.getElementById('ot-estado').value,fecha:document.getElementById('ot-fecha').value||hoy(),horaIni:ini,horaFin:fin,duracion,avance,materiales:otMatsSelected.map(m=>({id:m.id,cod:m.cod||'',texto:m.texto,um:m.um,precio:m.precio,moneda:m.moneda})),costoMat:`S/ ${costo.toFixed(2)}`,obs:document.getElementById('ot-obs').value};
+  const payload={desc,equipo,tecnico,temporada:document.getElementById('ot-temporada').value,areaSol:document.getElementById('ot-area-sol').value,sistema:document.getElementById('ot-sistema').value,subsistema:document.getElementById('ot-subsistema').value,ubicacion:document.getElementById('ot-ubicacion').value,tipo:document.getElementById('ot-tipo').value,estado:document.getElementById('ot-estado').value,fecha:document.getElementById('ot-fecha').value||hoy(),horaIni:ini,horaFin:fin,duracion,avance,materiales:otMatsSelected.map(m=>({id:m.id,cod:m.cod||'',texto:m.texto,um:m.um,precio:m.precio,moneda:m.moneda})),costoMat:`S/ ${costo.toFixed(2)}`,prioridad:document.getElementById('ot-prioridad')?.value||'',obs:document.getElementById('ot-obs').value};
   if(editingOTId){
     // MODO EDICIÓN
     if(fotoUrl)payload.fotoUrl=fotoUrl;
@@ -2571,6 +2708,7 @@ window.openNuevaOT=function(){
   ['ot-temporada','ot-area-sol','ot-sistema','ot-subsistema','ot-ubicacion'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   document.getElementById('ot-tipo').value='Correctivo';
   document.getElementById('ot-estado').value='Abierta';
+  const opEl=document.getElementById('ot-prioridad');if(opEl)opEl.value='';
   const otTec=document.getElementById('ot-tecnico');if(otTec)otTec.value='';
   const otEq=document.getElementById('ot-equipo');if(otEq)otEq.value='';
   document.getElementById('ot-avance').value=0;
@@ -3059,20 +3197,38 @@ function criticidadBadge(c){return`<span class="badge ${{Alta:'badge-red',Media:
 /* ── DASHBOARD FILTER ── */
 let dashFilter={type:'all',val:''};
 
+window.toggleYearPicker=function(){
+  const dd=document.getElementById('year-picker-dd');if(!dd)return;
+  const shown=dd.style.display==='flex';
+  if(!shown){
+    _buildYearPicker();
+    dd.style.display='flex';
+    /* Deactivate other chips and activate Año */
+    document.querySelectorAll('.filter-chip[id^="dflt-"]').forEach(b=>b.classList.remove('active'));
+    document.getElementById('dflt-year')?.classList.add('active');
+    dashFilter.type='year';
+    if(!dashFilter.val)dashFilter.val=String(new Date().getFullYear());
+    renderDashboard();
+  } else {
+    dd.style.display='none';
+  }
+};
 window._pickYear=function(y){
   dashFilter.val=String(y);
-  document.getElementById('dash-filter-val').value=String(y);
-  const badge=document.getElementById('dash-filter-badge');
-  if(badge){badge.style.display='inline-block';badge.textContent=y;}
-  _updateYearBtns();
+  dashFilter.type='year';
+  document.querySelectorAll('[id^="ybtn-"]').forEach(b=>b.classList.toggle('active',parseInt(b.dataset.y)===y));
   renderDashboard();
 };
-function _updateYearBtns(){
-  const curY=parseInt(dashFilter.val)||new Date().getFullYear();
-  document.querySelectorAll('[id^="ybtn-"]').forEach(b=>{
-    const y=parseInt(b.id.replace('ybtn-',''));
-    b.classList.toggle('active',y===curY);
-  });
+function _buildYearPicker(){
+  const dd=document.getElementById('year-picker-dd');if(!dd)return;
+  const curY=new Date().getFullYear();
+  const selY=parseInt(dashFilter.val)||curY;
+  let html='<div style="display:flex;flex-wrap:wrap;gap:6px;min-width:200px">';
+  for(let y=curY+1;y>=2020;y--){
+    html+=`<button data-y="${y}" onclick="_pickYear(${y})" class="filter-chip${y===selY?' active':''}" style="padding:6px 14px;min-width:64px">${y}</button>`;
+  }
+  html+='</div>';
+  dd.innerHTML=html;
 }
 window.setDashFilter=function(type,btn){
   document.querySelectorAll('.filter-chip[id^="dflt-"]').forEach(b=>b.classList.remove('active'));
@@ -3090,22 +3246,11 @@ window.setDashFilter=function(type,btn){
   }
   wrap.style.display='flex';
   badge.style.display='none';
-  if(type==='year'){inp.type='hidden';inp.value=String(new Date().getFullYear());dashFilter.val=inp.value;
+  if(type==='year'){/* handled by toggleYearPicker */
+    dashFilter.type='year';
     const curY=new Date().getFullYear();
-    let ypHtml='<div id="year-picker" style="display:flex;flex-wrap:wrap;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px;position:fixed;z-index:500;margin-top:6px;box-shadow:0 8px 24px rgba(0,0,0,.4)">';
-    for(let y=curY+1;y>=2020;y--)ypHtml+=`<button onclick="_pickYear(${y})" class="filter-chip" id="ybtn-${y}" style="padding:6px 14px;min-width:64px">${y}</button>`;
-    ypHtml+='</div>';
-    const existPicker=document.getElementById('year-picker');
-    if(existPicker)existPicker.remove();
-    /* Position picker below the Año button */
-    const yearBtn=document.getElementById('dflt-year');
-    document.body.insertAdjacentHTML('beforeend',ypHtml);
-    if(yearBtn){
-      const r=yearBtn.getBoundingClientRect();
-      const p=document.getElementById('year-picker');
-      if(p){p.style.top=(r.bottom+window.scrollY+4)+'px';p.style.left=r.left+'px';}
-    }
-    _updateYearBtns();
+    if(!dashFilter.val)dashFilter.val=String(curY);
+    _buildYearPicker();
     renderDashboard();}
   else if(type==='month'){inp.type='month';inp.placeholder='';}
   else if(type==='week'){inp.type='week';inp.placeholder='';}
@@ -3276,9 +3421,9 @@ window.toggleSidebar=function(){
   _sbFlap();
 };
 document.addEventListener('click',function(e){
-  if(!e.target.closest('#dash-filter-val-wrap')&&!e.target.closest('#year-picker')){
-    const p=document.getElementById('year-picker');
-    if(p)p.remove();
+  if(!e.target.closest('#dd-year-filter')){
+    const dd=document.getElementById('year-picker-dd');
+    if(dd)dd.style.display='none';
   }
 });
 window.closeSidebarOverlay=function(){
