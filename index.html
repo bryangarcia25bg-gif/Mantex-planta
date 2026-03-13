@@ -268,7 +268,7 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
 
 /* ── Sidebar toggle ── */
 .sidebar-toggle{display:none!important}
-.sb-flap{position:fixed;top:50%;transform:translateY(-50%);left:232px;z-index:150;width:14px;height:56px;background:var(--surface2);border:1px solid var(--border);border-left:none;border-radius:0 8px 8px 0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:left .25s ease,opacity .2s,background .2s;opacity:.2;user-select:none}
+.sb-flap{position:fixed;top:50%;transform:translateY(-50%);left:232px;z-index:150;width:18px;height:64px;background:var(--surface2);border:1px solid var(--border);border-left:none;border-radius:0 10px 10px 0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:left .25s ease,opacity .2s,background .2s;opacity:.45;user-select:none}
 .sb-flap:hover{opacity:1;background:var(--accent);border-color:var(--accent)}
 .sb-flap:hover .sb-arr{color:#fff}
 .sb-arr{font-size:9px;color:var(--muted);line-height:1;transition:color .2s}
@@ -282,6 +282,8 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
 /* ── Responsive mobile ── */
 @media(max-width:768px){
   .sidebar{transform:translateX(-232px)}
+  .sb-flap{left:0!important;width:22px!important;height:72px!important;opacity:.75!important;background:var(--accent)!important;border-color:var(--accent)!important;border-radius:0 12px 12px 0!important}
+  .sb-arr{color:#000!important;font-weight:900!important}
   .sidebar.mobile-open{transform:translateX(0);z-index:200}
   .main{margin-left:0!important}
   .sidebar-toggle{display:flex!important}
@@ -3111,6 +3113,53 @@ function renderEquipos(){
   </table></div>`;
 }
 
+
+window.verHistorialEquipo=function(eqId,tag){
+  const eq=eqData.find(x=>x.id===eqId);
+  const nombre=eq?eq.nombre:tag;
+  const titleEl=document.getElementById('historial-eq-title');
+  if(titleEl)titleEl.textContent='HISTORIAL OT — '+tag+(nombre&&nombre!==tag?' — '+nombre:'');
+  const ots=otData.filter(o=>(o.equipo||'').toLowerCase().trim()===(tag||'').toLowerCase().trim());
+  const body=document.getElementById('historial-eq-body');
+  if(!body)return;
+  if(!ots.length){
+    body.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted);font-family:var(--mono);font-size:12px">Sin órdenes de trabajo para este equipo</div>';
+    openModal('modal-historial-eq');
+    return;
+  }
+  const sorted=ots.slice().sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||''));
+  const rows=sorted.map(o=>{
+    const mats=o.materiales&&o.materiales.length?
+      o.materiales.map(m=>m.texto||m.cod||'').filter(Boolean).join(', '):'—';
+    return `<tr>
+      <td style="font-family:var(--mono);color:var(--accent);white-space:nowrap">${o.num||''}</td>
+      <td style="white-space:nowrap">${fmtFecha(o.fecha)}</td>
+      <td class="td-left" style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${o.desc||''}">${o.desc||''}</td>
+      <td>${o.tipo||'—'}</td>
+      <td>${o.tecnico||'—'}</td>
+      <td class="td-left" style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${mats}">${mats}</td>
+      <td>${estadoBadge(o.estado)}</td>
+      <td><button class="btn btn-ghost btn-sm" title="Ver en módulo OT" onclick="irAOT('${o.num||o.id}')">&#10138;</button></td>
+    </tr>`;
+  }).join('');
+  body.innerHTML=`<div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:10px;letter-spacing:1px">${sorted.length} ORDEN(ES) ENCONTRADA(S)</div>
+  <div class="table-wrap"><table>
+    <thead><tr>
+      <th>N° OT</th><th>Fecha</th><th>Actividad</th><th>Tipo</th><th>Técnico</th><th>Repuestos</th><th>Estado</th><th>Ver</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
+  openModal('modal-historial-eq');
+};
+window.irAOT=function(otNum){
+  closeModal('modal-historial-eq');
+  navigate('ot',null);
+  setTimeout(()=>{
+    const searchEl=document.getElementById('ot-search');
+    if(searchEl){searchEl.value=otNum;renderOT();}
+  },200);
+};
+
 window.openEditEquipo=function(id){
   const e=eqData.find(x=>x.id===id);if(!e)return;
   const f={
@@ -3127,7 +3176,34 @@ window.toggleEquipo=async function(id,e){await updateDoc(doc(db,'equipos',id),{e
 window.deleteEquipo=async function(id){if(!confirm('¿Eliminar?'))return;await deleteDoc(doc(db,'equipos',id));};
 let _savingEq=false;
 var editingEqId=null;
-window.saveEquipo=async function(){if(_savingEq)return;_savingEq=true;const nombre=document.getElementById('eq-nombre').value.trim(),tag=document.getElementById('eq-tag').value.trim();if(!nombre||!tag){toast('Nombre y TAG requeridos','error');_savingEq=false;return;}await addDoc(collection(db,'equipos'),{nombre,tag,area:document.getElementById('eq-area').value,tipo:document.getElementById('eq-tipo').value,marca:document.getElementById('eq-marca').value,crit:document.getElementById('eq-crit').value,estado:'Operativo',createdAt:serverTimestamp()});closeModal('modal-eq');_savingEq=false;toast(`Equipo ${tag} registrado`,'success');['eq-nombre','eq-tag','eq-area','eq-marca'].forEach(id=>document.getElementById(id).value='');};
+window.saveEquipo=async function(){
+  if(_savingEq)return;_savingEq=true;
+  const nombre=document.getElementById('eq-nombre').value.trim();
+  const tag=document.getElementById('eq-tag').value.trim();
+  if(!nombre||!tag){toast('Nombre y TAG requeridos','error');_savingEq=false;return;}
+  const payload={
+    nombre,tag,
+    area:document.getElementById('eq-area')?.value||'',
+    tipo:document.getElementById('eq-tipo')?.value||'',
+    marca:document.getElementById('eq-marca')?.value||'',
+    modelo:document.getElementById('eq-modelo')?.value||'',
+    crit:document.getElementById('eq-crit')?.value||'',
+    estado:document.getElementById('eq-estado')?.value||'Operativo',
+    desc:document.getElementById('eq-desc')?.value||''
+  };
+  if(editingEqId){
+    await updateDoc(doc(db,'equipos',editingEqId),payload);
+    toast('Equipo actualizado','success');
+    editingEqId=null;
+  } else {
+    payload.createdAt=serverTimestamp();
+    await addDoc(collection(db,'equipos'),payload);
+    toast(`Equipo ${tag} registrado`,'success');
+    ['eq-nombre','eq-tag','eq-area','eq-marca','eq-modelo'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  }
+  closeModal('modal-equipo');
+  _savingEq=false;
+};
 
 /* ── COMBOS ── */
 /* ── COMBO MANAGER (agregar + editar + eliminar) ── */
@@ -3453,6 +3529,36 @@ window.toggleSidebar=function(){
   _sbFlap();
 };
 /* year dropdown outside click removed */
+
+/* ── Swipe to open/close sidebar on mobile ── */
+(function(){
+  var swipeStartX=0,swipeStartY=0,swipeActive=false;
+  document.addEventListener('touchstart',function(e){
+    const t=e.touches[0];
+    swipeStartX=t.clientX;
+    swipeStartY=t.clientY;
+    swipeActive=true;
+  },{passive:true});
+  document.addEventListener('touchend',function(e){
+    if(!swipeActive)return;
+    swipeActive=false;
+    if(window.innerWidth>768)return;
+    const t=e.changedTouches[0];
+    const dx=t.clientX-swipeStartX;
+    const dy=t.clientY-swipeStartY;
+    if(Math.abs(dy)>Math.abs(dx)*1.5)return; // vertical swipe
+    if(dx>55&&swipeStartX<60){
+      // Swipe right from left edge → open sidebar
+      var sb=document.querySelector('.sidebar');
+      if(sb&&!sb.classList.contains('mobile-open')){toggleSidebar();}
+    } else if(dx<-55){
+      // Swipe left → close sidebar
+      var sb=document.querySelector('.sidebar');
+      if(sb&&sb.classList.contains('mobile-open')){toggleSidebar();}
+    }
+  },{passive:true});
+})();
+
 window.closeSidebarOverlay=function(){
   var sb=document.querySelector('.sidebar');if(sb)sb.classList.remove('mobile-open');
   var ov=document.getElementById('sidebar-overlay');if(ov)ov.classList.remove('visible');
