@@ -125,8 +125,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .card-title{font-family:var(--display);font-size:16px;letter-spacing:1px}
 .table-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;min-width:500px}
-th{padding:9px 12px;text-align:left;font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;background:var(--surface2);border-bottom:1px solid var(--border);white-space:nowrap}
-td{padding:10px 12px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle}
+th{padding:9px 12px;text-align:center;font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;background:var(--surface2);border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:10px 12px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle;text-align:center}
+td.td-left{text-align:left}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:rgba(128,128,128,.04)}
 .badge{display:inline-block;padding:2px 9px;border-radius:20px;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:1px}
@@ -713,7 +714,7 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
       <div class="section-title">EQUIPOS</div>
       <div class="section-sub">Registro de activos de la planta</div>
       <div class="search-bar">
-        <input class="search-input" id="eq-search" placeholder="🔍 Buscar equipo, TAG..." oninput="renderEquipos()">
+        <input class="search-input" id="eq-search" placeholder="🔍 Buscar equipo, TAG, área, modelo, tipo..." oninput="renderEquipos()">
         <button class="btn btn-ghost" id="btn-del-eq" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDeleteMode('eq')">🗑 Borrar</button>
         <button class="btn btn-primary" id="btn-nuevo-eq" onclick="openModal('modal-eq')">+ Nuevo Equipo</button>
       </div>
@@ -724,7 +725,7 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
         <button class="btn btn-danger btn-sm" onclick="execBulkDelete('eq')">🗑 Eliminar</button>
         <button class="btn btn-ghost btn-sm" onclick="toggleDeleteMode('eq')">✕ Cancelar</button>
       </div>
-      <div class="eqp-grid" id="eqp-grid"></div>
+      <div class="card" id="eqp-table-card"></div>
     </div>
 
     <!-- MATERIALES -->
@@ -1015,6 +1016,22 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('modal-import-prog')">Cancelar</button>
       <button class="btn btn-primary" onclick="importProg()">Importar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL HISTORIAL EQUIPO -->
+<div class="modal-overlay" id="modal-historial-eq">
+  <div class="modal" style="max-width:820px;max-height:90vh;overflow-y:auto">
+    <div class="modal-header">
+      <h2 id="historial-eq-title">HISTORIAL OT — EQUIPO</h2>
+      <button class="modal-close" onclick="closeModal('modal-historial-eq')">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <div id="historial-eq-body"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-historial-eq')">Cerrar</button>
     </div>
   </div>
 </div>
@@ -1449,7 +1466,7 @@ const NAV_CONFIG={
   jefatura:['dashboard','kanban','ot','prog','logistica','suministros','reportes']
 };
 const NAV_LABELS={dashboard:'Dashboard',kanban:'Kanban OT',prog:'Programación',ot:'Órdenes de Trabajo',logistica:'SAP — Servicios',suministros:'SAP — Suministros',equipos:'Equipos',materiales:'Materiales',herramientas:'Herramientas',epp:'Entrega EPPs',tecnicos:'Técnicos',usuarios:'Gestión de Usuarios',reportes:'Indicadores'};
-const NAV_ICONS={dashboard:'📊',kanban:'📌',prog:'📅',ot:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><circle cx="9" cy="6" r="3"/><path d="M3 20v-1a6 6 0 0 1 12 0v1"/><path d="M16 3.5 C16 3.5 18 5.5 16 7.5 L14.5 9 L13 7.5 Z"/><line x1="20.5" y1="20.5" x2="13" y2="13"/><line x1="16" y1="7.5" x2="20.5" y2="20.5"/></svg>',logistica:'📋',suministros:'🛒',equipos:'⚙️',materiales:'📦',herramientas:'🔨',epp:'🦺',tecnicos:'👷',usuarios:'👥',reportes:'📈'};
+const NAV_ICONS={dashboard:'📊',kanban:'📌',prog:'📅',ot:'🧑‍🔧',logistica:'📋',suministros:'🛒',equipos:'⚙️',materiales:'📦',herramientas:'🔨',epp:'🦺',tecnicos:'👷',usuarios:'👥',reportes:'📈'};
 const NAV_SECTIONS={dashboard:'Principal',kanban:'Operaciones',prog:'Operaciones',ot:'Operaciones',logistica:'Operaciones',suministros:'Operaciones',equipos:'Recursos',materiales:'Recursos',herramientas:'Recursos',epp:'Recursos',tecnicos:'Recursos',usuarios:'Administración',reportes:'Análisis'};
 const PAGE_TITLES={dashboard:'DASHBOARD',kanban:'KANBAN — ÓRDENES DE TRABAJO',prog:'PROGRAMACIÓN DE ACTIVIDADES',ot:'ÓRDENES DE TRABAJO',logistica:'SAP — SERVICIOS',suministros:'SAP — SUMINISTROS',equipos:'EQUIPOS',materiales:'MATERIALES',herramientas:'HERRAMIENTAS',epp:'ENTREGA DE EPPs',tecnicos:'TÉCNICOS',usuarios:'GESTIÓN DE USUARIOS',reportes:'INDICADORES'};
 
@@ -2580,10 +2597,10 @@ function renderOT(){
     <td style="font-size:12px">${o.subsistema||'—'}</td>
     <td style="font-size:12px">${o.ubicacion||'—'}</td>
     <td style="font-family:var(--mono);font-size:11px">${o.equipo||''}</td>
-    <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${o.desc||''}">${o.desc||''}</td>
+    <td class="td-left" style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${o.desc||''}">${o.desc||''}</td>
     <td>${tipoBadge(o.tipo)}</td>
     <td style="font-size:12px">${o.tecnico||''}</td>
-    <td style="font-family:var(--mono);font-size:11px">${o.fecha||''}</td>
+    <td style="font-family:var(--mono);font-size:11px;min-width:72px;white-space:nowrap">${fmtFecha(o.fecha)}</td>
     <td style="font-family:var(--mono);font-size:11px">${o.horaIni||'—'}</td>
     <td style="font-family:var(--mono);font-size:11px">${o.horaFin||'—'}</td>
     <td style="font-family:var(--mono);font-size:11px">${o.duracion||'—'}</td>
@@ -3055,14 +3072,61 @@ function renderEquipos(){
   const isDelEq=deleteMode['eq'];
   const barEq=document.getElementById('del-bar-eq');if(barEq)barEq.classList.toggle('active',!!isDelEq);
   const btnDelEq=document.getElementById('btn-del-eq');if(btnDelEq)btnDelEq.textContent=isDelEq?'✕ Salir':'🗑 Borrar';
-  const list=eqData.filter(e=>!search||(e.nombre||'').toLowerCase().includes(search)||(e.tag||'').toLowerCase().includes(search));
-  const iconMap={Bomba:'🔄',Motor:'⚡',Compresor:'💨',Transportador:'🏗️',Caldera:'🔥',Reductor:'⚙️',Ventilador:'🌀',Otro:'🔩'};
+  const list=eqData.filter(e=>{
+    if(!search)return true;
+    return (e.nombre||'').toLowerCase().includes(search)||
+           (e.tag||'').toLowerCase().includes(search)||
+           (e.area||'').toLowerCase().includes(search)||
+           (e.modelo||'').toLowerCase().includes(search)||
+           (e.tipo||'').toLowerCase().includes(search)||
+           (e.marca||'').toLowerCase().includes(search);
+  });
   const canWrite=ROLE_WRITE[currentUser.role];
-  document.getElementById('eqp-grid').innerHTML=list.length?list.map(e=>`<div class="eqp-card"><div style="font-size:24px;margin-bottom:7px">${iconMap[e.tipo]||'🔩'}</div><div style="font-weight:600;font-size:14px">${e.nombre}</div><div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px">${e.tag} · ${e.area||''}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${e.marca||''}</div><div style="display:flex;gap:5px;margin-top:9px;flex-wrap:wrap">${criticidadBadge(e.crit)} ${e.estado==='Operativo'?'<span class="badge badge-green">Operativo</span>':'<span class="badge badge-yellow">Mantto</span>'}</div>${canWrite?`<div style="display:flex;gap:5px;margin-top:9px"><button class="btn btn-ghost btn-sm" style="flex:1" onclick="toggleEquipo('${e.id}','${e.estado}')">${e.estado==='Operativo'?'⏸ Mantto':'▶ Operar'}</button>${isDelEq?`<input type='checkbox' class='del-row-chk-eq del-all-chk' value='${e.id}' onchange='updDelCountEq()' style='width:18px;height:18px;accent-color:var(--danger);cursor:pointer' title='Seleccionar para eliminar'>`:''}</div>`:''}</div>`).join(''):`<div style="padding:40px;text-align:center;color:var(--muted)">Sin equipos</div>`;
+  const delTh=isDelEq?'<th></th>':'';
+  const rows=list.map(e=>{
+    const delCell=isDelEq?`<td><input type="checkbox" class="del-row-chk del-row-chk-eq" value="${e.id}" onchange="updDelCount('eq')"></td>`:'';
+    const estBadge=e.estado==='Operativo'?
+      '<span style="background:rgba(0,212,170,.15);color:#00d4aa;border:1px solid rgba(0,212,170,.3);border-radius:4px;padding:2px 8px;font-size:10px;font-family:var(--mono);font-weight:700">Operativo</span>':
+      '<span style="background:rgba(255,165,2,.15);color:#ffa502;border:1px solid rgba(255,165,2,.3);border-radius:4px;padding:2px 8px;font-size:10px;font-family:var(--mono);font-weight:700">Mantto</span>';
+    return `<tr>
+      ${delCell}
+      <td style="font-family:var(--mono);font-size:11px;color:var(--accent)">${e.tag||'—'}</td>
+      <td class="td-left" style="font-weight:600">${e.nombre||''}</td>
+      <td>${e.tipo||'—'}</td>
+      <td>${e.area||'—'}</td>
+      <td>${e.modelo||'—'}</td>
+      <td>${e.marca||'—'}</td>
+      <td>${criticidadBadge(e.crit)}</td>
+      <td>${estBadge}</td>
+      <td style="white-space:nowrap">
+        ${canWrite?`<button class="btn btn-ghost btn-sm" onclick="toggleEquipo('${e.id}','${e.estado}')" title="${e.estado==='Operativo'?'Poner en mantenimiento':'Poner operativo'}">${e.estado==='Operativo'?'⏸':'▶'}</button>
+        <button class="btn btn-ghost btn-sm" onclick="openEditEquipo('${e.id}')" title="Editar">✏️</button>`:''}<button class="btn btn-ghost btn-sm" onclick="verHistorialEquipo('${e.id}','${e.tag||''}')" title="Ver historial de OT">👁 Historial</button>
+      </td>
+    </tr>`;
+  }).join('');
+  const empty=`<tr><td colspan="${isDelEq?10:9}" style="text-align:center;padding:28px;color:var(--muted)">Sin equipos registrados</td></tr>`;
+  document.getElementById('eqp-table-card').innerHTML=`<div class="table-wrap"><table>
+    <thead><tr>${delTh}<th>TAG</th><th>Nombre</th><th>Tipo</th><th>Área</th><th>Modelo</th><th>Marca</th><th>Criticidad</th><th>Estado</th><th>Historial / Acciones</th></tr></thead>
+    <tbody>${rows||empty}</tbody>
+  </table></div>`;
 }
+
+window.openEditEquipo=function(id){
+  const e=eqData.find(x=>x.id===id);if(!e)return;
+  const f={
+    'eq-nombre':'nombre','eq-tag':'tag','eq-area':'area',
+    'eq-tipo':'tipo','eq-marca':'marca','eq-modelo':'modelo',
+    'eq-crit':'crit','eq-estado':'estado','eq-desc':'desc'
+  };
+  document.getElementById('eq-modal-title').textContent='EDITAR EQUIPO';
+  Object.entries(f).forEach(([elId,field])=>{const el=document.getElementById(elId);if(el)el.value=e[field]||'';});
+  editingEqId=id;
+  openModal('modal-equipo');
+};
 window.toggleEquipo=async function(id,e){await updateDoc(doc(db,'equipos',id),{estado:e==='Operativo'?'En mantenimiento':'Operativo'});};
 window.deleteEquipo=async function(id){if(!confirm('¿Eliminar?'))return;await deleteDoc(doc(db,'equipos',id));};
 let _savingEq=false;
+var editingEqId=null;
 window.saveEquipo=async function(){if(_savingEq)return;_savingEq=true;const nombre=document.getElementById('eq-nombre').value.trim(),tag=document.getElementById('eq-tag').value.trim();if(!nombre||!tag){toast('Nombre y TAG requeridos','error');_savingEq=false;return;}await addDoc(collection(db,'equipos'),{nombre,tag,area:document.getElementById('eq-area').value,tipo:document.getElementById('eq-tipo').value,marca:document.getElementById('eq-marca').value,crit:document.getElementById('eq-crit').value,estado:'Operativo',createdAt:serverTimestamp()});closeModal('modal-eq');_savingEq=false;toast(`Equipo ${tag} registrado`,'success');['eq-nombre','eq-tag','eq-area','eq-marca'].forEach(id=>document.getElementById(id).value='');};
 
 /* ── COMBOS ── */
@@ -3187,6 +3251,8 @@ function populateMatSelect(){const el=document.getElementById('ot-mat-sel');if(!
 function populateOTSelect(){const el=document.getElementById('her-ot-e');if(!el)return;el.innerHTML='<option value="">— Sin OT —</option>'+otData.map(o=>`<option value="${o.num}">${o.num} — ${o.equipo||''}</option>`).join('');}
 function setDefaultDates(){['ot-fecha','epp-fecha','her-fecha-e','log-fesol'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=hoy();});}
 function hoy(){return new Date().toISOString().split('T')[0];}
+function fmtFecha(d){if(!d)return'—';const p=d.split('-');if(p.length!==3)return d;const [yy,mm,dd]=p;return dd+'/'+mm+'/'+yy.slice(2);}
+
 function fmtTs(ts){if(!ts)return'—';try{return ts.toDate().toLocaleString('es-PE',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});}catch(e){return'—';}}
 function emptyMsg(msg){return`<div style="text-align:center;color:var(--muted);padding:26px;font-size:13px">${msg}</div>`;}
 function estadoBadge(e){return`<span class="badge ${{Abierta:'badge-blue','En proceso':'badge-yellow',Pausada:'badge-gray',Cerrada:'badge-green'}[e]||'badge-gray'}">${e||'—'}</span>`;}
