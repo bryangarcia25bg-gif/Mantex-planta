@@ -1139,24 +1139,68 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
 
 <!-- MODAL KANBAN TEC -->
 <div class="modal-overlay" id="modal-tec-ot">
-  <div class="modal" style="max-width:420px">
+  <div class="modal" style="max-width:440px;max-height:92vh;overflow-y:auto">
     <div class="modal-header">
       <h2 id="tec-ot-title">ACTUALIZAR OT</h2>
       <button class="modal-close" onclick="closeModal('modal-tec-ot')">&#10005;</button>
     </div>
     <div class="modal-body">
-      <div class="form-group"><label>Estado</label>
-        <select class="form-control" id="tec-ot-estado"><option>Abierta</option><option>En proceso</option><option>Pausada</option><option>Cerrada</option></select>
+      <div class="form-group">
+        <label>Estado</label>
+        <select class="form-control" id="tec-ot-estado" onchange="onTecEstadoChange(this.value)">
+          <option>Abierta</option><option>En proceso</option><option>Pausada</option><option>Cerrada</option>
+        </select>
       </div>
-      <div class="form-grid">
-        <div class="form-group"><label>Hora Inicio</label><input type="time" class="form-control" id="tec-ot-ini"></div>
-        <div class="form-group"><label>Hora Fin</label><input type="time" class="form-control" id="tec-ot-fin"></div>
+      <!-- Campos obligatorios al cerrar -->
+      <div id="tec-ot-cerrar-fields">
+        <div style="background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.3);border-radius:8px;padding:9px 13px;margin-bottom:12px;font-size:11px;color:var(--warn)">
+          &#9888; Para cerrar la OT: Hora inicio, Hora fin y Avance al 100% son obligatorios.
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Hora Inicio <span style="color:var(--danger)">*</span></label>
+            <input type="time" class="form-control" id="tec-ot-ini">
+          </div>
+          <div class="form-group">
+            <label>Hora Fin <span style="color:var(--danger)">*</span></label>
+            <input type="time" class="form-control" id="tec-ot-fin">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>% Avance <span style="color:var(--danger)">*</span> <span id="tec-ot-avv-lbl" style="color:var(--muted);font-size:10px">(debe ser 100%)</span></label>
+          <input type="range" class="form-control" id="tec-ot-av" min="0" max="100" value="100"
+            oninput="document.getElementById('tec-ot-avv').textContent=this.value+'%'">
+          <div style="font-family:var(--mono);font-size:12px;color:var(--accent);margin-top:3px" id="tec-ot-avv">100%</div>
+        </div>
+        <div class="form-group" style="border-top:1px solid var(--border);padding-top:12px">
+          <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <span style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px">FIRMA DIGITAL <span style="color:var(--muted);font-size:9px;font-weight:normal">(opcional)</span></span>
+            <button type="button" class="btn btn-ghost btn-sm" onclick="_clearFirmaTec()" style="font-size:11px;padding:2px 8px">&#128465; Limpiar</button>
+          </label>
+          <canvas id="firma-tec-canvas" width="380" height="120"
+            style="border:1.5px solid var(--border);border-radius:8px;background:#fff;width:100%;cursor:crosshair;touch-action:none;display:block"></canvas>
+          <div style="font-size:10px;color:var(--muted);margin-top:4px;text-align:center">Firme con el dedo o el mouse</div>
+        </div>
       </div>
-      <div class="form-group"><label>% Avance</label>
-        <input type="range" class="form-control" id="tec-ot-av" min="0" max="100" value="0" oninput="document.getElementById('tec-ot-avv').textContent=this.value+'%'">
-        <div style="font-family:var(--mono);font-size:12px;color:var(--accent);margin-top:3px" id="tec-ot-avv">0%</div>
+      <!-- Campos opcionales siempre visibles -->
+      <div class="form-grid" id="tec-ot-std-fields">
+        <div class="form-group">
+          <label>Hora Inicio</label>
+          <input type="time" class="form-control" id="tec-ot-ini2">
+        </div>
+        <div class="form-group">
+          <label>Hora Fin</label>
+          <input type="time" class="form-control" id="tec-ot-fin2">
+        </div>
       </div>
-      <div class="form-group"><label>Comentario</label>
+      <div class="form-group" id="tec-ot-av-std-wrap">
+        <label>% Avance</label>
+        <input type="range" class="form-control" id="tec-ot-av2" min="0" max="100" value="0"
+          oninput="document.getElementById('tec-ot-avv2').textContent=this.value+'%'">
+        <div style="font-family:var(--mono);font-size:12px;color:var(--accent);margin-top:3px" id="tec-ot-avv2">0%</div>
+      </div>
+      <div class="form-group">
+        <label>Comentario</label>
         <textarea class="form-control" id="tec-ot-obs" rows="2" placeholder="Observaci&#243;n opcional..."></textarea>
       </div>
     </div>
@@ -2504,6 +2548,54 @@ async function _kb2ApplyMove(id,estado,extra){
 }
 
 /* ─ KANBAN TÉCNICO ─ */
+
+/* ── FIRMA TÉCNICO (modal-tec-ot canvas) ── */
+(function(){
+  var drawing=false,ctx=null,canvas=null,lx=0,ly=0;
+  function gc(){return document.getElementById('firma-tec-canvas');}
+  function init(){
+    canvas=gc();if(!canvas||canvas._tinit)return;
+    canvas._tinit=true;
+    ctx=canvas.getContext('2d');
+    ctx.strokeStyle='#111';ctx.lineWidth=2.2;ctx.lineCap='round';ctx.lineJoin='round';
+    function pos(e){
+      var r=canvas.getBoundingClientRect();
+      var sx=canvas.width/r.width,sy=canvas.height/r.height;
+      if(e.touches)return{x:(e.touches[0].clientX-r.left)*sx,y:(e.touches[0].clientY-r.top)*sy};
+      return{x:(e.clientX-r.left)*sx,y:(e.clientY-r.top)*sy};
+    }
+    function start(e){e.preventDefault();drawing=true;var p=pos(e);lx=p.x;ly=p.y;ctx.beginPath();ctx.arc(p.x,p.y,1.1,0,Math.PI*2);ctx.fillStyle='#111';ctx.fill();}
+    function move(e){e.preventDefault();if(!drawing)return;var p=pos(e);ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(p.x,p.y);ctx.stroke();lx=p.x;ly=p.y;}
+    function stop(){drawing=false;}
+    canvas.addEventListener('mousedown',start);canvas.addEventListener('mousemove',move);
+    canvas.addEventListener('mouseup',stop);canvas.addEventListener('mouseleave',stop);
+    canvas.addEventListener('touchstart',start,{passive:false});
+    canvas.addEventListener('touchmove',move,{passive:false});
+    canvas.addEventListener('touchend',stop);
+  }
+  window._initFirmaTec=function(){setTimeout(()=>{canvas=gc();if(canvas){canvas._tinit=false;init();}},100);};
+  window._clearFirmaTec=function(){canvas=gc();if(!canvas)return;canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);};
+  window._getFirmaTecDataURL=function(){
+    var c=gc();if(!c)return null;
+    var d=c.getContext('2d').getImageData(0,0,c.width,c.height).data;
+    var has=Array.from(d).some((v,i)=>i%4!==3&&v<250);
+    return has?c.toDataURL('image/jpeg',0.7):null;
+  };
+})();
+
+window.onTecEstadoChange=function(val){
+  var cerrar=val==='Cerrada';
+  var cerFields=document.getElementById('tec-ot-cerrar-fields');
+  var stdIni=document.getElementById('tec-ot-std-fields');
+  var stdAv=document.getElementById('tec-ot-av-std-wrap');
+  if(cerFields)cerFields.style.display=cerrar?'block':'none';
+  if(stdIni)stdIni.style.display=cerrar?'none':'flex';
+  if(stdAv)stdAv.style.display=cerrar?'none':'block';
+  if(cerrar){
+    setTimeout(()=>_initFirmaTec(),100);
+  }
+};
+
 window.openTecOT=function(id){
   var o=null;
   for(var i=0;i<otData.length;i++){if(otData[i].id===id){o=otData[i];break;}}
@@ -2513,19 +2605,34 @@ window.openTecOT=function(id){
   document.getElementById('tec-ot-estado').value=o.estado||'Abierta';
   document.getElementById('tec-ot-ini').value=o.horaIni||'';
   document.getElementById('tec-ot-fin').value=o.horaFin||'';
-  document.getElementById('tec-ot-av').value=o.avance||0;
-  document.getElementById('tec-ot-avv').textContent=(o.avance||0)+'%';
+  document.getElementById('tec-ot-ini2').value=o.horaIni||'';
+  document.getElementById('tec-ot-fin2').value=o.horaFin||'';
+  document.getElementById('tec-ot-av').value=100;
+  document.getElementById('tec-ot-avv').textContent='100%';
+  document.getElementById('tec-ot-av2').value=o.avance||0;
+  document.getElementById('tec-ot-avv2').textContent=(o.avance||0)+'%';
   document.getElementById('tec-ot-obs').value='';
+  onTecEstadoChange(o.estado||'Abierta');
   openModal('modal-tec-ot');
+  // Init firma canvas after modal opens
+  setTimeout(()=>_initFirmaTec(),150);
 };
 var _savTecOT=false;
 window.saveTecOT=async function(){
   if(_savTecOT||!editingOTId)return;
   _savTecOT=true;
   var estado=document.getElementById('tec-ot-estado').value;
-  var ini=document.getElementById('tec-ot-ini').value;
-  var fin=document.getElementById('tec-ot-fin').value;
-  var avance=parseInt(document.getElementById('tec-ot-av').value)||0;
+  var cerrar=estado==='Cerrada';
+  // Cerrar: use dedicated fields
+  var ini=cerrar?document.getElementById('tec-ot-ini').value:document.getElementById('tec-ot-ini2').value;
+  var fin=cerrar?document.getElementById('tec-ot-fin').value:document.getElementById('tec-ot-fin2').value;
+  var avance=cerrar?parseInt(document.getElementById('tec-ot-av').value)||0:parseInt(document.getElementById('tec-ot-av2').value)||0;
+  // Validate cerrar
+  if(cerrar){
+    if(!ini){toast('Hora Inicio es obligatoria para cerrar la OT','error');_savTecOT=false;return;}
+    if(!fin){toast('Hora Fin es obligatoria para cerrar la OT','error');_savTecOT=false;return;}
+    if(avance<100){toast('El % Avance debe ser 100% para cerrar la OT','error');_savTecOT=false;return;}
+  }
   var obs=document.getElementById('tec-ot-obs').value.trim();
   var dur='—';
   if(ini&&fin){
@@ -2534,7 +2641,10 @@ window.saveTecOT=async function(){
     if(m<0)m+=1440;
     dur=Math.floor(m/60)+'h '+m%60+'m';
   }
-  await updateDoc(doc(db,"ot",editingOTId),{estado:estado,horaIni:ini,horaFin:fin,duracion:dur,avance:avance});
+  var firmaDataURL=cerrar&&window._getFirmaTecDataURL?window._getFirmaTecDataURL():null;
+  var payload={estado:estado,horaIni:ini,horaFin:fin,duracion:dur,avance:avance};
+  if(firmaDataURL)payload.firmaTecnico=firmaDataURL;
+  await updateDoc(doc(db,"ot",editingOTId),payload);
   var ot=null;for(var i=0;i<otData.length;i++){if(otData[i].id===editingOTId){ot=otData[i];break;}}
   await addActivity((ot?ot.num:'OT')+': "'+estado+'" '+avance+'%'+(obs?' — '+obs:''),'ot');
   closeModal('modal-tec-ot');
@@ -2927,7 +3037,10 @@ window.openNuevaOT=function(){
   const foto=document.getElementById('ot-foto');if(foto)foto.value='';
   otMatsSelected=[];
   renderOTMats();
+  populateMatSelect();
   openModal('modal-ot');
+  // Scroll modal body to top after opening
+  setTimeout(()=>{const mb=document.querySelector('#modal-ot .modal-body');if(mb)mb.scrollTop=0;},50);
 };
 window.openCambioEstadoOT=function(id,num,estado,avance){editingOTId=id;document.getElementById('est-ot-num').textContent=num;document.getElementById('est-ot-val').value=estado;document.getElementById('est-ot-avance').value=avance||0;document.getElementById('est-ot-comment').value='';document.getElementById('modal-estado-ot').classList.add('open');};
 window.confirmEstadoOT=async function(){const nuevoEstado=document.getElementById('est-ot-val').value;const avance=document.getElementById('est-ot-avance').value;const comment=document.getElementById('est-ot-comment').value.trim();await updateDoc(doc(db,'ot',editingOTId),{estado:nuevoEstado,avance:parseInt(avance)});const ot=otData.find(o=>o.id===editingOTId);await addActivity(`${ot?.num} → "${nuevoEstado}" ${avance}%${comment?' — '+comment:''}`,'ot');closeModal('modal-estado-ot');toast(`OT: ${nuevoEstado}`,'success');};
@@ -3533,6 +3646,7 @@ function populateSelects(){
   const tid=document.getElementById('ot-tecnico');if(tid)tid.innerHTML=tecOpts;
   const eid2=document.getElementById('epp-tec');if(eid2)eid2.innerHTML=tecOpts;
   const uid=document.getElementById('usr-tec-asoc');if(uid)uid.innerHTML='<option value="">— Sin asociar —</option>'+tecData.map(t=>`<option value="${t.nombre}">${t.nombre}</option>`).join('');
+  populateMatSelect();
 }
 function populateMatSelect(){const el=document.getElementById('ot-mat-sel');if(!el)return;el.innerHTML='<option value="">— Seleccionar material —</option>'+matData.map(m=>`<option value="${m.id}">${m.cod||''} · ${m.texto} (${m.um}) ${m.moneda} ${m.precio}</option>`).join('');}
 function populateOTSelect(){const el=document.getElementById('her-ot-e');if(!el)return;el.innerHTML='<option value="">— Sin OT —</option>'+otData.map(o=>`<option value="${o.num}">${o.num} — ${o.equipo||''}</option>`).join('');}
