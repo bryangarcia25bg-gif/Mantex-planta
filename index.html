@@ -282,8 +282,8 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
 /* ── Responsive mobile ── */
 @media(max-width:768px){
   .sidebar{transform:translateX(-232px)}
-  .sb-flap{left:0!important;width:22px!important;height:72px!important;opacity:.75!important;background:var(--accent)!important;border-color:var(--accent)!important;border-radius:0 12px 12px 0!important}
-  .sb-arr{color:#000!important;font-weight:900!important}
+  .sb-flap{left:0!important;width:10px!important;height:52px!important;opacity:.75!important;background:var(--accent)!important;border-color:var(--accent)!important;border-radius:0 12px 12px 0!important}
+  .sb-arr{display:none!important;font-weight:900!important}
   .sidebar.mobile-open{transform:translateX(0);z-index:200}
   .main{margin-left:0!important}
   .sidebar-toggle{display:flex!important}
@@ -391,8 +391,8 @@ th.del-col,td.del-col{width:28px;padding:4px 8px!important;text-align:center}
   <div class="login-box">
     <div class="login-logo">MANTEX</div>
     <div class="login-sub">Gestión de Mantenimiento Industrial</div>
-    <input class="login-input" id="login-user" placeholder="Usuario" autocomplete="off">
-    <input class="login-input" id="login-pass" type="password" placeholder="Contraseña">
+    <input class="login-input" id="login-user" placeholder="Usuario" autocomplete="off" onkeydown="if(event.key==='Enter')document.getElementById('login-pass').focus()">
+    <input class="login-input" id="login-pass" type="password" placeholder="Contraseña" onkeydown="if(event.key==='Enter')doLogin()">
     <button class="login-btn" onclick="doLogin()">INGRESAR</button>
     <div class="login-note">🔒 Sistema seguro · Firebase Firestore</div>
   </div>
@@ -1496,7 +1496,7 @@ let visibleSumCols=SUM_COLS.map(c=>c.key);
 const DEFAULT_KPI=[
   {id:'kpi-ot-total',label:'Total OT',icon:'📊',color:'blue',link:'ot',visible:true,custom:false},
   {id:'kpi-ot-act',label:'OT Activas',icon:'🔧',color:'yellow',link:'ot',visible:true,custom:false},
-  {id:'kpi-servicios',label:'Servicios',icon:'📋',color:'blue',link:'logistica',visible:true,custom:false},
+  {id:'kpi-ot-enproc',label:'OT En Proceso',icon:'⚙️',color:'yellow',link:'ot',visible:true,custom:false},
   {id:'kpi-ot-cerr',label:'OT Cerradas',icon:'✅',color:'green',link:'ot',visible:true,custom:false},
 ];
 const DEFAULT_WIDGETS=[
@@ -1505,8 +1505,22 @@ const DEFAULT_WIDGETS=[
   {id:'svc-pendientes',label:'Servicios Pendientes',icon:'📋',full:false,visible:true,custom:false},
   {id:'costo-areas',label:'Costo por Área',icon:'💰',full:false,visible:true,custom:false},
 ];
-let kpiLayout=JSON.parse(localStorage.getItem('mantex_kpi_layout')||'null')||DEFAULT_KPI.map(k=>({...k}));
-let widgetLayout=JSON.parse(localStorage.getItem('mantex_widget_layout')||'null')||DEFAULT_WIDGETS.map(w=>({...w}));
+let kpiLayout=(()=>{
+  const saved=JSON.parse(localStorage.getItem('mantex_kpi_layout')||'null');
+  if(!saved)return DEFAULT_KPI.map(k=>({...k}));
+  const merged=[...saved];
+  DEFAULT_KPI.forEach(d=>{if(!merged.find(s=>s.id===d.id))merged.push({...d});});
+  // Remove obsolete kpi-servicios if present, add kpi-ot-enproc
+  return merged.filter(k=>k.id!=='kpi-servicios');
+})();
+let widgetLayout=(()=>{
+  const saved=JSON.parse(localStorage.getItem('mantex_widget_layout')||'null');
+  if(!saved)return DEFAULT_WIDGETS.map(w=>({...w}));
+  // Merge: add any default widget missing from saved layout
+  const merged=[...saved];
+  DEFAULT_WIDGETS.forEach(d=>{if(!merged.find(s=>s.id===d.id))merged.push({...d});});
+  return merged;
+})();
 let dragType='',dragId='';
 
 /* ── THEME ── */
@@ -1661,7 +1675,7 @@ function getKPIValue(k){
     case 'kpi-ot-total': return {val:dot.length,sub:'Total registradas'};
     case 'kpi-ot-act': return {val:dot.filter(o=>o.estado!=='Cerrada').length,sub:'En proceso y abiertas'};
     case 'kpi-alta-prior': return {val:dot.filter(o=>o.prior==='Alta'&&o.estado!=='Cerrada').length,sub:'Requieren atención'};
-    case 'kpi-servicios': return {val:logData.filter(s=>s.estadoOP==='PENDIENTE'||s.estado==='Pendiente'||s.estado==='En proceso').length,sub:'Pendiente / En proceso'};
+    case 'kpi-ot-enproc': return {val:dot.filter(o=>o.estado==='En proceso').length,sub:'En ejecución activa'};
     case 'kpi-ot-cerr': return {val:dot.filter(o=>o.estado==='Cerrada').length,sub:'Completadas'};
     default: return {val:'—',sub:k.sub||''};
   }
