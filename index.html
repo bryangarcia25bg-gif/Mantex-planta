@@ -1713,7 +1713,7 @@ const NAV_CONFIG={
   jefatura:['dashboard','kanban','ot','prog','logistica','suministros','reportes']
 };
 const NAV_LABELS={dashboard:'Dashboard',kanban:'Kanban OT',prog:'Programación',ot:'Órdenes de Trabajo',logistica:'SAP — Servicios',suministros:'SAP — Suministros',equipos:'Equipos',materiales:'Materiales',herramientas:'Herramientas',epp:'Entrega EPPs',tecnicos:'Técnicos',usuarios:'Gestión de Usuarios',reportes:'Indicadores'};
-const NAV_ICONS={dashboard:'📊',kanban:'📌',prog:'📅',ot:'🧑‍🔧',logistica:'📋',suministros:'🛒',equipos:'⚙️',materiales:'📦',herramientas:'🔨',epp:'🦺',tecnicos:'👷🏽',usuarios:'👥',reportes:'📈'};
+const NAV_ICONS={dashboard:'📊',kanban:'📌',prog:'📅',ot:'🧑‍🔧',logistica:'📋',suministros:'🛒',equipos:'⚙️',materiales:'📦',herramientas:'🔨',epp:'🦺',tecnicos:'👷🏻',usuarios:'👥',reportes:'📈'};
 const NAV_SECTIONS={dashboard:'Principal',kanban:'Operaciones',prog:'Operaciones',ot:'Operaciones',logistica:'Operaciones',suministros:'Operaciones',equipos:'Recursos',materiales:'Recursos',herramientas:'Recursos',epp:'Recursos',tecnicos:'Recursos',usuarios:'Administración',reportes:'Análisis'};
 const PAGE_TITLES={dashboard:'DASHBOARD',kanban:'KANBAN — ÓRDENES DE TRABAJO',prog:'PROGRAMACIÓN DE ACTIVIDADES',ot:'ÓRDENES DE TRABAJO',logistica:'SAP — SERVICIOS',suministros:'SAP — SUMINISTROS',equipos:'EQUIPOS',materiales:'MATERIALES',herramientas:'HERRAMIENTAS',epp:'ENTREGA DE EPPs',tecnicos:'TÉCNICOS',usuarios:'GESTIÓN DE USUARIOS',reportes:'INDICADORES'};
 
@@ -2590,10 +2590,13 @@ function updatePrevSummaryCards(){
 }
 function renderProgTable(subtype){
   const isPrev=subtype==='preventivo';
-  const tipos=isPrev?['Preventivo','Correctivo','Predictivo']:['Diario'];
+  const tipos=['Preventivo','Correctivo','Predictivo'];
   const search=(document.getElementById('prog-search-'+(isPrev?'prev':'diario'))||{value:''}).value.toLowerCase();
   const list=progData.filter(a=>{
-    if(!tipos.includes(a.tipo))return false;
+    // Use submodulo field if available, otherwise fall back to tipo
+    if(a.submodulo){return isPrev?(a.submodulo==='preventivo'):(a.submodulo==='diario');}
+    if(isPrev){return tipos.includes(a.tipo);}
+    return !tipos.includes(a.tipo)||a.tipo==='Diario';
     if(search&&!Object.values(a).join(' ').toLowerCase().includes(search))return false;
     return true;
   }).sort((a,b)=>(a.fechaIni||'').localeCompare(b.fechaIni||''));
@@ -2773,7 +2776,8 @@ function renderProgKanban(){
       html+=`<div class="prog-kb-card" data-id="${a.id}" data-estado="${col.id}" draggable="true">`;
       html+=`<div class="prog-kb-num">${progTipoBadge(a.tipo)}</div>`;
       html+=`<div class="prog-kb-desc">${a.desc||''}</div>`;
-      html+=`<div class="prog-kb-meta">&#128197; ${a.fechaIni||''} &nbsp;&#128101; ${a.responsable||''}</div>`;
+      if(a.equipo){html+=`<div style="font-size:10px;font-family:var(--mono);color:var(--muted);margin-bottom:3px">⚙️ ${a.equipo}</div>`;}
+      html+=`<div class="prog-kb-meta">&#128197; ${a.fechaIni||''} &nbsp;&#128101; ${a.responsable||'No asignado'}</div>`;
       html+=`</div>`;
     });
     html+=`</div></div>`;
@@ -2828,6 +2832,29 @@ function renderProgKanban(){
         openModal('modal-programar-act');
         _progDrag={id:null,from:null};
       }
+    } else if(_progDrag.from==='No Programado'&&toCol==='En proceso'){
+      const a=progData.find(x=>x.id===_progDrag.id);
+      const isPrevE=a&&(a.codigo||a.frecuencia||a.diaProg||a.submodulo==='preventivo');
+      const hasResp=a&&a.responsable&&a.responsable!=='No asignado';
+      const hasFecha=a&&a.fechaIni;
+      if(hasResp&&hasFecha){
+        a.estado='En proceso';
+        await updateDoc(doc(db,'prog_actividades',_progDrag.id),{estado:'En proceso'});
+        toast('Actividad → En proceso','success');
+        renderProgKanban();
+        _progDrag={id:null,from:null};
+      } else {
+        // Must fill in responsable and fecha first via Programado
+        _progActPending={id:_progDrag.id,to:'En proceso'};
+        const dEl=document.getElementById('prog-act-desc');if(dEl)dEl.textContent=a?a.desc:'';
+        const rEl=document.getElementById('prog-act-resp');if(rEl)rEl.value=hasResp?a.responsable:'';
+        const fEl=document.getElementById('prog-act-fecha');if(fEl)fEl.value=hasFecha?a.fechaIni:'';
+        const fechaLabel=isPrevE?'Fecha Programada':'Fecha Inicio';
+        const lEl=document.getElementById('prog-act-fecha-label');if(lEl)lEl.innerHTML=fechaLabel+' <span style="color:var(--danger)">*</span>';
+        const oEl=document.getElementById('prog-act-obs');if(oEl)oEl.value='';
+        openModal('modal-programar-act');
+        _progDrag={id:null,from:null};
+      }
     } else if(toCol==='Completado'&&_progDrag.from==='No Programado'){
       // Cannot go directly from No Programado to Completado
       toast('La actividad debe pasar primero a PROGRAMADO o EN PROCESO antes de Completado','error');
@@ -2866,8 +2893,9 @@ window.confirmarProgramarAct=async function(){
   if(btn){btn.disabled=true;btn.textContent='Guardando...';}
   const obs=document.getElementById('prog-act-obs').value.trim();
   const a=progData.find(x=>x.id===_progActPending.id);
-  if(a){a.estado='Programado';a.responsable=resp;a.fechaIni=fecha;if(obs)a.obs=obs;}
-  await updateDoc(doc(db,'prog_actividades',_progActPending.id),{estado:'Programado',responsable:resp,fechaIni:fecha,...(obs?{obs}:{})});
+  const targetEstado=_progActPending.to||'Programado';
+  if(a){a.estado=targetEstado;a.responsable=resp;a.fechaIni=fecha;if(obs)a.obs=obs;}
+  await updateDoc(doc(db,'prog_actividades',_progActPending.id),{estado:targetEstado,responsable:resp,fechaIni:fecha,...(obs?{obs}:{})});
   toast('Actividad programada','success');
   _savingProgAct=false;
   if(btn){btn.disabled=false;btn.textContent='Programar';}
@@ -2921,7 +2949,7 @@ window.openProgModal=function(tipo){
   const tipoEl=document.getElementById('prog-tipo');
   // For Diario tab, tipo is forced to 'Diario' on save, but show Preventivo in form
   tipoEl.value=tipo||'Preventivo';
-  document.getElementById('prog-estado').value='Pendiente';
+  document.getElementById('prog-estado').value='Programado';
   document.getElementById('prog-desc').value='';
   document.getElementById('prog-equipo').value='';
   document.getElementById('prog-resp').value='No asignado';
@@ -2941,7 +2969,7 @@ window.editProg=function(id){
   _editingProgId=id;
   document.getElementById('prog-modal-title').textContent='EDITAR ACTIVIDAD';
   document.getElementById('prog-tipo').value=a.tipo||'Preventivo';
-  document.getElementById('prog-estado').value=a.estado||'Pendiente';
+  document.getElementById('prog-estado').value=a.estado||'Programado';
   document.getElementById('prog-desc').value=a.desc||'';
   document.getElementById('prog-equipo').value=a.equipo||'';
   document.getElementById('prog-resp').value=a.responsable||'No asignado';
@@ -3010,6 +3038,7 @@ window.saveProg=async function(){
   if(_savingProg)return;
   _savingProg=true;
   const sb=document.querySelector('#modal-prog .btn-primary');if(sb){sb.disabled=true;sb.textContent='Guardando...';}
+  const submodulo=_activeProgTab==='diario'?'diario':'preventivo';
   const tipo=document.getElementById('prog-tipo').value;
   const estado=document.getElementById('prog-estado').value;
   const desc=document.getElementById('prog-desc').value.trim();
@@ -3018,6 +3047,7 @@ window.saveProg=async function(){
   if(!fechaIni){toast('La fecha de inicio es obligatoria','error');_savingProg=false;const sb0b=document.querySelector('#modal-prog .btn-primary');if(sb0b){sb0b.disabled=false;sb0b.textContent='Guardar';}return;}
   const payload={
     tipo,estado,desc,
+    submodulo,
     equipo:document.getElementById('prog-equipo').value.trim(),
     responsable:document.getElementById('prog-resp').value.trim()||'No asignado',
     codigo:(document.getElementById('prog-codigo')?.value||'').trim(),
@@ -3104,6 +3134,7 @@ function renderKanbanBoard(){
         }
         html+=`<div class="kb2-card" data-id="${o.id}" data-estado="${col.id}" draggable="true">`;
         html+=`<div class="kb2-num"><span>${o.num}</span><span style="font-size:9px;font-family:var(--mono);color:var(--muted)">${o.fecha||''}</span></div>`;
+        if(o.tipo){html+=`<div style="margin:2px 0 4px;"><span style="font-size:9px;font-family:var(--mono);background:rgba(30,144,255,.12);color:#60a5fa;border:1px solid rgba(30,144,255,.25);border-radius:3px;padding:1px 6px">${o.tipo}</span></div>`;}
         html+=`<div class="kb2-desc">${o.desc||''}</div>`;
         html+=`<hr class="kb2-hr">`;
         html+=`<div class="kb2-g">`;
