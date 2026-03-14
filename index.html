@@ -4329,7 +4329,7 @@ window.verHistorialEquipo=function(eqId,tag){
 window._historialEqRows=[];
 window._filterHistorialEq=function(){
   const q=(document.getElementById('historial-eq-search')?.value||'').toLowerCase();
-  const tbody=document.querySelector('#historial-eq-body .table-wrap tbody');
+  const tbody=document.querySelector('#historial-eq-body tbody');
   if(!tbody)return;
   if(!q){tbody.querySelectorAll('tr').forEach(r=>r.style.display='');return;}
   tbody.querySelectorAll('tr').forEach(r=>{const t=r.textContent.toLowerCase();r.style.display=t.includes(q)?'':'none';});
