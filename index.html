@@ -697,7 +697,7 @@ input[type="time"]{text-align:center}
               <div class="dropdown-item" onclick="exportProg('pdf')">&#128196; PDF</div>
             </div>
           </div>
-          <button class="btn btn-ghost" id="btn-del-prog-prev" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDeleteMode('prog-prev')">&#128465; Borrar</button>
+          <button class="btn btn-ghost" id="btn-del-prog-prev" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDeleteMode('prog-prev')">🗑 Borrar</button>
           <button class="btn btn-primary" onclick="openProgModal('Preventivo')">+ Nueva Actividad</button>
         </div>
         <div class="del-mode-bar" id="del-bar-prog-prev">
@@ -716,7 +716,7 @@ input[type="time"]{text-align:center}
       <div class="prog-panel" id="ppanel-diario">
         <div class="search-bar">
           <input class="search-input" id="prog-search-diario" placeholder="&#128269; Buscar equipo, descripción, responsable, tipo, estado..." oninput="renderProgTable('diario')">
-          <button class="btn btn-ghost" id="btn-del-prog-diario" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDeleteMode('prog-diario')">&#128465; Borrar</button>
+          <button class="btn btn-ghost" id="btn-del-prog-diario" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDeleteMode('prog-diario')">🗑 Borrar</button>
           <button class="btn btn-primary" onclick="openProgModal('Diario')">+ Nueva Actividad</button>
         </div>
         <div class="del-mode-bar" id="del-bar-prog-diario">
@@ -736,6 +736,7 @@ input[type="time"]{text-align:center}
         <div class="search-bar" style="align-items:center">
           <span style="font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:1px">SEMANA:</span>
           <input type="week" class="form-control" id="crono-week-sel" style="max-width:180px" oninput="crono_updateBtns(this.value);renderCronograma()" onchange="crono_updateBtns(this.value);renderCronograma()">
+          <button class="btn btn-sm" style="background:var(--accent);color:#000;font-weight:600;padding:4px 12px" onclick="crono_updateBtns(document.getElementById('crono-week-sel').value);renderCronograma()">&#128269; Ver</button>
           <button class="btn btn-ghost btn-sm" id="crono-btn-prev" onclick="crono_prevWeek()">&#8592; Sem. Pasada</button>
           <button class="btn btn-sm" id="crono-btn-this" style="background:var(--accent);color:#000;font-weight:700" onclick="crono_thisWeek()">Esta semana</button>
           <button class="btn btn-ghost btn-sm" id="crono-btn-next" onclick="crono_nextWeek()">Sem. Próxima &#8594;</button>
@@ -1109,7 +1110,7 @@ input[type="time"]{text-align:center}
         </div>
       </div>
       <div class="form-group"><label>Descripci&#243;n Actividad *</label>
-        <input class="form-control" id="prog-desc" placeholder="Descripci&#243;n de la actividad...">
+        <textarea class="form-control" id="prog-desc" placeholder="Descripci&#243;n de la actividad..." rows="3" style="resize:vertical;min-height:72px"></textarea>
       </div>
       <div class="form-grid">
         <div class="form-group"><label>Frecuencia</label>
@@ -2641,7 +2642,12 @@ function renderProgTable(subtype){
   const el=document.getElementById(tblId);
   if(!el)return;
   const prevHeaders=`${delTh}<th>C&oacute;digo</th><th>Equipo</th><th>Descripci&oacute;n Actividad</th><th>Frecuencia</th><th>D&iacute;a Prog.</th><th>Fecha Inicio</th><th>Fecha Fin</th><th>Responsable</th><th>Tipo</th><th>Estado</th><th>Acciones</th>`;
-  const diarHeaders=`${delTh}<th>Equipo</th><th>Descripci&oacute;n Actividad</th><th>Fecha Inicio</th><th>Fecha Final</th><th>Responsable</th><th>Tipo</th><th>Estado</th><th>Acciones</th>`;
+  const diarHeaders=`${delTh}<th>Equipo</th><th>Descripci&oacute;n Actividad</th><th>Fecha Inicio</th><th>Fecha Fin</th><th>Responsable</th><th>Tipo</th><th>Estado</th><th>Acciones</th>`;
+  const delKey2=isPrev?'prog-prev':'prog-diario';
+  const bar2=document.getElementById('del-bar-'+delKey2);
+  if(bar2)bar2.classList.toggle('active',!!isDelMode);
+  const btnDel2=document.getElementById('btn-del-prog-'+(isPrev?'prev':'diario'));
+  if(btnDel2){btnDel2.textContent=isDelMode?'✕ Salir':'🗑 Borrar';btnDel2.style.color=isDelMode?'':'var(--danger)';}
   el.innerHTML=`<table><thead><tr>${isPrev?prevHeaders:diarHeaders}</tr></thead><tbody>${rows||empty}</tbody></table>`;
 }
 
@@ -3949,8 +3955,8 @@ function renderMateriales(){
   if(mat_th){const ec=mat_th.querySelector('th.del-col');if(isDelMode&&!ec){const th=document.createElement('th');th.className='del-col';th.style.cssText='width:28px';th.innerHTML='';mat_th.insertBefore(th,mat_th.firstChild);}else if(!isDelMode&&ec)ec.remove();}
   document.getElementById('mat-tbody').innerHTML=list.length?list.map(m=>`<tr>
     ${isDelMode?`<td class="del-col"><input type="checkbox" class="del-row-chk del-row-chk-mat" value="${m.id}" onchange="updDelCount('mat')"></td>`:''}
-    <td style="font-family:var(--mono);font-size:12px;color:var(--accent)">${m.cod||'—'}</td>
-    <td>${m.texto||'—'}</td>
+    <td style="font-family:var(--mono);font-size:12px;color:var(--accent);text-align:left">${m.cod||'—'}</td>
+    <td style="text-align:left">${m.texto||'—'}</td>
     <td><span class="badge badge-gray">${m.um||'—'}</span></td>
     <td style="font-family:var(--mono);text-align:right">${m.precio?Number(m.precio).toFixed(2):'—'}</td>
     <td><span class="badge badge-blue">${m.moneda||'—'}</span></td>
