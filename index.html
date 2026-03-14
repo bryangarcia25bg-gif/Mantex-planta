@@ -735,7 +735,7 @@ input[type="time"]{text-align:center}
       <div class="prog-panel" id="ppanel-cronograma">
         <div class="search-bar" style="align-items:center">
           <span style="font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:1px">SEMANA:</span>
-          <input type="week" class="form-control" id="crono-week-sel" style="max-width:180px" onchange="crono_updateBtns(this.value);renderCronograma()">
+          <input type="week" class="form-control" id="crono-week-sel" style="max-width:180px" oninput="crono_updateBtns(this.value);renderCronograma()" onchange="crono_updateBtns(this.value);renderCronograma()">
           <button class="btn btn-ghost btn-sm" id="crono-btn-prev" onclick="crono_prevWeek()">&#8592; Sem. Pasada</button>
           <button class="btn btn-sm" id="crono-btn-this" style="background:var(--accent);color:#000;font-weight:700" onclick="crono_thisWeek()">Esta semana</button>
           <button class="btn btn-ghost btn-sm" id="crono-btn-next" onclick="crono_nextWeek()">Sem. Próxima &#8594;</button>
@@ -1131,11 +1131,11 @@ input[type="time"]{text-align:center}
         </div>
       </div>
       <div class="form-grid">
-        <div class="form-group" id="prog-fecha-prog-wrap"><label>Fecha Programada</label>
+        <div class="form-group" id="prog-fecha-prog-wrap"><label id="prog-fecha-ini-label">Fecha Inicio</label>
           <input type="date" class="form-control" id="prog-fecha-ini">
         </div>
-        <div class="form-group"><label>Semana</label>
-          <input type="week" class="form-control" id="prog-semana">
+        <div class="form-group" id="prog-fecha-fin-wrap"><label>Fecha Fin</label>
+          <input type="date" class="form-control" id="prog-semana">
         </div>
       </div>
       <div class="form-grid">
@@ -2608,7 +2608,7 @@ function renderProgTable(subtype){
   const isDelMode=deleteMode[delKey];
   const delTh=isDelMode?'<th class="del-col"></th>':'';
   const rows=list.map(a=>{
-    const delCell=isDelMode?`<td class="del-col"><input type="checkbox" class="del-row-chk" value="${a.id}" onchange="updateDelCount('${delKey}',this)"></td>`:'';
+    const delCell=isDelMode?`<td class="del-col"><input type="checkbox" class="del-row-chk del-row-chk-${delKey}" value="${a.id}" onchange="updDelCount('${delKey}')"></td>`:'';
     const prevRow=`<tr>
       ${delCell}
       <td style="font-family:var(--mono);font-size:11px;text-align:left">${a.codigo||'—'}</td>
@@ -2617,7 +2617,7 @@ function renderProgTable(subtype){
       <td>${a.frecuencia||'—'}</td>
       <td>${a.diaProg||'—'}</td>
       <td style="font-family:var(--mono);font-size:11px">${a.fechaIni||'—'}</td>
-      <td style="font-family:var(--mono);font-size:11px">${a.semana||'—'}</td>
+      <td style="font-family:var(--mono);font-size:11px">${a.fechaFin||'—'}</td>
       <td>${a.responsable||'No asignado'}</td>
       <td>${progTipoBadge(a.tipo)}</td>
       ${progEstadoBadge(a.estado)?`<td>${progEstadoBadge(a.estado)}</td>`:'<td></td>'}
@@ -2640,7 +2640,7 @@ function renderProgTable(subtype){
   const tblId=isPrev?'prog-prev-tbl':'prog-diario-tbl';
   const el=document.getElementById(tblId);
   if(!el)return;
-  const prevHeaders=`${delTh}<th>C&oacute;digo</th><th>Equipo</th><th>Descripci&oacute;n Actividad</th><th>Frecuencia</th><th>D&iacute;a Prog.</th><th>Fecha Prog.</th><th>Semana</th><th>Responsable</th><th>Tipo</th><th>Estado</th><th>Acciones</th>`;
+  const prevHeaders=`${delTh}<th>C&oacute;digo</th><th>Equipo</th><th>Descripci&oacute;n Actividad</th><th>Frecuencia</th><th>D&iacute;a Prog.</th><th>Fecha Inicio</th><th>Fecha Fin</th><th>Responsable</th><th>Tipo</th><th>Estado</th><th>Acciones</th>`;
   const diarHeaders=`${delTh}<th>Equipo</th><th>Descripci&oacute;n Actividad</th><th>Fecha Inicio</th><th>Fecha Final</th><th>Responsable</th><th>Tipo</th><th>Estado</th><th>Acciones</th>`;
   el.innerHTML=`<table><thead><tr>${isPrev?prevHeaders:diarHeaders}</tr></thead><tbody>${rows||empty}</tbody></table>`;
 }
@@ -2723,7 +2723,8 @@ function renderCronograma(){
   const acts=progData.filter(a=>{
     if(!a.fechaIni)return false;
     const fi=new Date(a.fechaIni+'T00:00:00');
-    const ff=a.fechaFin?new Date(a.fechaFin+'T23:59:59'):fi;
+    if(isNaN(fi.getTime()))return false;
+    const ff=a.fechaFin?new Date(a.fechaFin+'T23:59:59'):new Date(fi.getTime()+86399999);
     return fi<=weekEnd&&ff>=weekStart;
   }).sort((a,b)=>(a.fechaIni||'').localeCompare(b.fechaIni||''));
   if(!acts.length){
@@ -2733,7 +2734,7 @@ function renderCronograma(){
   const rows=acts.map(a=>{
     const color=PROG_TIPO_COLOR[a.tipo]||'#8892aa';
     const fi=new Date(a.fechaIni+'T00:00:00');
-    const ff=a.fechaFin?new Date(a.fechaFin+'T23:59:59'):fi;
+    const ff=a.fechaFin?new Date(a.fechaFin+'T23:59:59'):new Date(fi.getTime()+86399999);
     let cells='';
     days.forEach(d=>{
       const dt=new Date(d);dt.setHours(12,0,0,0);
@@ -2748,7 +2749,7 @@ function renderCronograma(){
       ${cells}
     </tr>`;
   }).join('');
-  container.innerHTML=`<div style="font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:2px;margin-bottom:8px">SEMANA ${wPart} — ${y}</div><div class="crono-wrap" style="border:1px solid var(--border);border-radius:8px;overflow:hidden"><table class="crono-table" style="border:none"><thead><tr>${hdrs}</tr></thead><tbody>${rows}</tbody></table></div>`;
+  container.innerHTML=`<div class="crono-wrap" style="border:1px solid var(--border);border-radius:8px;overflow:hidden"><table class="crono-table" style="border:none"><thead><tr>${hdrs}</tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
 /* ── KANBAN ACTIVIDADES ── */
@@ -2945,7 +2946,7 @@ window.openProgModal=function(tipo){
     if(el2){const wrap=el2.closest('.form-group');if(wrap)wrap.style.display=_isDiario?'none':'';}
   });
   const fpWrap=document.getElementById('prog-fecha-prog-wrap');
-  if(fpWrap){const lbl=fpWrap.querySelector('label');if(lbl)lbl.textContent=_isDiario?'Fecha Inicio':'Fecha Programada';}
+  if(fpWrap){const lbl=fpWrap.querySelector('label');if(lbl)lbl.textContent=_isDiario?'Fecha Inicio':'Fecha Inicio';}
   document.getElementById('prog-modal-title').textContent=_isDiario?'NUEVA ACTIVIDAD — DIARIO':'NUEVA ACTIVIDAD';
   document.getElementById('prog-desc').value='';
   document.getElementById('prog-equipo').value='';
@@ -2957,7 +2958,7 @@ window.openProgModal=function(tipo){
   document.getElementById('prog-fecha-fin').value='';
   document.getElementById('prog-anio').value=new Date().getFullYear();
   const wSel=document.getElementById('prog-semana');
-  if(wSel){const d=new Date();const dow=d.getDay()||7;const mon=new Date(d.getTime()-(dow-1)*86400000);const y2=mon.getFullYear();const jan4=new Date(y2,0,4);const doy=(mon-new Date(y2,0,0))/86400000;const wn=Math.ceil((doy+(jan4.getDay()||7)-1)/7);wSel.value=`${y2}-W${String(wn).padStart(2,'0')}`;}
+  if(wSel)wSel.value='';  // Fecha Fin — cleared on new activity
   document.getElementById('prog-obs').value='';
   openModal('modal-prog');
 };
@@ -2983,7 +2984,7 @@ window.editProg=function(id){
   document.getElementById('prog-fecha-ini').value=a.fechaIni||'';
   document.getElementById('prog-fecha-fin').value=a.fechaFin||'';
   document.getElementById('prog-anio').value=a.anio||new Date().getFullYear();
-  const wSel=document.getElementById('prog-semana');if(wSel)wSel.value=a.semana||'';
+  const wSel=document.getElementById('prog-semana');if(wSel)wSel.value=a.fechaFin||a.semana||'';
   document.getElementById('prog-obs').value=a.obs||'';
   openModal('modal-prog');
 };
@@ -3058,9 +3059,9 @@ window.saveProg=async function(){
     frecuencia:document.getElementById('prog-frecuencia')?.value||'',
     diaProg:document.getElementById('prog-dia')?.value||'',
     fechaIni,
-    fechaFin:document.getElementById('prog-fecha-fin').value,
+    fechaFin:document.getElementById('prog-fecha-fin')?.value||((_activeProgTab!=='diario')?document.getElementById('prog-semana')?.value:''),
     anio:parseInt(document.getElementById('prog-anio').value)||new Date().getFullYear(),
-    semana:document.getElementById('prog-semana').value,
+    semana:document.getElementById('prog-semana')?.value||'',
     obs:document.getElementById('prog-obs').value.trim(),
     creadoPor:currentUser.name
   };
@@ -4509,7 +4510,7 @@ window.confirmRenameWidget=function(){
 /* ── DELETE MODE (global) ── */
 window.toggleDeleteMode=function(mod){
   deleteMode[mod]=!deleteMode[mod];
-  const renderMap={ot:renderOT,log:renderLogistica,sum:renderSuministros,mat:renderMateriales,epp:renderEPP,tec:renderTecnicos,usr:renderUsuarios,her:renderHerramientas,eq:renderEquipos};
+  const renderMap={ot:renderOT,log:renderLogistica,sum:renderSuministros,mat:renderMateriales,epp:renderEPP,tec:renderTecnicos,usr:renderUsuarios,her:renderHerramientas,eq:renderEquipos,'prog-prev':()=>renderProgTable('preventivo'),'prog-diario':()=>renderProgTable('diario')};
   renderMap[mod]?.();
 };
 window.selectAllRows=function(mod,chk){
@@ -4525,7 +4526,7 @@ window.execBulkDelete=async function(mod){
   const ids=[...document.querySelectorAll('.del-row-chk-'+mod+':checked')].map(c=>c.value);
   if(!ids.length){toast('Selecciona al menos un registro','error');return;}
   if(!confirm('¿Eliminar '+ids.length+' registro(s) seleccionados?'))return;
-  const colMap={ot:'ot',log:'logistica',sum:'suministros',mat:'materiales',epp:'epp',tec:'tecnicos',usr:'usuarios',her:'herramientas',eq:'equipos'};
+  const colMap={ot:'ot',log:'logistica',sum:'suministros',mat:'materiales',epp:'epp',tec:'tecnicos',usr:'usuarios',her:'herramientas',eq:'equipos','prog-prev':'prog_actividades','prog-diario':'prog_actividades'};
   const col=colMap[mod];if(!col)return;
   try{
     const batch=writeBatch(db);
@@ -4533,6 +4534,8 @@ window.execBulkDelete=async function(mod){
     await batch.commit();
     deleteMode[mod]=false;
     toast(ids.length+' registro(s) eliminados','success');
+    if(mod==='prog-prev')renderProgTable('preventivo');
+    else if(mod==='prog-diario')renderProgTable('diario');
   }catch(e){toast('Error: '+e.message,'error');}
 };
 
