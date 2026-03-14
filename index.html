@@ -1222,6 +1222,10 @@ input[type="time"]{text-align:center}
         <label id="prog-act-fecha-label">Fecha Programada <span style="color:var(--danger)">*</span></label>
         <input type="date" class="form-control" id="prog-act-fecha">
       </div>
+      <div class="form-group" id="prog-act-ffin-wrap" style="display:none">
+        <label>Fecha Final <span style="color:var(--danger)">*</span></label>
+        <input type="date" class="form-control" id="prog-act-ffin">
+      </div>
       <div class="form-group">
         <label>Observaciones <span style="color:var(--muted);font-size:10px">(opcional)</span></label>
         <textarea class="form-control" id="prog-act-obs" rows="2" placeholder="Notas adicionales..."></textarea>
@@ -2810,51 +2814,28 @@ function renderProgKanban(){
       _progDrag={id:null,from:null};
     } else if(toCol==='Programado'&&_progDrag.from==='No Programado'){
       const a=progData.find(x=>x.id===_progDrag.id);
-      const isPrev=a&&(a.codigo||a.frecuencia||a.diaProg);
-      const fechaLabel=isPrev?'Fecha Programada':'Fecha Inicio';
-      // If activity already has resp and fecha filled, move directly
-      const hasResp=a&&a.responsable&&a.responsable!=='No asignado';
-      const hasFecha=a&&a.fechaIni;
-      if(hasResp&&hasFecha){
-        // Move directly
-        a.estado='Programado';
-        await updateDoc(doc(db,'prog_actividades',_progDrag.id),{estado:'Programado'});
-        toast('Actividad → Programado','success');
-        renderProgKanban();
-        _progDrag={id:null,from:null};
-      } else {
-        _progActPending={id:_progDrag.id,to:'Programado'};
-        const dEl=document.getElementById('prog-act-desc');if(dEl)dEl.textContent=a?a.desc:'';
-        const rEl=document.getElementById('prog-act-resp');if(rEl)rEl.value=hasResp?a.responsable:'';
-        const fEl=document.getElementById('prog-act-fecha');if(fEl)fEl.value=hasFecha?a.fechaIni:'';
-        const lEl=document.getElementById('prog-act-fecha-label');if(lEl)lEl.innerHTML=fechaLabel+' <span style="color:var(--danger)">*</span>';
-        const oEl=document.getElementById('prog-act-obs');if(oEl)oEl.value='';
-        openModal('modal-programar-act');
-        _progDrag={id:null,from:null};
-      }
+      const isPrevP=a&&(a.submodulo==='preventivo'||(a.codigo||a.frecuencia||a.diaProg));
+      const fechaLabel=isPrevP?'Fecha Programada':'Fecha Inicio';
+      _progActPending={id:_progDrag.id,to:'Programado'};
+      // Pre-fill with existing values if available
+      const dEl=document.getElementById('prog-act-desc');if(dEl)dEl.textContent=a?a.desc:'';
+      const rEl=document.getElementById('prog-act-resp');if(rEl)rEl.value=(a&&a.responsable&&a.responsable!=='No asignado')?a.responsable:'';
+      const fEl=document.getElementById('prog-act-fecha');if(fEl)fEl.value=(a&&a.fechaIni)?a.fechaIni:'';
+      const lEl=document.getElementById('prog-act-fecha-label');if(lEl)lEl.innerHTML=fechaLabel+' <span style="color:var(--danger)">*</span>';
+      const oEl=document.getElementById('prog-act-obs');if(oEl)oEl.value='';
+      // Show/hide fecha fin field (only for Diario)
+      const ffinWrap2=document.getElementById('prog-act-ffin-wrap');
+      if(ffinWrap2){ffinWrap2.style.display=isPrevP?'none':'block';}
+      const ffinEl2=document.getElementById('prog-act-ffin');if(ffinEl2)ffinEl2.value=(a&&a.fechaFin)?a.fechaFin:'';
+      // Adapt modal title
+      const mTitle=document.querySelector('#modal-programar-act h2');
+      if(mTitle)mTitle.textContent=isPrevP?'PROGRAMAR — PREVENTIVO':'PROGRAMAR — DIARIO';
+      openModal('modal-programar-act');
+      _progDrag={id:null,from:null};
     } else if(_progDrag.from==='No Programado'&&toCol==='En proceso'){
-      const a=progData.find(x=>x.id===_progDrag.id);
-      const isPrevE=a&&(a.codigo||a.frecuencia||a.diaProg||a.submodulo==='preventivo');
-      const hasResp=a&&a.responsable&&a.responsable!=='No asignado';
-      const hasFecha=a&&a.fechaIni;
-      if(hasResp&&hasFecha){
-        a.estado='En proceso';
-        await updateDoc(doc(db,'prog_actividades',_progDrag.id),{estado:'En proceso'});
-        toast('Actividad → En proceso','success');
-        renderProgKanban();
-        _progDrag={id:null,from:null};
-      } else {
-        // Must fill in responsable and fecha first via Programado
-        _progActPending={id:_progDrag.id,to:'En proceso'};
-        const dEl=document.getElementById('prog-act-desc');if(dEl)dEl.textContent=a?a.desc:'';
-        const rEl=document.getElementById('prog-act-resp');if(rEl)rEl.value=hasResp?a.responsable:'';
-        const fEl=document.getElementById('prog-act-fecha');if(fEl)fEl.value=hasFecha?a.fechaIni:'';
-        const fechaLabel=isPrevE?'Fecha Programada':'Fecha Inicio';
-        const lEl=document.getElementById('prog-act-fecha-label');if(lEl)lEl.innerHTML=fechaLabel+' <span style="color:var(--danger)">*</span>';
-        const oEl=document.getElementById('prog-act-obs');if(oEl)oEl.value='';
-        openModal('modal-programar-act');
-        _progDrag={id:null,from:null};
-      }
+      // Block: must go through Programado first
+      toast('⚠️ No se puede pasar directamente a EN PROCESO. Primero mueve la actividad a PROGRAMADO.','error');
+      _progDrag={id:null,from:null};
     } else if(toCol==='Completado'&&_progDrag.from==='No Programado'){
       // Cannot go directly from No Programado to Completado
       toast('La actividad debe pasar primero a PROGRAMADO o EN PROCESO antes de Completado','error');
@@ -2889,17 +2870,21 @@ window.confirmarProgramarAct=async function(){
   if(_savingProgAct)return;
   const resp=document.getElementById('prog-act-resp').value.trim();
   const fecha=document.getElementById('prog-act-fecha').value;
+  const aCP=progData.find(x=>x.id===_progActPending.id);
+  const isPrevCP=aCP&&(aCP.submodulo==='preventivo'||(aCP.codigo||aCP.frecuencia||aCP.diaProg));
+  const ffinVal=(document.getElementById('prog-act-ffin')?.value||'').trim();
   if(!resp){toast('El responsable es obligatorio','error');return;}
-  if(!fecha){toast('La fecha es obligatoria','error');return;}
+  if(!fecha){toast(_isPrevCP?'La fecha programada es obligatoria':'La fecha inicio es obligatoria','error');return;}
+  if(!isPrevCP&&!ffinVal){toast('La fecha final es obligatoria para actividades de Diario','error');return;}
   _savingProgAct=true;
   const btn=document.getElementById('btn-prog-confirm');
   if(btn){btn.disabled=true;btn.textContent='Guardando...';}
   const obs=document.getElementById('prog-act-obs').value.trim();
-  const a=progData.find(x=>x.id===_progActPending.id);
   const targetEstado=_progActPending.to||'Programado';
-  if(a){a.estado=targetEstado;a.responsable=resp;a.fechaIni=fecha;if(obs)a.obs=obs;}
-  await updateDoc(doc(db,'prog_actividades',_progActPending.id),{estado:targetEstado,responsable:resp,fechaIni:fecha,...(obs?{obs}:{})});
-  toast('Actividad programada','success');
+  const updPayload={estado:targetEstado,responsable:resp,fechaIni:fecha,...(!isPrevCP&&ffinVal?{fechaFin:ffinVal}:{}),...(obs?{obs}:{})};
+  if(aCP){aCP.estado=targetEstado;aCP.responsable=resp;aCP.fechaIni=fecha;if(!isPrevCP&&ffinVal)aCP.fechaFin=ffinVal;if(obs)aCP.obs=obs;}
+  await updateDoc(doc(db,'prog_actividades',_progActPending.id),updPayload);
+  toast('Actividad '+(targetEstado==='Programado'?'programada':'actualizada'),'success');
   _savingProgAct=false;
   if(btn){btn.disabled=false;btn.textContent='Programar';}
   closeModal('modal-programar-act');
