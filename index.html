@@ -164,7 +164,13 @@ textarea.form-control{resize:vertical;min-height:65px}
 .combo-add-btn{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;padding:0 10px;font-size:15px;transition:all .15s;flex-shrink:0}
 .combo-add-btn:hover{color:var(--accent);border-color:var(--accent)}
 .search-bar{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
-.search-input{flex:1;min-width:160px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 11px;font-size:13px;font-family:var(--sans);outline:none;transition:border-color .15s}
+.search-input{flex:1;min-width:160px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 32px 7px 11px;font-size:13px;font-family:var(--sans);outline:none;transition:border-color .15s}
+.search-wrap{position:relative;flex:1;min-width:160px;display:flex;align-items:center}
+.search-wrap .search-input{width:100%;flex:none;min-width:0}
+.search-clear{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:14px;padding:2px 4px;line-height:1;display:none;border-radius:3px}
+.search-clear:hover{color:var(--text);background:var(--surface2)}
+.search-wrap:focus-within .search-clear,
+.search-clear.visible{display:block}
 .search-input:focus{border-color:var(--accent)}
 .section-title{font-family:var(--display);font-size:23px;letter-spacing:2px;margin-bottom:4px}
 .section-sub{font-size:13px;color:var(--muted);margin-bottom:18px}
@@ -490,7 +496,7 @@ input[type="time"]{text-align:center}
       <div class="section-title">ÓRDENES DE TRABAJO</div>
       <div class="section-sub">Gestión y seguimiento de OT de mantenimiento</div>
       <div class="search-bar">
-        <input class="search-input" id="ot-search" placeholder="🔍 Buscar OT, equipo, técnico, subsistema, ubicación..." oninput="_dOT()">
+        <div class="search-wrap"><input class="search-input" id="ot-search" placeholder="🔍 Buscar OT, equipo, técnico, subsistema, ubicación..." oninput="_dOT()"><button class="search-clear" id="ot-search-clear" onclick="_clearSearch('ot-search',()=>_dOT())" title="Limpiar">&#x2715;</button></div>
         <div class="multi-sel-wrap" id="ot-estado-ms-wrap">
           <button class="multi-sel-btn" onclick="toggleMultiSel('ot-estado-ms')" id="ot-estado-ms-btn">Todos estados ▾</button>
           <div class="multi-sel-panel" id="ot-estado-ms">
@@ -567,7 +573,7 @@ input[type="time"]{text-align:center}
       <div class="section-title">SAP — SERVICIOS</div>
       <div class="section-sub">Seguimiento de solicitudes, pedidos y servicios</div>
       <div class="search-bar">
-        <input class="search-input" id="log-search" placeholder="🔍 Buscar sol. pedido, texto, proveedor..." oninput="_dLog()">
+        <div class="search-wrap"><input class="search-input" id="log-search" placeholder="🔍 Buscar sol. pedido, texto, proveedor..." oninput="_dLog()"><button class="search-clear" id="log-search-clear" onclick="_clearSearch('log-search',()=>_dLog())" title="Limpiar">&#x2715;</button></div>
         <select class="form-control" style="width:165px" id="log-f-estadoMP" onchange="renderLogistica()">
           <option value="">Todos estados MP</option>
           <option>APROBADO</option><option>RECHAZADO</option>
@@ -616,7 +622,7 @@ input[type="time"]{text-align:center}
       <div class="section-title">SAP — SUMINISTROS</div>
       <div class="section-sub">Solicitudes de pedido de materiales y suministros</div>
       <div class="search-bar">
-        <input class="search-input" id="sum-search" placeholder="🔍 Buscar material, pedido, solicitante..." oninput="_dSum()">
+        <div class="search-wrap"><input class="search-input" id="sum-search" placeholder="🔍 Buscar material, pedido, solicitante..." oninput="_dSum()"><button class="search-clear" id="sum-search-clear" onclick="_clearSearch('sum-search',()=>_dSum())" title="Limpiar">&#x2715;</button></div>
         <button class="btn btn-ghost btn-sm" onclick="openModal('modal-sum-cols')">⚙️ Columnas</button>
         <div class="date-range-wrap">
           <button class="btn btn-ghost" id="dr-btn-sum" onclick="toggleDateRange('sum',event)" title="Filtrar por fecha">📅 Fecha</button>
@@ -681,7 +687,7 @@ input[type="time"]{text-align:center}
           </div>
         </div>
         <div class="search-bar">
-          <input class="search-input" id="prog-search-prev" placeholder="&#128269; Buscar actividad, equipo, responsable, tipo, estado..." oninput="renderProgTable('preventivo')">
+          <div class="search-wrap"><input class="search-input" id="prog-search-prev" placeholder="&#128269; Buscar actividad, equipo, responsable, tipo, estado..." oninput="renderProgTable('preventivo')"><button class="search-clear" id="prog-search-prev-clear" onclick="_clearSearch('prog-search-prev',()=>renderProgTable('preventivo'))" title="Limpiar">&#x2715;</button></div>
           <div class="dropdown" id="dd-import-prog">
             <button class="btn btn-ghost" onclick="toggleDD('dd-import-prog')">&#11014; Importar &#9662;</button>
             <div class="dropdown-menu">
@@ -715,7 +721,7 @@ input[type="time"]{text-align:center}
       <!-- Panel: Diario -->
       <div class="prog-panel" id="ppanel-diario">
         <div class="search-bar">
-          <input class="search-input" id="prog-search-diario" placeholder="&#128269; Buscar equipo, descripción, responsable, tipo, estado..." oninput="renderProgTable('diario')">
+          <div class="search-wrap"><input class="search-input" id="prog-search-diario" placeholder="&#128269; Buscar equipo, descripción, responsable, tipo, estado..." oninput="renderProgTable('diario')"><button class="search-clear" id="prog-search-diario-clear" onclick="_clearSearch('prog-search-diario',()=>renderProgTable('diario'))" title="Limpiar">&#x2715;</button></div>
           <button class="btn btn-ghost" id="btn-del-prog-diario" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDeleteMode('prog-diario')">🗑 Borrar</button>
           <button class="btn btn-primary" onclick="openProgModal('Diario')">+ Nueva Actividad</button>
         </div>
@@ -755,7 +761,7 @@ input[type="time"]{text-align:center}
       <div class="section-title">EQUIPOS</div>
       <div class="section-sub">Registro de activos de la planta</div>
       <div class="search-bar">
-        <input class="search-input" id="eq-search" placeholder="🔍 Buscar equipo, TAG, área, modelo, tipo..." oninput="renderEquipos()">
+        <div class="search-wrap"><input class="search-input" id="eq-search" placeholder="🔍 Buscar equipo, TAG, área, modelo, tipo..." oninput="renderEquipos()"><button class="search-clear" id="eq-search-clear" onclick="_clearSearch('eq-search',()=>renderEquipos())" title="Limpiar">&#x2715;</button></div>
         <button class="btn btn-ghost" id="btn-del-eq" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDeleteMode('eq')">🗑 Borrar</button>
         <button class="btn btn-primary" id="btn-nuevo-eq" onclick="openModal('modal-eq')">+ Nuevo Equipo</button>
       </div>
@@ -774,7 +780,7 @@ input[type="time"]{text-align:center}
       <div class="section-title">MATERIALES</div>
       <div class="section-sub">Lista de materiales disponibles para actividades</div>
       <div class="search-bar">
-        <input class="search-input" id="mat-search" placeholder="🔍 Buscar material, código, centro..." oninput="_dMat()">
+        <div class="search-wrap"><input class="search-input" id="mat-search" placeholder="🔍 Buscar material, código, centro..." oninput="_dMat()"><button class="search-clear" id="mat-search-clear" onclick="_clearSearch('mat-search',()=>_dMat())" title="Limpiar">&#x2715;</button></div>
         <div class="dropdown" id="dd-import-mat">
           <button class="btn btn-ghost" onclick="toggleDD('dd-import-mat')">⬆️ Importar ▾</button>
           <div class="dropdown-menu">
@@ -802,14 +808,14 @@ input[type="time"]{text-align:center}
       <div class="section-title">HERRAMIENTAS</div>
       <div class="section-sub">Control de entrega y devolución</div>
       <!-- Tabs -->
-      <div style="display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:14px">
-        <button id="her-tab-her" onclick="switchHerTab('her')" class="prog-tab active" style="font-size:12px;padding:8px 18px">🔧 Herramientas</button>
-        <button id="her-tab-eq" onclick="switchHerTab('eq')" class="prog-tab" style="font-size:12px;padding:8px 18px">💻 Equipos Electrónicos</button>
+      <div class="prog-tabs">
+        <div id="her-tab-her" onclick="switchHerTab('her')" class="prog-tab active">🔧&nbsp;HERRAMIENTAS</div>
+        <div id="her-tab-eq" onclick="switchHerTab('eq')" class="prog-tab">📡&nbsp;EQUIPOS ELECTRÓNICOS</div>
       </div>
       <!-- Panel: Herramientas -->
       <div id="her-panel-her">
         <div class="search-bar">
-          <input class="search-input" id="her-search" placeholder="🔍 Buscar herramienta, técnico..." oninput="_dHer()">
+          <div class="search-wrap"><input class="search-input" id="her-search" placeholder="🔍 Buscar herramienta, técnico..." oninput="_dHer()"><button class="search-clear" id="her-search-clear" onclick="_clearSearch('her-search',()=>_dHer())" title="Limpiar">&#x2715;</button></div>
           <button class="btn btn-ghost" id="btn-del-her" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDeleteMode('her')">🗑 Borrar</button>
           <button class="btn btn-primary" onclick="openModal('modal-her-tipo')">+ Registrar</button>
         </div>
@@ -831,7 +837,7 @@ input[type="time"]{text-align:center}
       <!-- Panel: Equipos Electrónicos -->
       <div id="her-panel-eq" style="display:none">
         <div class="search-bar">
-          <input class="search-input" id="eleq-search" placeholder="🔍 Buscar equipo, técnico, marca..." oninput="renderEquiposElec()">
+          <div class="search-wrap"><input class="search-input" id="eleq-search" placeholder="🔍 Buscar equipo, técnico, marca..." oninput="renderEquiposElec()"><button class="search-clear" id="eleq-search-clear" onclick="_clearSearch('eleq-search',()=>renderEquiposElec())" title="Limpiar">&#x2715;</button></div>
           <button class="btn btn-ghost" id="btn-del-eleq" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDeleteMode('eleq')">🗑 Borrar</button>
           <button class="btn btn-primary" onclick="_openEleqForm()">+ Registrar</button>
         </div>
@@ -873,7 +879,7 @@ input[type="time"]{text-align:center}
       <div class="section-title">ENTREGA DE EPPs</div>
       <div class="section-sub">Control de equipos de protección personal</div>
       <div class="search-bar">
-        <input class="search-input" id="epp-search" placeholder="🔍 Buscar técnico o EPP..." oninput="_dEPP()">
+        <div class="search-wrap"><input class="search-input" id="epp-search" placeholder="🔍 Buscar técnico o EPP..." oninput="_dEPP()"><button class="search-clear" id="epp-search-clear" onclick="_clearSearch('epp-search',()=>_dEPP())" title="Limpiar">&#x2715;</button></div>
         <button class="btn btn-ghost" id="btn-gestionar-epp" onclick="openModal('modal-gestion-epp')">⚙️ Gestionar EPPs</button>
         <button class="btn btn-ghost" id="btn-del-epp" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDeleteMode('epp')">🗑 Borrar</button>
         <button class="btn btn-primary" id="btn-nuevo-epp" onclick="openModal('modal-epp')">📋 Registro de Entrega</button>
@@ -899,7 +905,7 @@ input[type="time"]{text-align:center}
       <div class="section-title">TÉCNICOS</div>
       <div class="section-sub">Personal de mantenimiento</div>
       <div class="search-bar">
-        <input class="search-input" id="tec-search" placeholder="🔍 Buscar técnico..." oninput="_dTec()">
+        <div class="search-wrap"><input class="search-input" id="tec-search" placeholder="🔍 Buscar técnico..." oninput="_dTec()"><button class="search-clear" id="tec-search-clear" onclick="_clearSearch('tec-search',()=>_dTec())" title="Limpiar">&#x2715;</button></div>
         <button class="btn btn-ghost" id="btn-del-tec" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDeleteMode('tec')">🗑 Borrar</button>
         <button class="btn btn-primary" id="btn-nuevo-tec" onclick="openModal('modal-tec')">+ Nuevo Técnico</button>
       </div>
@@ -919,7 +925,7 @@ input[type="time"]{text-align:center}
       <div class="section-title">GESTIÓN DE USUARIOS</div>
       <div class="section-sub">Crear y administrar accesos al sistema</div>
       <div class="search-bar">
-        <input class="search-input" id="usr-search" placeholder="🔍 Buscar usuario..." oninput="_dUsr()">
+        <div class="search-wrap"><input class="search-input" id="usr-search" placeholder="🔍 Buscar usuario..." oninput="_dUsr()"><button class="search-clear" id="usr-search-clear" onclick="_clearSearch('usr-search',()=>_dUsr())" title="Limpiar">&#x2715;</button></div>
         <button class="btn btn-ghost" id="btn-del-usr" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDeleteMode('usr')">🗑 Borrar</button>
         <button class="btn btn-primary" onclick="openModal('modal-usr')">+ Nuevo Usuario</button>
       </div>
@@ -1131,7 +1137,7 @@ input[type="time"]{text-align:center}
       <button class="modal-close" onclick="closeModal('modal-historial-eq')">&#10005;</button>
     </div>
     <div class="modal-body">
-      <div style="margin-bottom:10px"><input class="search-input" id="historial-eq-search" placeholder="🔍 Buscar N° OT, fecha, actividad, técnico..." style="width:100%" oninput="_filterHistorialEq()"></div>
+      <div style="margin-bottom:10px"><input <div class="search-wrap" style="width:100%"><input class="search-input" id="historial-eq-search" placeholder="🔍 Buscar N° OT, fecha, actividad, técnico..." style="width:100%" oninput="_filterHistorialEq()"><button class="search-clear" id="historial-eq-search-clear" onclick="_clearSearch('historial-eq-search',_filterHistorialEq)" title="Limpiar">&#x2715;</button></div></div>
       <div id="historial-eq-body"></div>
     </div>
     <div class="modal-footer">
@@ -1899,8 +1905,18 @@ function computeOTCounter(){
 }
 
 /* ── NAV ── */
+window._clearSearch=function(id,cb){const el=document.getElementById(id);if(el)el.value='';const cl=document.getElementById(id+'-clear');if(cl)cl.style.display='none';if(cb)cb();};
+// Auto-show/hide clear buttons
+document.addEventListener('input',function(e){if(!e.target.classList.contains('search-input'))return;const cl=e.target.parentElement?.querySelector('.search-clear');if(cl)cl.style.display=e.target.value?'block':'none';});
 function navigate(page,el){
   ['ot','log','sum','mat','epp','tec','usr','her','eq'].forEach(k=>{deleteMode[k]=false;});
+  // Clear all search bars on navigation
+  document.getElementById('ot-search')&&(document.getElementById('ot-search').value='');document.getElementById('log-search')&&(document.getElementById('log-search').value='');document.getElementById('sum-search')&&(document.getElementById('sum-search').value='');document.getElementById('prog-search-prev')&&(document.getElementById('prog-search-prev').value='');document.getElementById('prog-search-diario')&&(document.getElementById('prog-search-diario').value='');document.getElementById('eq-search')&&(document.getElementById('eq-search').value='');document.getElementById('mat-search')&&(document.getElementById('mat-search').value='');document.getElementById('her-search')&&(document.getElementById('her-search').value='');document.getElementById('eleq-search')&&(document.getElementById('eleq-search').value='');document.getElementById('epp-search')&&(document.getElementById('epp-search').value='');document.getElementById('tec-search')&&(document.getElementById('tec-search').value='');document.getElementById('usr-search')&&(document.getElementById('usr-search').value='');
+  // Hide all clear buttons
+  document.querySelectorAll('.search-clear').forEach(b=>b.style.display='none');
+  // Reset cronograma to current week
+  const _cs=document.getElementById('crono-week-sel');if(_cs)_cs.value='';
+  window._calMonth=null;window._calYear=null;
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   const pg=document.getElementById('page-'+page);if(!pg)return;
