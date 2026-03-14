@@ -801,28 +801,74 @@ input[type="time"]{text-align:center}
     <div class="page" id="page-herramientas">
       <div class="section-title">HERRAMIENTAS</div>
       <div class="section-sub">Control de entrega y devolución</div>
-      <div class="search-bar">
-        <input class="search-input" id="her-search" placeholder="🔍 Buscar herramienta, técnico..." oninput="_dHer()">
-        <button class="btn btn-ghost" id="btn-del-her" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDeleteMode('her')">🗑 Borrar</button>
-        <button class="btn btn-primary" id="btn-nueva-her" onclick="openModal('modal-her-tipo')">+ Registrar</button>
+      <!-- Tabs -->
+      <div style="display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:14px">
+        <button id="her-tab-her" onclick="switchHerTab('her')" class="prog-tab active" style="font-size:12px;padding:8px 18px">🔧 Herramientas</button>
+        <button id="her-tab-eq" onclick="switchHerTab('eq')" class="prog-tab" style="font-size:12px;padding:8px 18px">💻 Equipos Electrónicos</button>
       </div>
-      <div class="del-mode-bar" id="del-bar-her">
-        <input type="checkbox" class="del-all-chk" onchange="selectAllRows('her',this)"> <span>Seleccionar todo</span>
-        <span style="margin-left:8px;color:var(--muted)">|</span>
-        <span><b class="del-count-sp">0</b> seleccionado(s)</span>
-        <button class="btn btn-danger btn-sm" onclick="execBulkDelete('her')">🗑 Eliminar</button>
-        <button class="btn btn-ghost btn-sm" onclick="toggleDeleteMode('her')">✕ Cancelar</button>
-      </div>
-      <div class="grid2">
-        <div class="card"><div class="card-header"><span class="card-title">HISTORIAL</span></div>
-          <div class="table-wrap"><table><thead><tr><th>Tipo</th><th>Técnico</th><th>Herramienta</th><th>Cant.</th><th>OT</th><th>Fecha</th><th>Estado</th></tr></thead>
-          <tbody id="her-tbody"></tbody></table></div>
+      <!-- Panel: Herramientas -->
+      <div id="her-panel-her">
+        <div class="search-bar">
+          <input class="search-input" id="her-search" placeholder="🔍 Buscar herramienta, técnico..." oninput="_dHer()">
+          <button class="btn btn-ghost" id="btn-del-her" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDeleteMode('her')">🗑 Borrar</button>
+          <button class="btn btn-primary" onclick="openModal('modal-her-tipo')">+ Registrar</button>
         </div>
-        <div class="card"><div class="card-header"><span class="card-title">PENDIENTES DEVOLUCIÓN</span></div><div style="padding:14px" id="her-pendientes"></div></div>
+        <div class="del-mode-bar" id="del-bar-her">
+          <input type="checkbox" class="del-all-chk" onchange="selectAllRows('her',this)"> <span>Seleccionar todo</span>
+          <span style="margin-left:8px;color:var(--muted)">|</span>
+          <span><b class="del-count-sp">0</b> seleccionado(s)</span>
+          <button class="btn btn-danger btn-sm" onclick="execBulkDelete('her')">🗑 Eliminar</button>
+          <button class="btn btn-ghost btn-sm" onclick="toggleDeleteMode('her')">✕ Cancelar</button>
+        </div>
+        <div class="grid2">
+          <div class="card"><div class="card-header"><span class="card-title">HISTORIAL</span></div>
+            <div class="table-wrap"><table><thead><tr><th>Técnico</th><th>Herramienta</th><th>Marca</th><th>Cant.</th><th>Fecha</th><th>Estado</th></tr></thead>
+            <tbody id="her-tbody"></tbody></table></div>
+          </div>
+          <div class="card"><div class="card-header"><span class="card-title">PENDIENTES DEVOLUCIÓN</span></div><div style="padding:14px" id="her-pendientes"></div></div>
+        </div>
+      </div>
+      <!-- Panel: Equipos Electrónicos -->
+      <div id="her-panel-eq" style="display:none">
+        <div class="search-bar">
+          <input class="search-input" id="eleq-search" placeholder="🔍 Buscar equipo, técnico, marca..." oninput="renderEquiposElec()">
+          <button class="btn btn-ghost" id="btn-del-eleq" style="color:var(--danger);border-color:rgba(255,71,87,.3)" onclick="toggleDeleteMode('eleq')">🗑 Borrar</button>
+          <button class="btn btn-primary" onclick="_openEleqForm()">+ Registrar</button>
+        </div>
+        <div class="del-mode-bar" id="del-bar-eleq">
+          <input type="checkbox" class="del-all-chk" onchange="selectAllRows('eleq',this)"> <span>Seleccionar todo</span>
+          <span style="margin-left:8px;color:var(--muted)">|</span>
+          <span><b class="del-count-sp">0</b> seleccionado(s)</span>
+          <button class="btn btn-danger btn-sm" onclick="execBulkDelete('eleq')">🗑 Eliminar</button>
+          <button class="btn btn-ghost btn-sm" onclick="toggleDeleteMode('eleq')">✕ Cancelar</button>
+        </div>
+        <div class="grid2">
+          <div class="card"><div class="card-header"><span class="card-title">HISTORIAL</span></div>
+            <div class="table-wrap"><table><thead><tr><th>Técnico</th><th>Equipo</th><th>Marca</th><th>N° Serie</th><th>Cant.</th><th>Fecha</th><th>Estado</th></tr></thead>
+            <tbody id="eleq-tbody"></tbody></table></div>
+          </div>
+          <div class="card"><div class="card-header"><span class="card-title">PENDIENTES DEVOLUCIÓN</span></div><div style="padding:14px" id="eleq-pendientes"></div></div>
+        </div>
       </div>
     </div>
 
-    <!-- EPP -->
+    <!-- MODAL EQUIPOS ELECTRONICOS -->
+<div class="modal-overlay" id="modal-eleq-entrega">
+  <div class="modal"><div class="modal-header"><h2>💻 ENTREGA EQUIPO ELECTRÓNICO</h2><button class="modal-close" onclick="closeModal('modal-eleq-entrega')">✕</button></div>
+    <div class="modal-body"><div class="form-grid">
+      <div class="form-group"><label>Técnico *</label><select class="form-control" id="eleq-tec-e"></select></div>
+      <div class="form-group"><label>Equipo *</label><input type="text" class="form-control" id="eleq-nombre-e" placeholder="ej. Laptop, Tablet, Multímetro"></div>
+      <div class="form-group"><label>Marca</label><input type="text" class="form-control" id="eleq-marca-e" placeholder="ej. Dell, Fluke, HP"></div>
+      <div class="form-group"><label>N° Serie</label><input type="text" class="form-control" id="eleq-serie-e" placeholder="Número de serie"></div>
+      <div class="form-group"><label>Cantidad</label><input type="number" class="form-control" id="eleq-cant-e" value="1" min="1"></div>
+      <div class="form-group"><label>Fecha Entrega</label><input type="date" class="form-control" id="eleq-fecha-e"></div>
+      <div class="form-group"><label>Condición</label><select class="form-control" id="eleq-condicion-e"><option>Bueno</option><option>Regular</option><option>Requiere mantenimiento</option></select></div>
+      <div class="form-group form-full"><label>Observaciones</label><textarea class="form-control" id="eleq-obs-e"></textarea></div>
+    </div></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-eleq-entrega')">Cancelar</button><button class="btn btn-primary" onclick="saveEquipoElec()">Registrar Entrega</button></div>
+  </div>
+</div>
+<!-- EPP -->
     <div class="page" id="page-epp">
       <div class="section-title">ENTREGA DE EPPs</div>
       <div class="section-sub">Control de equipos de protección personal</div>
@@ -1085,6 +1131,7 @@ input[type="time"]{text-align:center}
       <button class="modal-close" onclick="closeModal('modal-historial-eq')">&#10005;</button>
     </div>
     <div class="modal-body">
+      <div style="margin-bottom:10px"><input class="search-input" id="historial-eq-search" placeholder="🔍 Buscar N° OT, fecha, actividad, técnico..." style="width:100%" oninput="_filterHistorialEq()"></div>
       <div id="historial-eq-body"></div>
     </div>
     <div class="modal-footer">
@@ -1566,11 +1613,9 @@ input[type="time"]{text-align:center}
     <div class="modal-body"><div class="form-grid">
       <div class="form-group"><label>Técnico *</label><select class="form-control" id="her-tec-e"></select></div>
       <div class="form-group"><label>Herramienta *</label><input type="text" class="form-control" id="her-nombre-e" placeholder="ej. Llave torquímetro 3/4"></div>
-      <div class="form-group"><label>Código / Serie</label><input type="text" class="form-control" id="her-codigo-e"></div>
+      <div class="form-group"><label>Marca</label><input type="text" class="form-control" id="her-codigo-e" placeholder="ej. Stanley, Bosch..."></div>
       <div class="form-group"><label>Cantidad</label><input type="number" class="form-control" id="her-cant-e" value="1" min="1"></div>
-      <div class="form-group"><label>OT Relacionada</label><select class="form-control" id="her-ot-e"></select></div>
       <div class="form-group"><label>Fecha Entrega</label><input type="date" class="form-control" id="her-fecha-e"></div>
-      <div class="form-group"><label>Fe.Devolución Estimada</label><input type="date" class="form-control" id="her-fecha-dev-e"></div>
       <div class="form-group"><label>Condición</label><select class="form-control" id="her-condicion-e"><option>Bueno</option><option>Regular</option><option>Requiere mantenimiento</option></select></div>
       <div class="form-group form-full"><label>Observaciones</label><textarea class="form-control" id="her-obs-e"></textarea></div>
     </div></div>
@@ -1834,6 +1879,10 @@ function subscribeAll(){
   unsubscribers.push(onSnapshot(collection(db,'tecnicos'),snap=>{tecData=snap.docs.map(d=>({id:d.id,...d.data()}));populateSelects();if(isActive('page-tecnicos'))renderTecnicos();}));
   unsubscribers.push(onSnapshot(collection(db,'epp'),snap=>{eppData=snap.docs.map(d=>({id:d.id,...d.data()}));if(isActive('page-epp'))renderEPP();}));
   unsubscribers.push(onSnapshot(collection(db,'herramientas'),snap=>{herData=snap.docs.map(d=>({id:d.id,...d.data()}));if(isActive('page-herramientas'))renderHerramientas();}));
+  unsubscribers.push(onSnapshot(collection(db,'eq_electronicos'),snap=>{
+    eleqData=snap.docs.map(d=>({id:d.id,...d.data()}));
+    if(isActive('page-herramientas')&&_activeHerTab==='eq')renderEquiposElec();
+  }));
   unsubscribers.push(onSnapshot(collection(db,'materiales'),snap=>{matData=snap.docs.map(d=>({id:d.id,...d.data()}));populateMatSelect();if(isActive('page-materiales'))renderMateriales();}));
   unsubscribers.push(onSnapshot(query(collection(db,'activity'),orderBy('ts','desc')),snap=>{actData=snap.docs.map(d=>({id:d.id,...d.data()}));if(isActive('page-dashboard')){renderDashboard();}}));
   unsubscribers.push(onSnapshot(collection(db,'usuarios'),snap=>{usrData=snap.docs.map(d=>({id:d.id,...d.data()}));if(isActive('page-usuarios'))renderUsuarios();}));
@@ -2552,7 +2601,18 @@ function progTipoBadge(t){
 
 window.switchProgTab=function(tab){
   _activeProgTab=tab;
-  if(tab==='cronograma'){setTimeout(()=>{const s=document.getElementById('crono-week-sel');if(s&&!s.value)crono_thisWeek();},50);}
+  if(tab==='cronograma'){
+    setTimeout(()=>{
+      const s=document.getElementById('crono-week-sel');
+      if(s&&!s.value){crono_thisWeek();}
+      else if(s&&s.value){crono_updateBtns(s.value);renderCronograma();}
+      // Attach polling for manual calendar selection (input[type=week] doesn't always fire events)
+      if(!s||s._cronoPollAttached)return;
+      s._cronoPollAttached=true;
+      let _cv=s.value;
+      setInterval(()=>{if(s.value!==_cv){_cv=s.value;crono_updateBtns(s.value);renderCronograma();}},300);
+    },80);
+  }
   document.querySelectorAll('.prog-tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.prog-panel').forEach(p=>p.classList.remove('active'));
   const tabEl=document.getElementById('ptab-'+tab);
@@ -3972,7 +4032,6 @@ window.openHerForm=function(tipo){
   closeModal('modal-her-tipo');
   if(tipo==='entrega'){
     const tec=document.getElementById('her-tec-e');if(tec)tec.innerHTML='<option value="">— Seleccionar —</option>'+tecData.map(t=>`<option>${t.nombre}</option>`).join('');
-    const ot=document.getElementById('her-ot-e');if(ot)ot.innerHTML='<option value="">— Sin OT —</option>'+otData.map(o=>`<option value="${o.num}">${o.num} — ${o.equipo||''}</option>`).join('');
     document.getElementById('her-fecha-e').value=hoy();
     document.getElementById('modal-her-entrega').classList.add('open');
   } else {
@@ -3992,7 +4051,7 @@ function renderHerramientas(){
   const btnDelHer=document.getElementById('btn-del-her');if(btnDelHer)btnDelHer.textContent=isDelHer?'✕ Salir':'🗑 Borrar';
   const her_th=document.querySelector('#her-tbody')?.closest('table')?.querySelector('thead tr');
   if(her_th){const ec=her_th.querySelector('th.del-col');if(isDelHer&&!ec){const th=document.createElement('th');th.className='del-col';th.style.cssText='width:28px';th.innerHTML='';her_th.insertBefore(th,her_th.firstChild);}else if(!isDelHer&&ec)ec.remove();}
-  document.getElementById('her-tbody').innerHTML=list.length?list.map(h=>`<tr>${isDelHer?`<td class="del-col"><input type="checkbox" class="del-row-chk del-row-chk-her" value="${h.id}" onchange="updDelCount('her')"></td>`:''}<td>${h.movTipo==='devolucion'?'<span class="badge badge-green">↩ Dev.</span>':'<span class="badge badge-yellow">🛠 Entrega</span>'}</td><td>${h.tecnico}</td><td>${h.nombre}</td><td style="font-family:var(--mono)">${h.cant}</td><td style="font-family:var(--mono);font-size:11px">${h.otRel||'—'}</td><td style="font-family:var(--mono);font-size:11px">${h.fecha||''}</td><td>${h.devuelto?'<span class="badge badge-green">Devuelta</span>':'<span class="badge badge-yellow">Pendiente</span>'}</td></tr>`).join(''):`<tr><td colspan="${isDelHer?8:7}">${emptyMsg('Sin registros')}</td></tr>`;
+  document.getElementById('her-tbody').innerHTML=list.length?list.map(h=>`<tr>${isDelHer?`<td class="del-col"><input type="checkbox" class="del-row-chk del-row-chk-her" value="${h.id}" onchange="updDelCount('her')"></td>`:''}<td>${h.tecnico}</td><td>${h.nombre}</td><td style="font-family:var(--mono);font-size:11px">${h.codigo||'—'}</td><td style="font-family:var(--mono)">${h.cant}</td><td style="font-family:var(--mono);font-size:11px">${h.fecha||''}</td><td>${h.devuelto?'<span class="badge badge-green">Devuelta</span>':'<span class="badge badge-yellow">Pendiente</span>'}</td></tr>`).join(''):`<tr><td colspan="${isDelHer?7:6}">${emptyMsg('Sin registros')}</td></tr>`;
   const pend=herData.filter(h=>!h.devuelto);
   document.getElementById('her-pendientes').innerHTML=pend.length?pend.map(h=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:13px;font-weight:600">${h.nombre}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${h.tecnico} · ${h.fecha||''}</div></div><button class="btn btn-success btn-sm" onclick="quickDevolver('${h.id}')">✓ Devuelta</button></div>`).join(''):`<div style="text-align:center;color:var(--muted);padding:20px;font-size:13px">✅ Sin pendientes</div>`;
 }
@@ -4001,7 +4060,7 @@ window.saveHerramienta=async function(tipo){
   if(_savingHer)return;_savingHer=true;
   const tec=document.getElementById('her-tec-e').value,nombre=document.getElementById('her-nombre-e').value.trim();
   if(!tec||!nombre){toast('Técnico y herramienta requeridos','error');_savingHer=false;return;}
-  await addDoc(collection(db,'herramientas'),{movTipo:'entrega',tecnico:tec,nombre,codigo:document.getElementById('her-codigo-e').value,cant:document.getElementById('her-cant-e').value,otRel:document.getElementById('her-ot-e').value,fecha:document.getElementById('her-fecha-e').value||hoy(),fechaDev:document.getElementById('her-fecha-dev-e').value,condicion:document.getElementById('her-condicion-e').value,obs:document.getElementById('her-obs-e').value,devuelto:false,entregadoPor:currentUser.name,createdAt:serverTimestamp()});
+  await addDoc(collection(db,'herramientas'),{movTipo:'entrega',tecnico:tec,nombre,codigo:document.getElementById('her-codigo-e').value,cant:document.getElementById('her-cant-e').value,fecha:document.getElementById('her-fecha-e').value||hoy(),condicion:document.getElementById('her-condicion-e').value,obs:document.getElementById('her-obs-e').value,devuelto:false,entregadoPor:currentUser.name,createdAt:serverTimestamp()});
   closeModal('modal-her-entrega');_savingHer=false;toast(`Herramienta entregada a ${tec}`,'success');
   ['her-nombre-e','her-codigo-e','her-obs-e'].forEach(id=>document.getElementById(id).value='');
 };
@@ -4014,6 +4073,56 @@ window.saveDevolucion=async function(){
 window.selectAllEq=function(chk){document.querySelectorAll('.del-row-chk-eq').forEach(c=>c.checked=chk.checked);updDelCountEq();};
 window.updDelCountEq=function(){const n=document.querySelectorAll('.del-row-chk-eq:checked').length;document.querySelectorAll('.del-count-sp-eq').forEach(s=>s.textContent=n);};
 window.quickDevolver=async function(id){await updateDoc(doc(db,'herramientas',id),{devuelto:true,fechaDevReal:hoy()});toast('Herramienta marcada como devuelta','success');};
+
+
+/* ── EQUIPOS ELECTRÓNICOS ── */
+let eleqData=[];
+var _savingEleq=false;
+var _activeHerTab='her';
+window.switchHerTab=function(tab){
+  _activeHerTab=tab;
+  document.getElementById('her-panel-her').style.display=tab==='her'?'':'none';
+  document.getElementById('her-panel-eq').style.display=tab==='eq'?'':'none';
+  document.getElementById('her-tab-her').classList.toggle('active',tab==='her');
+  document.getElementById('her-tab-eq').classList.toggle('active',tab==='eq');
+  if(tab==='eq')renderEquiposElec();
+};
+// openEquipoElecForm is triggered by modal button
+document.getElementById('modal-eleq-entrega')&&document.querySelector('#modal-eleq-entrega button[onclick*="openModal"]');
+window._openEleqForm=function(){const s=document.getElementById('eleq-tec-e');if(s)s.innerHTML='<option value="">— Seleccionar —</option>'+tecData.map(t=>`<option>${t.nombre}</option>`).join('');document.getElementById('eleq-fecha-e').value=hoy();openModal('modal-eleq-entrega');};
+window.saveEquipoElec=async function(){
+  if(_savingEleq)return;_savingEleq=true;
+  const tec=document.getElementById('eleq-tec-e').value;
+  const nombre=document.getElementById('eleq-nombre-e').value.trim();
+  if(!tec||!nombre){toast('Técnico y equipo requeridos','error');_savingEleq=false;return;}
+  await addDoc(collection(db,'eq_electronicos'),{
+    tecnico:tec,nombre,
+    marca:document.getElementById('eleq-marca-e').value.trim(),
+    serie:document.getElementById('eleq-serie-e').value.trim(),
+    cant:document.getElementById('eleq-cant-e').value||1,
+    fecha:document.getElementById('eleq-fecha-e').value||hoy(),
+    condicion:document.getElementById('eleq-condicion-e').value,
+    obs:document.getElementById('eleq-obs-e').value.trim(),
+    devuelto:false,entregadoPor:currentUser.name,createdAt:serverTimestamp()
+  });
+  closeModal('modal-eleq-entrega');_savingEleq=false;
+  toast(`Equipo entregado a ${tec}`,'success');
+  ['eleq-nombre-e','eleq-marca-e','eleq-serie-e','eleq-obs-e'].forEach(id=>document.getElementById(id).value='');
+};
+window.quickDevolverEleq=async function(id){
+  await updateDoc(doc(db,'eq_electronicos',id),{devuelto:true,fechaDevReal:hoy()});
+  toast('Equipo marcado como devuelto','success');
+};
+function renderEquiposElec(){
+  const search=(document.getElementById('eleq-search')?.value||'').toLowerCase();
+  const list=eleqData.filter(h=>!search||(h.tecnico||'').toLowerCase().includes(search)||(h.nombre||'').toLowerCase().includes(search)||(h.marca||'').toLowerCase().includes(search));
+  const isDel=deleteMode['eleq'];
+  const bar=document.getElementById('del-bar-eleq');if(bar)bar.classList.toggle('active',!!isDel);
+  const btnDel=document.getElementById('btn-del-eleq');if(btnDel)btnDel.textContent=isDel?'✕ Salir':'🗑 Borrar';
+  document.getElementById('eleq-tbody').innerHTML=list.length?list.map(h=>`<tr>${isDel?`<td class="del-col"><input type="checkbox" class="del-row-chk del-row-chk-eleq" value="${h.id}" onchange="updDelCount('eleq')"></td>`:''}<td>${h.tecnico}</td><td>${h.nombre}</td><td style="font-family:var(--mono);font-size:11px">${h.marca||'—'}</td><td style="font-family:var(--mono);font-size:11px">${h.serie||'—'}</td><td style="font-family:var(--mono)">${h.cant}</td><td style="font-family:var(--mono);font-size:11px">${h.fecha||''}</td><td>${h.devuelto?'<span class="badge badge-green">Devuelto</span>':'<span class="badge badge-yellow">Pendiente</span>'}</td></tr>`).join(''):`<tr><td colspan="${isDel?8:7}">${emptyMsg('Sin registros')}</td></tr>`;
+  const pend=eleqData.filter(h=>!h.devuelto);
+  document.getElementById('eleq-pendientes').innerHTML=pend.length?pend.map(h=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:13px;font-weight:600">${h.nombre}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${h.tecnico} · ${h.fecha||''}</div></div><button class="btn btn-success btn-sm" onclick="quickDevolverEleq('${h.id}')">✓ Devuelto</button></div>`).join(''):`<div style="text-align:center;color:var(--muted);padding:20px;font-size:13px">✅ Sin pendientes</div>`;
+}
 
 /* ── EPP ── */
 function populateEPPSelect(){const sel=document.getElementById('epp-tipo');if(!sel)return;sel.innerHTML='<option value="">— Seleccionar EPP —</option>'+eppCatData.map(e=>`<option value="${e.nombre}">${e.nombre}</option>`).join('');}
@@ -4182,7 +4291,16 @@ window.verHistorialEquipo=function(eqId,tag){
     </tr></thead>
     <tbody>${rows}</tbody>
   </table></div>`;
+  document.getElementById('historial-eq-search').value='';
   openModal('modal-historial-eq');
+};
+window._historialEqRows=[];
+window._filterHistorialEq=function(){
+  const q=(document.getElementById('historial-eq-search')?.value||'').toLowerCase();
+  const tbody=document.querySelector('#historial-eq-body .table-wrap tbody');
+  if(!tbody)return;
+  if(!q){tbody.querySelectorAll('tr').forEach(r=>r.style.display='');return;}
+  tbody.querySelectorAll('tr').forEach(r=>{const t=r.textContent.toLowerCase();r.style.display=t.includes(q)?'':'none';});
 };
 window.irAOT=function(otNum){
   closeModal('modal-historial-eq');
@@ -4383,7 +4501,6 @@ function populateSelects(){
   populateMatSelect();
 }
 function populateMatSelect(){const el=document.getElementById('ot-mat-sel');if(!el)return;el.innerHTML='<option value="">— Seleccionar material —</option>'+matData.map(m=>`<option value="${m.id}">${m.cod||''} · ${m.texto} (${m.um}) ${m.moneda} ${m.precio}</option>`).join('');}
-function populateOTSelect(){const el=document.getElementById('her-ot-e');if(!el)return;el.innerHTML='<option value="">— Sin OT —</option>'+otData.map(o=>`<option value="${o.num}">${o.num} — ${o.equipo||''}</option>`).join('');}
 function setDefaultDates(){['ot-fecha','epp-fecha','her-fecha-e','log-fesol'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=hoy();});}
 function hoy(){return new Date().toISOString().split('T')[0];}
 function fmtFecha(d){if(!d)return'—';const p=d.split('-');if(p.length!==3)return d;const [yy,mm,dd]=p;return dd+'/'+mm+'/'+yy.slice(2);}
@@ -4516,7 +4633,7 @@ window.confirmRenameWidget=function(){
 /* ── DELETE MODE (global) ── */
 window.toggleDeleteMode=function(mod){
   deleteMode[mod]=!deleteMode[mod];
-  const renderMap={ot:renderOT,log:renderLogistica,sum:renderSuministros,mat:renderMateriales,epp:renderEPP,tec:renderTecnicos,usr:renderUsuarios,her:renderHerramientas,eq:renderEquipos,'prog-prev':()=>renderProgTable('preventivo'),'prog-diario':()=>renderProgTable('diario')};
+  const renderMap={ot:renderOT,log:renderLogistica,sum:renderSuministros,mat:renderMateriales,epp:renderEPP,tec:renderTecnicos,usr:renderUsuarios,her:renderHerramientas,eq:renderEquipos,'prog-prev':()=>renderProgTable('preventivo'),'prog-diario':()=>renderProgTable('diario'),eleq:renderEquiposElec};
   renderMap[mod]?.();
 };
 window.selectAllRows=function(mod,chk){
@@ -4532,7 +4649,7 @@ window.execBulkDelete=async function(mod){
   const ids=[...document.querySelectorAll('.del-row-chk-'+mod+':checked')].map(c=>c.value);
   if(!ids.length){toast('Selecciona al menos un registro','error');return;}
   if(!confirm('¿Eliminar '+ids.length+' registro(s) seleccionados?'))return;
-  const colMap={ot:'ot',log:'logistica',sum:'suministros',mat:'materiales',epp:'epp',tec:'tecnicos',usr:'usuarios',her:'herramientas',eq:'equipos','prog-prev':'prog_actividades','prog-diario':'prog_actividades'};
+  const colMap={ot:'ot',log:'logistica',sum:'suministros',mat:'materiales',epp:'epp',tec:'tecnicos',usr:'usuarios',her:'herramientas',eq:'equipos','prog-prev':'prog_actividades','prog-diario':'prog_actividades',eleq:'eq_electronicos'};
   const col=colMap[mod];if(!col)return;
   try{
     const batch=writeBatch(db);
@@ -4542,6 +4659,7 @@ window.execBulkDelete=async function(mod){
     toast(ids.length+' registro(s) eliminados','success');
     if(mod==='prog-prev')renderProgTable('preventivo');
     else if(mod==='prog-diario')renderProgTable('diario');
+    else if(mod==='eleq')renderEquiposElec();
   }catch(e){toast('Error: '+e.message,'error');}
 };
 
