@@ -810,7 +810,7 @@ input[type="time"]{text-align:center}
       <!-- Tabs -->
       <div class="prog-tabs">
         <div id="her-tab-her" onclick="switchHerTab('her')" class="prog-tab active">🔧&nbsp;HERRAMIENTAS</div>
-        <div id="her-tab-eq" onclick="switchHerTab('eq')" class="prog-tab">📡&nbsp;EQUIPOS ELECTRÓNICOS</div>
+        <div id="her-tab-eq" onclick="switchHerTab('eq')" class="prog-tab">🖩&nbsp;EQUIPOS ELECTRÓNICOS</div>
       </div>
       <!-- Panel: Herramientas -->
       <div id="her-panel-her">
@@ -1137,7 +1137,12 @@ input[type="time"]{text-align:center}
       <button class="modal-close" onclick="closeModal('modal-historial-eq')">&#10005;</button>
     </div>
     <div class="modal-body">
-      <div style="margin-bottom:10px"><input <div class="search-wrap" style="width:100%"><input class="search-input" id="historial-eq-search" placeholder="🔍 Buscar N° OT, fecha, actividad, técnico..." style="width:100%" oninput="_filterHistorialEq()"><button class="search-clear" id="historial-eq-search-clear" onclick="_clearSearch('historial-eq-search',_filterHistorialEq)" title="Limpiar">&#x2715;</button></div></div>
+      <div style="margin-bottom:10px">
+        <div class="search-wrap" style="width:100%">
+          <input class="search-input" id="historial-eq-search" placeholder="🔍 Buscar N° OT, fecha, actividad, técnico..." style="width:100%;padding-right:32px" oninput="_filterHistorialEq()">
+          <button class="search-clear" id="historial-eq-search-clear" onclick="_clearSearch('historial-eq-search',_filterHistorialEq)" title="Limpiar">&#x2715;</button>
+        </div>
+      </div>
       <div id="historial-eq-body"></div>
     </div>
     <div class="modal-footer">
@@ -3219,7 +3224,8 @@ function renderKanbanBoard(){
           if(o.materiales.length>2)mats+=`<span style="font-size:9px;color:var(--muted);padding:1px 4px">+${o.materiales.length-2} más</span>`;
           mats+='</div>';
         }
-        html+=`<div class="kb2-card" data-id="${o.id}" data-estado="${col.id}" draggable="true">`;
+        const _cardBorder={Asignada:"#3B82F6","En proceso":"#F59E0B",Cerrada:"#10B981",Cancelado:"#EF4444"};const _cardBg={Asignada:"rgba(59,130,246,.04)","En proceso":"rgba(245,158,11,.05)",Cerrada:"rgba(16,185,129,.04)",Cancelado:"rgba(239,68,68,.04)"};
+        html+=`<div class="kb2-card" data-id="${o.id}" data-estado="${col.id}" draggable="true" style="border-left:3px solid ${_cardBorder[col.id]||'var(--border)'};background:${_cardBg[col.id]||'var(--surface)'}">`; 
         html+=`<div class="kb2-num"><span>${o.num}</span><span style="font-size:9px;font-family:var(--mono);color:var(--muted)">${o.fecha||''}</span></div>`;
         if(o.tipo){const _tc={Correctivo:["rgba(255,71,87,.15)","#ff4757","rgba(255,71,87,.4)"],Preventivo:["rgba(0,212,170,.15)","#00d4aa","rgba(0,212,170,.4)"],Predictivo:["rgba(30,144,255,.15)","#1e90ff","rgba(30,144,255,.4)"],Mejora:["rgba(255,165,0,.15)","#e08c00","rgba(255,165,0,.4)"]};const _tv=_tc[o.tipo]||["rgba(90,100,128,.15)","#8892aa","rgba(90,100,128,.4)"];html+=`<div style="display:flex;justify-content:flex-end;margin:1px 0 3px;"><span style="font-size:9px;font-family:var(--mono);background:${_tv[0]};color:${_tv[1]};border:1px solid ${_tv[2]};border-radius:3px;padding:1px 6px">${o.tipo}</span></div>`;}
         html+=`<div class="kb2-desc">${o.desc||''}</div>`;
