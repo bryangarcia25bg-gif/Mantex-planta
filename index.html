@@ -810,7 +810,7 @@ input[type="time"]{text-align:center}
       <!-- Tabs -->
       <div class="prog-tabs">
         <div id="her-tab-her" onclick="switchHerTab('her')" class="prog-tab active">🔧&nbsp;HERRAMIENTAS</div>
-        <div id="her-tab-eq" onclick="switchHerTab('eq')" class="prog-tab">🖩&nbsp;EQUIPOS ELECTRÓNICOS</div>
+        <div id="her-tab-eq" onclick="switchHerTab('eq')" class="prog-tab">📡&nbsp;EQUIPOS ELECTRÓNICOS</div>
       </div>
       <!-- Panel: Herramientas -->
       <div id="her-panel-her">
@@ -3520,7 +3520,17 @@ function renderOT(){
   lastFilteredOT=[...list];
   const stats={Asignada:0,'En proceso':0,Cerrada:0,Cancelado:0};
   filterOTByUser().forEach(o=>stats[o.estado]=(stats[o.estado]||0)+1);
-  document.getElementById('ot-stats').innerHTML=Object.entries(stats).map(([k,v])=>`<div class="stat-box"><div class="val">${v}</div><div class="lbl">${k}</div></div>`).join('');
+  const _stColors={Asignada:{bg:'rgba(59,130,246,.12)',border:'rgba(59,130,246,.35)',val:'#3B82F6'},
+    'En proceso':{bg:'rgba(245,158,11,.12)',border:'rgba(245,158,11,.35)',val:'#F59E0B'},
+    Cerrada:{bg:'rgba(16,185,129,.12)',border:'rgba(16,185,129,.35)',val:'#10B981'},
+    Cancelado:{bg:'rgba(239,68,68,.12)',border:'rgba(239,68,68,.35)',val:'#EF4444'}};
+  document.getElementById('ot-stats').innerHTML=Object.entries(stats).map(([k,v])=>{
+    const _sc=_stColors[k]||{bg:'var(--surface2)',border:'var(--border)',val:'var(--text)'};
+    return `<div class="stat-box" style="background:${_sc.bg};border:1px solid ${_sc.border}">`+
+      `<div class="val" style="color:${_sc.val}">${v}</div>`+
+      `<div class="lbl" style="color:${_sc.val};opacity:.8">${k}</div>`+
+    `</div>`;
+  }).join('');
   // Update del-col header — solo muestra columna vacía sin checkbox (ya está en del-bar)
   const thRow=document.getElementById('ot-th-row');
   if(thRow){const existing=thRow.querySelector('th.del-col');if(isDelMode&&!existing){const th=document.createElement('th');th.className='del-col';th.style.cssText='width:28px';th.innerHTML='';thRow.insertBefore(th,thRow.firstChild);}else if(!isDelMode&&existing){existing.remove();}}
@@ -4307,9 +4317,9 @@ window.verHistorialEquipo=function(eqId,tag){
     </tr>`;
   }).join('');
   body.innerHTML=`<div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:10px;letter-spacing:1px">${sorted.length} ORDEN(ES) ENCONTRADA(S)</div>
-  <div class="table-wrap"><table>
+  <div style="overflow-x:hidden"><table style="width:100%;border-collapse:collapse">
     <thead><tr>
-      <th>N° OT</th><th>Fecha</th><th>Actividad</th><th>Tipo</th><th>Técnico</th><th>Repuestos</th><th>Estado</th><th>Ver</th>
+      <th style="text-align:left;padding:7px 8px;font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px;border-bottom:1px solid var(--border)">N° OT</th><th style="text-align:left;padding:7px 8px;font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px;border-bottom:1px solid var(--border)">Fecha</th><th style="text-align:left;padding:7px 8px;font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px;border-bottom:1px solid var(--border)">Actividad</th><th style="text-align:left;padding:7px 8px;font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px;border-bottom:1px solid var(--border)">Tipo</th><th style="text-align:left;padding:7px 8px;font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px;border-bottom:1px solid var(--border)">Técnico</th><th style="text-align:left;padding:7px 8px;font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px;border-bottom:1px solid var(--border)">Repuestos</th><th style="text-align:left;padding:7px 8px;font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px;border-bottom:1px solid var(--border)">Estado</th><th style="padding:7px 8px;border-bottom:1px solid var(--border)"></th>
     </tr></thead>
     <tbody>${rows}</tbody>
   </table></div>`;
