@@ -1833,8 +1833,14 @@ let widgetLayout=(()=>{
 let dragType='',dragId='';
 
 /* ── THEME ── */
-function initTheme(){const saved=localStorage.getItem('mantex_theme')||'dark';document.documentElement.setAttribute('data-theme',saved);updateThemeBtn(saved);}
-window.toggleTheme=function(){const cur=document.documentElement.getAttribute('data-theme');const next=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',next);localStorage.setItem('mantex_theme',next);updateThemeBtn(next);};
+function initTheme(){const saved=localStorage.getItem('mantex_theme')||'dark';document.documentElement.setAttribute('data-theme',saved);updateThemeBtn(saved);setTimeout(()=>_updateLogoTheme(saved),50);}
+window.toggleTheme=function(){const cur=document.documentElement.getAttribute('data-theme');const next=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',next);localStorage.setItem('mantex_theme',next);updateThemeBtn(next);_updateLogoTheme(next);};
+window._updateLogoTheme=function(theme){
+  const wrap=document.querySelector('.topbar-logo-m');
+  if(!wrap)return;
+  wrap.classList.remove('topbar-logo-theme-dark','topbar-logo-theme-light');
+  wrap.classList.add(theme==='dark'?'topbar-logo-theme-dark':'topbar-logo-theme-light');
+};
 function updateThemeBtn(t){const b=document.getElementById('theme-btn');if(b)b.textContent=t==='dark'?'🌙 OSCURO':'☀️ CLARO';}
 initTheme();
 
@@ -2284,7 +2290,7 @@ function renderProgCalendario(el){
     const dots=acts.slice(0,3).map(a=>`<div style="width:6px;height:6px;border-radius:50%;background:${TIPO_COLOR[a.tipo]||'#8B5CF6'};flex-shrink:0"></div>`).join('');
     const more=acts.length>3?`<div style="font-size:8px;color:var(--muted)">+${acts.length-3}</div>`:'';
     const tipContent=acts.length?acts.slice(0,4).map(a=>`${a.tipo}: ${(a.desc||'').slice(0,28)}`).join('|'):'';
-    cells+=`<div style="min-height:52px;background:${dayBg};border-radius:4px;padding:3px 4px;cursor:${acts.length?'pointer':'default'}" ${acts.length?`onmouseenter="showCalTip(event,'${d} ${MESES[month]}','${tipContent.replace(/'/g,'`')}','${calId}')" onmouseleave="hideCalTip('${calId}')"`:''}>
+    cells+=`<div style="min-height:52px;background:${dayBg};border-radius:4px;padding:3px 4px;cursor:${acts.length?'pointer':'default'}" ${acts.length?`onmouseenter="showCalTip(event,'${d} ${MESES[month]}','${tipContent.replace(/'/g,'`')}','${calId}')" onmouseleave="hideCalTip('${calId}') onclick=\"_calGoToCronograma(${d},${month},${year})\""`:''}>
       <div style="font-size:10px;font-weight:700;${isToday?`color:#fff;background:${todayBg};border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;`:'color:var(--muted);'}">${d}</div>
       <div style="display:flex;flex-wrap:wrap;gap:2px;margin-top:3px">${dots}${more}</div>
     </div>`;
@@ -2305,6 +2311,27 @@ function renderProgCalendario(el){
   </div>
   <div id="${calId}" style="display:none;position:fixed;background:rgba(15,15,25,0.97);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:8px 12px;font-size:11px;color:#fff;z-index:9999;max-width:220px;box-shadow:0 6px 20px rgba(0,0,0,.5)"></div>`;
 }
+window._calGoToCronograma=function(day,month,year){
+  // Calculate ISO week for the given date
+  const d=new Date(year,month,day);
+  const dow=d.getDay()||7;
+  const mon=new Date(d.getTime()-(dow-1)*86400000);
+  const y2=mon.getFullYear();
+  const jan4=new Date(y2,0,4);
+  const doy=(mon-new Date(y2,0,0))/86400000;
+  const wn=Math.ceil((doy+(jan4.getDay()||7)-1)/7);
+  const weekVal=y2+'-W'+String(wn).padStart(2,'0');
+  // Navigate to prog module and switch to cronograma tab
+  const navEl=document.getElementById('nav-prog');
+  navigate('prog',navEl);
+  setTimeout(()=>{
+    switchProgTab('cronograma');
+    setTimeout(()=>{
+      const sel=document.getElementById('crono-week-sel');
+      if(sel){sel.value=weekVal;crono_updateBtns(weekVal);renderCronograma();}
+    },100);
+  },80);
+};
 window.calNav=function(dir){
   window._calMonth=(window._calMonth||new Date().getMonth())+dir;
   if(window._calMonth>11){window._calMonth=0;window._calYear=(window._calYear||new Date().getFullYear())+1;}
@@ -3664,24 +3691,10 @@ function _buildOTPDFHtml(o){
   .ot-pdf .firma-lbl{font-weight:bold;font-size:7.5pt;text-align:center;background:#f0f0f0}
   .ot-pdf .firma-val{font-size:8pt;text-align:center;border-top:1px solid #333;padding-top:2px}
 
-/* Logo background in dark mode */
-#hf-logo-img {
-  border-radius: 3px;
-  padding: 0;
-  background: transparent;
-}
-/* Dark mode: white bg to make logo readable */
-:root #hf-logo-img,
-[data-theme="dark"] #hf-logo-img {
-  background: rgba(255,255,255,0.92);
-  padding: 2px 4px;
-  border-radius: 4px;
-}
-/* Light mode: no background needed */
-[data-theme="light"] #hf-logo-img {
-  background: transparent;
-  padding: 0;
-}
+/* Logo: white bg in dark, transparent in light */
+#hf-logo-img{border-radius:4px;transition:background .2s,padding .2s}
+.topbar-logo-theme-dark #hf-logo-img{background:rgba(255,255,255,.93);padding:2px 5px}
+.topbar-logo-theme-light #hf-logo-img{background:transparent;padding:0}
 </style>
 <div class="ot-pdf">
   <!-- HEADER -->
