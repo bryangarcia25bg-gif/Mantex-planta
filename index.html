@@ -139,7 +139,8 @@ tr:hover td{background:rgba(128,128,128,.04)}
 .badge-gray{background:rgba(90,100,128,.15);color:var(--muted);border:1px solid rgba(90,100,128,.3)}
 .badge-orange{background:rgba(255,165,0,.15);color:#e08c00;border:1px solid rgba(255,165,0,.3)}
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center;padding:14px}
-.modal-overlay.open{display:flex}
+.modal-overlay.open{display:flex;cursor:default}
+.modal-overlay.open>.modal{cursor:default}
 .modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;width:100%;max-width:680px;max-height:93vh;overflow-y:auto;animation:slideUp .2s ease;box-shadow:0 20px 60px var(--shadow)}
 .modal-xl{max-width:960px}
 .modal-sm{max-width:440px}
@@ -4903,6 +4904,22 @@ window.closeSidebarOverlay=function(){
 })();
 
 window.toast=function(msg,type='success'){const el=document.getElementById('toast');el.textContent=(type==='success'?'✅ ':type==='error'?'❌ ':'ℹ️ ')+msg;el.className=`show ${type}`;el.style.display='flex';clearTimeout(window._tt);window._tt=setTimeout(()=>el.style.display='none',3400);};
+
+// ── Prevent closing modals by clicking outside ──
+document.addEventListener('click', function(e) {
+  // If click lands directly on .modal-overlay (the dark backdrop), block it
+  if (e.target.classList && e.target.classList.contains('modal-overlay')) {
+    e.stopImmediatePropagation();
+    e.preventDefault();
+    // Small shake animation to indicate "you must use the cancel button"
+    const modal = e.target.querySelector('.modal');
+    if (modal) {
+      modal.style.transition = 'transform .1s';
+      modal.style.transform = 'scale(1.02)';
+      setTimeout(() => { modal.style.transform = ''; }, 150);
+    }
+  }
+}, true); // capture phase to intercept before any other handler
 </script>
 </body>
 </html>
