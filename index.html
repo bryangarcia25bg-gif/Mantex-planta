@@ -1921,7 +1921,6 @@ function navigate(page,el){
   // Hide all clear buttons
   document.querySelectorAll('.search-clear').forEach(b=>b.style.display='none');
   // Reset cronograma to current week
-  const _cs=document.getElementById('crono-week-sel');if(_cs)_cs.value='';
   window._calMonth=null;window._calYear=null;
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
@@ -2625,9 +2624,7 @@ window.switchProgTab=function(tab){
   _activeProgTab=tab;
   if(tab==='cronograma'){
     setTimeout(()=>{
-      const s=document.getElementById('crono-week-sel');
-      if(s&&!s.value){crono_thisWeek();}
-      else if(s&&s.value){crono_updateBtns(s.value);renderCronograma();}
+      crono_thisWeek(); // Always reset to current week when entering module
       // Attach polling for manual calendar selection (input[type=week] doesn't always fire events)
       if(!s||s._cronoPollAttached)return;
       s._cronoPollAttached=true;
@@ -3666,6 +3663,25 @@ function _buildOTPDFHtml(o){
   .ot-pdf .firma-box{height:90px;vertical-align:bottom;padding:4px}
   .ot-pdf .firma-lbl{font-weight:bold;font-size:7.5pt;text-align:center;background:#f0f0f0}
   .ot-pdf .firma-val{font-size:8pt;text-align:center;border-top:1px solid #333;padding-top:2px}
+
+/* Logo background in dark mode */
+#hf-logo-img {
+  border-radius: 3px;
+  padding: 0;
+  background: transparent;
+}
+/* Dark mode: white bg to make logo readable */
+:root #hf-logo-img,
+[data-theme="dark"] #hf-logo-img {
+  background: rgba(255,255,255,0.92);
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+/* Light mode: no background needed */
+[data-theme="light"] #hf-logo-img {
+  background: transparent;
+  padding: 0;
+}
 </style>
 <div class="ot-pdf">
   <!-- HEADER -->
