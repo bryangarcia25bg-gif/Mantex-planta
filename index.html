@@ -1836,10 +1836,17 @@ let dragType='',dragId='';
 function initTheme(){const saved=localStorage.getItem('mantex_theme')||'dark';document.documentElement.setAttribute('data-theme',saved);updateThemeBtn(saved);setTimeout(()=>_updateLogoTheme(saved),50);}
 window.toggleTheme=function(){const cur=document.documentElement.getAttribute('data-theme');const next=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',next);localStorage.setItem('mantex_theme',next);updateThemeBtn(next);_updateLogoTheme(next);};
 window._updateLogoTheme=function(theme){
-  const wrap=document.querySelector('.topbar-logo-m');
-  if(!wrap)return;
-  wrap.classList.remove('topbar-logo-theme-dark','topbar-logo-theme-light');
-  wrap.classList.add(theme==='dark'?'topbar-logo-theme-dark':'topbar-logo-theme-light');
+  const img=document.getElementById('hf-logo-img');
+  if(!img)return;
+  if(theme==='dark'){
+    img.style.background='rgba(255,255,255,0.93)';
+    img.style.padding='2px 6px';
+    img.style.borderRadius='4px';
+  } else {
+    img.style.background='transparent';
+    img.style.padding='0';
+    img.style.borderRadius='3px';
+  }
 };
 function updateThemeBtn(t){const b=document.getElementById('theme-btn');if(b)b.textContent=t==='dark'?'🌙 OSCURO':'☀️ CLARO';}
 initTheme();
@@ -2290,7 +2297,7 @@ function renderProgCalendario(el){
     const dots=acts.slice(0,3).map(a=>`<div style="width:6px;height:6px;border-radius:50%;background:${TIPO_COLOR[a.tipo]||'#8B5CF6'};flex-shrink:0"></div>`).join('');
     const more=acts.length>3?`<div style="font-size:8px;color:var(--muted)">+${acts.length-3}</div>`:'';
     const tipContent=acts.length?acts.slice(0,4).map(a=>`${a.tipo}: ${(a.desc||'').slice(0,28)}`).join('|'):'';
-    cells+=`<div style="min-height:52px;background:${dayBg};border-radius:4px;padding:3px 4px;cursor:${acts.length?'pointer':'default'}" ${acts.length?`onmouseenter="showCalTip(event,'${d} ${MESES[month]}','${tipContent.replace(/'/g,'`')}','${calId}')" onmouseleave="hideCalTip('${calId}') onclick=\"_calGoToCronograma(${d},${month},${year})\""`:''}>
+    cells+=`<div style="min-height:52px;background:${dayBg};border-radius:4px;padding:3px 4px;cursor:${acts.length?'pointer':'default'};${acts.length?'transition:box-shadow .15s':''}" ${acts.length?`onmouseenter="showCalTip(event,'${d} ${MESES[month]}','${tipContent.replace(/'/g,'`')}','${calId}')" onmouseleave="hideCalTip('${calId}')" onclick="_calGoToCronograma(${d},${month},${year})"`:''}>
       <div style="font-size:10px;font-weight:700;${isToday?`color:#fff;background:${todayBg};border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;`:'color:var(--muted);'}">${d}</div>
       <div style="display:flex;flex-wrap:wrap;gap:2px;margin-top:3px">${dots}${more}</div>
     </div>`;
