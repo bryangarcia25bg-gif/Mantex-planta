@@ -1,0 +1,456 @@
+```html
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Checklist Mantenimiento</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+
+body{
+font-family:Arial;
+margin:0;
+background:#f4f6f9;
+}
+
+header{
+background:#0f172a;
+color:white;
+padding:12px;
+font-size:18px;
+}
+
+.container{
+padding:15px;
+}
+
+.card{
+background:white;
+padding:15px;
+margin-bottom:15px;
+border-radius:8px;
+}
+
+table{
+border-collapse:collapse;
+width:100%;
+font-size:12px;
+}
+
+th,td{
+border:1px solid #cbd5e1;
+padding:6px;
+text-align:center;
+}
+
+th{
+background:#e2e8f0;
+}
+
+.lock{
+background:#f1f5f9;
+}
+
+.CR{
+background:#fee2e2;
+font-weight:bold;
+}
+
+.SC{
+background:#fef9c3;
+font-weight:bold;
+}
+
+.status{
+cursor:pointer;
+height:28px;
+}
+
+.pending{
+background:#e5e7eb;
+}
+
+.ok{
+background:#16a34a;
+color:white;
+}
+
+.fail{
+background:#dc2626;
+color:white;
+}
+
+button{
+background:#0f172a;
+color:white;
+padding:10px;
+border:none;
+border-radius:6px;
+margin-top:10px;
+}
+
+.progress{
+height:10px;
+background:#ddd;
+margin-top:10px;
+border-radius:6px;
+}
+
+.bar{
+height:10px;
+background:#16a34a;
+width:0%;
+border-radius:6px;
+}
+
+#login{
+position:fixed;
+top:0;
+left:0;
+right:0;
+bottom:0;
+background:white;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.loginBox{
+background:white;
+padding:30px;
+border-radius:10px;
+box-shadow:0 5px 20px rgba(0,0,0,.2);
+}
+
+canvas{
+border:1px solid #ccc;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>Checklist Mantenimiento Líneas</header>
+
+<div id="login">
+
+<div class="loginBox">
+
+<h3>Ingreso Técnico</h3>
+
+<input id="user" placeholder="Usuario"><br><br>
+<input id="pass" type="password" placeholder="Contraseña"><br><br>
+
+<button onclick="login()">Ingresar</button>
+
+</div>
+
+</div>
+
+<div class="container">
+
+<div class="card">
+
+Turno
+
+<select id="turno">
+<option>Mañana</option>
+<option>Tarde</option>
+<option>Noche</option>
+</select>
+
+Fecha
+
+<input type="date" id="fecha">
+
+<div class="progress">
+<div class="bar" id="bar"></div>
+</div>
+
+</div>
+
+<div class="card" style="overflow:auto">
+
+<table id="tabla">
+
+<tr>
+
+<th>Sistema</th>
+<th>Pieza</th>
+<th>Crit</th>
+<th>Condición</th>
+
+<th>01</th>
+<th>02</th>
+<th>03</th>
+<th>04</th>
+<th>05</th>
+<th>06</th>
+<th>07</th>
+<th>08</th>
+<th>09</th>
+<th>10</th>
+
+<th>Obs</th>
+<th>Foto</th>
+
+</tr>
+
+</table>
+
+</div>
+
+<div class="card">
+
+Firma Técnico
+
+<br><br>
+
+<canvas id="firma" width="300" height="120"></canvas>
+
+<br>
+
+<button onclick="limpiarFirma()">Limpiar Firma</button>
+
+</div>
+
+<button onclick="guardarChecklist()">Guardar Checklist</button>
+
+<button onclick="generarPDF()">Generar PDF</button>
+
+</div>
+
+<script>
+
+const API_URL="https://script.google.com/macros/s/AKfycbzHx0EetGX_rH1rLon15npm2Vs570LV2JVWfLiyqBijrrln435DVDbGdJWSYIIKEiTVXg/exec"
+
+const equipos=[
+
+["ELIMINADOR DE LIGAS","01","CR","Fajas transportadoras sin grietas"],
+["ELIMINADOR DE LIGAS","01","CR","Sellos motoreductor sin fugas"],
+
+["SOFT SORTER","02","CR","Fajas transportadoras sin grietas"],
+["SOFT SORTER","02","CR","Cortinas completas"],
+["SOFT SORTER","02","CR","Sellos motoreductor sin fugas"]
+
+]
+
+const tabla=document.getElementById("tabla")
+
+equipos.forEach(e=>{
+
+let tr=document.createElement("tr")
+
+tr.dataset.equipo=e[0]
+tr.dataset.pieza=e[1]
+tr.dataset.condicion=e[3]
+
+tr.innerHTML+=`<td class="lock">${e[0]}</td>`
+tr.innerHTML+=`<td class="lock">${e[1]}</td>`
+tr.innerHTML+=`<td class="${e[2]}">${e[2]}</td>`
+tr.innerHTML+=`<td class="lock">${e[3]}</td>`
+
+for(let i=0;i<10;i++){
+
+let td=document.createElement("td")
+
+td.className="status pending"
+
+td.onclick=()=>toggle(td)
+
+tr.appendChild(td)
+
+}
+
+tr.innerHTML+=`<td><input class="obs"></td>`
+
+tr.innerHTML+=`<td><input type="file" accept="image/*"></td>`
+
+tabla.appendChild(tr)
+
+})
+
+function toggle(cell){
+
+if(cell.classList.contains("pending")){
+
+cell.className="status ok"
+cell.innerHTML="✓"
+
+}
+
+else if(cell.classList.contains("ok")){
+
+cell.className="status fail"
+cell.innerHTML="X"
+
+}
+
+else{
+
+cell.className="status pending"
+cell.innerHTML=""
+
+}
+
+updateProgress()
+
+}
+
+function updateProgress(){
+
+let cells=document.querySelectorAll(".status")
+
+let done=0
+
+cells.forEach(c=>{
+if(!c.classList.contains("pending")) done++
+})
+
+let percent=(done/cells.length)*100
+
+document.getElementById("bar").style.width=percent+"%"
+
+}
+
+async function login(){
+
+let user=document.getElementById("user").value
+let pass=document.getElementById("pass").value
+
+let res=await fetch(API_URL,{
+method:"POST",
+body:JSON.stringify({
+action:"login",
+user:user,
+pass:pass
+})
+})
+
+let data=await res.json()
+
+if(data.status=="ok"){
+
+localStorage.setItem("tecnico",data.nombre)
+
+document.getElementById("login").style.display="none"
+
+}else{
+
+alert("Usuario incorrecto")
+
+}
+
+}
+
+async function guardarChecklist(){
+
+let tecnico=localStorage.getItem("tecnico")
+
+let turno=document.getElementById("turno").value
+
+let registros=[]
+
+document.querySelectorAll("#tabla tr").forEach((row,i)=>{
+
+if(i==0) return
+
+let equipo=row.dataset.equipo
+let pieza=row.dataset.pieza
+let condicion=row.dataset.condicion
+let obs=row.querySelector(".obs").value
+
+row.querySelectorAll(".status").forEach((c,j)=>{
+
+let estado="pendiente"
+
+if(c.classList.contains("ok")) estado="conforme"
+if(c.classList.contains("fail")) estado="no_conforme"
+
+registros.push({
+
+equipo:equipo,
+pieza:pieza,
+condicion:condicion,
+linea:j+1,
+estado:estado,
+obs:obs
+
+})
+
+})
+
+})
+
+await fetch(API_URL,{
+method:"POST",
+body:JSON.stringify({
+action:"guardar",
+tecnico:tecnico,
+turno:turno,
+registros:registros
+})
+})
+
+alert("Checklist guardado")
+
+}
+
+function generarPDF(){
+
+const { jsPDF } = window.jspdf
+
+let doc=new jsPDF()
+
+doc.text("Checklist Mantenimiento",20,20)
+
+doc.save("checklist.pdf")
+
+}
+
+/* FIRMA DIGITAL */
+
+let canvas=document.getElementById("firma")
+let ctx=canvas.getContext("2d")
+let drawing=false
+
+canvas.addEventListener("mousedown",()=>drawing=true)
+canvas.addEventListener("mouseup",()=>drawing=false)
+
+canvas.addEventListener("mousemove",draw)
+
+function draw(e){
+
+if(!drawing) return
+
+ctx.lineWidth=2
+ctx.lineCap="round"
+
+ctx.lineTo(e.offsetX,e.offsetY)
+ctx.stroke()
+
+ctx.beginPath()
+ctx.moveTo(e.offsetX,e.offsetY)
+
+}
+
+function limpiarFirma(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height)
+
+}
+
+</script>
+
+</body>
+
+</html>
+```
